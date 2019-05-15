@@ -8,21 +8,21 @@ using System.Text.RegularExpressions;
 using System.IO;
 using Newtonsoft.Json;
 
-using s3i.Readers;
+using s3i_lib;
 
-namespace s3i
+namespace s3i_lib
 {
-    class ProductProps : Dictionary<string, string>
+    public class ProductProps : Dictionary<string, string>
     {
     }
-    class ProductInfo
+    public class ProductInfo
     {
         public string Name { get; set; }
         public string Path { get; set; }
         public ProductProps Props { get; protected set; } = new ProductProps();
     }
 
-    class Products : List<ProductInfo>
+    public class Products : List<ProductInfo>
     {
         public string ToJson()
         {
@@ -33,10 +33,10 @@ namespace s3i
             return JsonConvert.DeserializeObject<Products>(json);
         }
         static readonly string sectionProducts = "$products$";
-        public static Products FromIni(Stream stream)
+        public static async Task<Products> FromIni(Stream stream)
         {
             var products = new Products();
-            IniReader.Read(stream, (sectionName, keyName, keyValue) =>
+            await IniReader.Read(stream, async (sectionName, keyName, keyValue) =>
             {
                 if (sectionProducts.Equals(sectionName, StringComparison.InvariantCultureIgnoreCase))
                 {
@@ -46,6 +46,7 @@ namespace s3i
                 {
                     products[products.Count - 1].Props.Add(keyName, keyValue);
                 }
+                await Task.CompletedTask;
             });
             return products;
         }

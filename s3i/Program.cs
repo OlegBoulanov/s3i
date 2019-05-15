@@ -6,6 +6,8 @@ using System.Threading.Tasks;
 
 using System.IO;
 
+using s3i_lib;
+
 namespace s3i
 {
     class Program
@@ -20,16 +22,23 @@ namespace s3i
                 return -1;
             }
             var commandLine = CommandLine.Parse(args);
-            foreach(var uri in commandLine.Args)
-            {
-                var installer = new Installer(uri);
-                var s3h = new S3Helper(commandLine.Options[CommandLine.OptionType.ProfileName]);
-                await s3h.Download(installer.Uri, (contentType, stream) => {
-                    Console.WriteLine($"{contentType}");
-                    var doc = Products.FromIni(stream);
-                    Console.WriteLine(doc.ToJson());
+            var s3 = new S3Helper(commandLine.Options[CommandLine.OptionType.ProfileName]);
+            // can read products and download files in parallel
+            var products = new Products();
+            var res = Parallel.ForEach(commandLine.Args,
+                async (uri) =>
+                {
+                    var installer = new Installer(s3);
+                    var prods = await installer.ReadProducts(uri);
+                    lock (products)
+                    {
+                        products.AddRange(prods);
+                    }
                 });
-            }
+
+
+
+            // but installation needs to be sequential
             return 0;
         }
 

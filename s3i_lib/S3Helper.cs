@@ -13,9 +13,9 @@ using Amazon.S3;
 using Amazon.S3.Model;
 using Amazon.S3.Util;
 
-namespace s3i
+namespace s3i_lib
 {
-    class S3Helper
+    public class S3Helper
     {
         public AmazonS3Client S3 { get; protected set; }
         public S3Helper(string profileName)
@@ -28,14 +28,14 @@ namespace s3i
                 S3 = new AmazonS3Client(awsCredentials);
             }
         }
-        public async Task Download(AmazonS3Uri uri, Action<string, Stream> processStream)
+        public async Task DownloadAsync(string bucket, string key, Func<string, Stream, Task> processStream)
         {
-            GetObjectRequest request = new GetObjectRequest { BucketName = uri.Bucket, Key = uri.Key };
+            GetObjectRequest request = new GetObjectRequest { BucketName = bucket, Key = key };
             using (GetObjectResponse response = await S3.GetObjectAsync(request))
             {
                 using (Stream responseStream = response.ResponseStream)
                 {
-                    processStream?.Invoke(response.Headers["Content-Type"], responseStream);
+                    await processStream?.Invoke(response.Headers["Content-Type"], responseStream);
                 }
             }
         }
