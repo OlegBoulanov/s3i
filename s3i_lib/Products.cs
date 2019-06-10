@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -10,6 +11,8 @@ using Newtonsoft.Json;
 
 using s3i_lib;
 
+using Amazon.S3.Util;
+
 namespace s3i_lib
 {
     public class ProductProps : Dictionary<string, string>
@@ -18,37 +21,109 @@ namespace s3i_lib
     public class ProductInfo
     {
         public string Name { get; set; }
-        public string Path { get; set; }
+        public string RelativeUri { get; set; }
+        public string AbsoluteUri { get; set; }
+        public string DownloadPath { get; set; }
         public ProductProps Props { get; protected set; } = new ProductProps();
     }
 
+    class ProductInfoEqualityComparer : IEqualityComparer<ProductInfo>
+    {
+        public bool Equals(ProductInfo x, ProductInfo y)
+        {
+            return x == null ? y == null : x.AbsoluteUri == null ? y.AbsoluteUri == null : x.AbsoluteUri.Equals(y.AbsoluteUri);
+        }
+
+        public int GetHashCode(ProductInfo obj)
+        {
+            return obj == null ? 0 : obj.AbsoluteUri == null ? 0 : obj.AbsoluteUri.GetHashCode();
+        }
+    }
+
+
     public class Products : List<ProductInfo>
     {
+        public Products()
+        {
+        }
+        public Products(IEnumerable<ProductInfo> p)
+        {
+            AddRange(p);
+        }
         public string ToJson()
         {
             return JsonConvert.SerializeObject(this, Formatting.Indented);
         }
-        public static Products FromJson(string json)
+        public static async Task<Products> FromJson(Stream stream)
         {
-            return JsonConvert.DeserializeObject<Products>(json);
+            using(var reader = new StreamReader(stream))
+            {
+                return JsonConvert.DeserializeObject<Products>(await reader.ReadToEndAsync());
+            }
         }
         static readonly string sectionProducts = "$products$";
-        public static async Task<Products> FromIni(Stream stream)
+        public static async Task<Products> FromIni(Stream stream, string baseUri)
         {
             var products = new Products();
             await IniReader.Read(stream, async (sectionName, keyName, keyValue) =>
             {
                 if (sectionProducts.Equals(sectionName, StringComparison.InvariantCultureIgnoreCase))
                 {
-                    products.Add(new ProductInfo { Name = keyName, Path = keyValue });
+                    products.Add(new ProductInfo { Name = keyName, RelativeUri = keyValue });
                 }
-                else if (0 < products.Count)
+                else
                 {
-                    products[products.Count - 1].Props.Add(keyName, keyValue);
+                    var product = products.FirstOrDefault((p) => { return sectionName.Equals(p.Name); });
+                    if(default(ProductInfo) != product) product.Props.Add(keyName, keyValue);
                 }
                 await Task.CompletedTask;
             });
+            products.ForEach((p) => { p.AbsoluteUri = p.RelativeUri.RebaseUri(baseUri); });
             return products;
+        }
+        public static async Task<Products> ReadProducts(S3Helper s3, string configFileUri)
+        {
+            var products = new Products();
+            var uri = new AmazonS3Uri(configFileUri);
+            await s3.DownloadAsync(uri.Bucket, uri.Key, async (contentType, stream) =>
+            {
+                switch (Path.GetExtension(configFileUri).ToLower())
+                {
+                    case ".msi":
+                        products.Add(new ProductInfo { Name = configFileUri, RelativeUri= configFileUri, AbsoluteUri = configFileUri });
+                        break;
+                    case ".ini":
+                        products.AddRange(await Products.FromIni(stream, configFileUri));
+                        break;
+                    case ".json":
+                        products.AddRange(await Products.FromJson(stream));
+                        break;
+                    default:
+                        throw new FormatException($"Unsupported file extension in {configFileUri}");
+                }
+            });
+            return products;
+        }
+        public static async Task<Products> ReadProducts(S3Helper s3, IEnumerable<string> uris)
+        {
+            var arrayOfProducts = await Task.WhenAll(
+                uris.Aggregate(new ConcurrentQueue<Task<Products>>(),
+                (tasks, uri) =>
+                {
+                    tasks.Enqueue(Task<Products>.Run(() =>
+                    {
+                        return ReadProducts(s3, uri);
+                    }));
+                    return tasks;
+                }));
+            return new Products(arrayOfProducts.SelectMany(x => x));
+            //return arrayOfProducts.Aggregate(new Products(), (p, pp) => { p.AddRange(pp); return p; });
+        }
+        public Products SelectForDownload(string tempFolder)
+        {
+            // collect uniqe by absolute uri, and add local paths to download to
+            return new Products(this.GroupBy(pi => pi.AbsoluteUri,
+            (uri, prods)=> { var p = prods.First(); return new ProductInfo { AbsoluteUri = uri, DownloadPath = p.AbsoluteUri.BuildLocalPath(tempFolder) }; }));
         }
     }
 }

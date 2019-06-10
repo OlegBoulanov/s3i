@@ -15,14 +15,16 @@ namespace s3i_lib_tests
     [TestClass]
     public class S3Helper_Test
     {
+        const string testProfileName = "default";
+        const string testObjectS3Uri = "https://bucket.s3.amazonaws.com/key";
+        const int testObjectLineCount = 35;
+
         [TestMethod]
-        public async Task TestMethod1()
+        public async Task S3Download()
         {
-            var commandLine = CommandLine.Parse("-p", "elizacorp-shared.olegb", "https://install.elizacorp.com.s3.amazonaws.com/Test/Windows10/Config/Nashville/Group02/Products.ini");
-            var s3 = new S3Helper(commandLine.Options[CommandLine.OptionType.ProfileName]);
-            var uri = new AmazonS3Uri(commandLine.Args[0]);
+            var uri = new AmazonS3Uri(testObjectS3Uri);
             var lines = new ConcurrentQueue<string>();
-            await s3.DownloadAsync(
+            await new S3Helper(testProfileName).DownloadAsync(
                 uri.Bucket, uri.Key, 
                 async (type, stream) => {
                     using (var reader = new StreamReader(stream)) {
@@ -31,7 +33,7 @@ namespace s3i_lib_tests
                 });
             foreach (var s in lines) Console.WriteLine(s);
             Console.WriteLine($"Done: {lines.Count}");
-            Assert.AreEqual(88, lines.Count);
+            Assert.AreEqual(testObjectLineCount, lines.Count);
         }
     }
 }
