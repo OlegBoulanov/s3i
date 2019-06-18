@@ -31,16 +31,6 @@ namespace s3i
                 {
                     return baseUri = (0 == i ? uri : uri.RebaseUri(baseUri));
                 }));
-            var productsToDownload = products.SelectForDownload(commandLine.Options[CommandLine.OptionType.TempFolder]);
-
-            foreach (var p in products)
-            {
-                Console.WriteLine($"Product {p.Name} @ {p.AbsoluteUri}");
-            }
-            foreach(var file in productsToDownload)
-            {
-                Console.WriteLine($"Download {file.Name} \n => {file.AbsoluteUri} \n => {file.DownloadPath}");
-            }
 
             // but installation needs to be sequential
             return 0;

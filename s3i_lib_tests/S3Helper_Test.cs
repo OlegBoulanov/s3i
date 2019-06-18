@@ -15,9 +15,9 @@ namespace s3i_lib_tests
     [TestClass]
     public class S3Helper_Test
     {
-        const string testProfileName = "default";
-        const string testObjectS3Uri = "https://bucket.s3.amazonaws.com/key";
-        const int testObjectLineCount = 35;
+        const string testProfileName = "s3i";
+        const string testObjectS3Uri = "https://install.elizacorp.com.s3.amazonaws.com/Test/Windows10/Config/s3i/1/Products.ini";
+        const int testObjectLineCount = 94;
 
         [TestMethod]
         public async Task S3Download()
@@ -25,7 +25,7 @@ namespace s3i_lib_tests
             var uri = new AmazonS3Uri(testObjectS3Uri);
             var lines = new ConcurrentQueue<string>();
             await new S3Helper(testProfileName).DownloadAsync(
-                uri.Bucket, uri.Key, 
+                uri.Bucket, uri.Key, DateTime.MinValue,
                 async (type, stream) => {
                     using (var reader = new StreamReader(stream)) {
                         for (string s; null != (s = await reader.ReadLineAsync()); ) lines.Enqueue(s);

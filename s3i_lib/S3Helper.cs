@@ -28,12 +28,12 @@ namespace s3i_lib
                 S3 = new AmazonS3Client(awsCredentials);
             }
         }
-        public async Task DownloadAsync(string bucket, string key, Func<string, Stream, Task> processStream)
+        public async Task DownloadAsync(string bucket, string key, DateTime modifiedSinceDateUtc, Func<string, Stream, Task> processStream)
         {
-            GetObjectRequest request = new GetObjectRequest { BucketName = bucket, Key = key };
-            using (GetObjectResponse response = await S3.GetObjectAsync(request))
+            var request = new GetObjectRequest { BucketName = bucket, Key = key, ModifiedSinceDateUtc = modifiedSinceDateUtc };
+            using (var response = await S3.GetObjectAsync(request))
             {
-                using (Stream responseStream = response.ResponseStream)
+                using (var responseStream = response.ResponseStream)
                 {
                     await processStream?.Invoke(response.Headers["Content-Type"], responseStream);
                 }

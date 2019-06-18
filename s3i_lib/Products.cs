@@ -23,23 +23,8 @@ namespace s3i_lib
         public string Name { get; set; }
         public string RelativeUri { get; set; }
         public string AbsoluteUri { get; set; }
-        public string DownloadPath { get; set; }
         public ProductProps Props { get; protected set; } = new ProductProps();
     }
-
-    class ProductInfoEqualityComparer : IEqualityComparer<ProductInfo>
-    {
-        public bool Equals(ProductInfo x, ProductInfo y)
-        {
-            return x == null ? y == null : x.AbsoluteUri == null ? y.AbsoluteUri == null : x.AbsoluteUri.Equals(y.AbsoluteUri);
-        }
-
-        public int GetHashCode(ProductInfo obj)
-        {
-            return obj == null ? 0 : obj.AbsoluteUri == null ? 0 : obj.AbsoluteUri.GetHashCode();
-        }
-    }
-
 
     public class Products : List<ProductInfo>
     {
@@ -85,7 +70,7 @@ namespace s3i_lib
         {
             var products = new Products();
             var uri = new AmazonS3Uri(configFileUri);
-            await s3.DownloadAsync(uri.Bucket, uri.Key, async (contentType, stream) =>
+            await s3.DownloadAsync(uri.Bucket, uri.Key, DateTime.MinValue, async (contentType, stream) =>
             {
                 switch (Path.GetExtension(configFileUri).ToLower())
                 {
@@ -119,11 +104,6 @@ namespace s3i_lib
             return new Products(arrayOfProducts.SelectMany(x => x));
             //return arrayOfProducts.Aggregate(new Products(), (p, pp) => { p.AddRange(pp); return p; });
         }
-        public Products SelectForDownload(string tempFolder)
-        {
-            // collect uniqe by absolute uri, and add local paths to download to
-            return new Products(this.GroupBy(pi => pi.AbsoluteUri,
-            (uri, prods)=> { var p = prods.First(); return new ProductInfo { AbsoluteUri = uri, DownloadPath = p.AbsoluteUri.BuildLocalPath(tempFolder) }; }));
-        }
+
     }
 }
