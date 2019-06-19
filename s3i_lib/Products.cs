@@ -23,6 +23,7 @@ namespace s3i_lib
         public string Name { get; set; }
         public string RelativeUri { get; set; }
         public string AbsoluteUri { get; set; }
+        public string LocalPath { get; set; }
         public ProductProps Props { get; protected set; } = new ProductProps();
     }
 
@@ -47,7 +48,7 @@ namespace s3i_lib
             }
         }
         static readonly string sectionProducts = "$products$";
-        public static async Task<Products> FromIni(Stream stream, string baseUri)
+        public static async Task<Products> FromIni(Stream stream, string baseUri, string tempFilePath)
         {
             var products = new Products();
             await IniReader.Read(stream, async (sectionName, keyName, keyValue) =>
@@ -63,10 +64,14 @@ namespace s3i_lib
                 }
                 await Task.CompletedTask;
             });
-            products.ForEach((p) => { p.AbsoluteUri = p.RelativeUri.RebaseUri(baseUri); });
+            products.ForEach((p) =>
+            {
+                p.AbsoluteUri = p.RelativeUri.RebaseUri(baseUri);
+                p.LocalPath = p.AbsoluteUri.MapToLocalPath(tempFilePath);
+            });
             return products;
         }
-        public static async Task<Products> ReadProducts(S3Helper s3, string configFileUri)
+        public static async Task<Products> ReadProducts(S3Helper s3, string configFileUri, string tempFilePath)
         {
             var products = new Products();
             var uri = new AmazonS3Uri(configFileUri);
@@ -75,10 +80,11 @@ namespace s3i_lib
                 switch (Path.GetExtension(configFileUri).ToLower())
                 {
                     case ".msi":
-                        products.Add(new ProductInfo { Name = configFileUri, RelativeUri= configFileUri, AbsoluteUri = configFileUri });
+                        products.Add(new ProductInfo { Name = configFileUri, RelativeUri = configFileUri, AbsoluteUri = configFileUri });
+                        await Task.CompletedTask;
                         break;
                     case ".ini":
-                        products.AddRange(await Products.FromIni(stream, configFileUri));
+                        products.AddRange(await Products.FromIni(stream, configFileUri, tempFilePath));
                         break;
                     case ".json":
                         products.AddRange(await Products.FromJson(stream));
@@ -89,7 +95,7 @@ namespace s3i_lib
             });
             return products;
         }
-        public static async Task<Products> ReadProducts(S3Helper s3, IEnumerable<string> uris)
+        public static async Task<Products> ReadProducts(S3Helper s3, IEnumerable<string> uris, string tempFilePath)
         {
             var arrayOfProducts = await Task.WhenAll(
                 uris.Aggregate(new ConcurrentQueue<Task<Products>>(),
@@ -97,12 +103,28 @@ namespace s3i_lib
                 {
                     tasks.Enqueue(Task<Products>.Run(() =>
                     {
-                        return ReadProducts(s3, uri);
+                        return ReadProducts(s3, uri, tempFilePath);
                     }));
                     return tasks;
                 }));
             return new Products(arrayOfProducts.SelectMany(x => x));
             //return arrayOfProducts.Aggregate(new Products(), (p, pp) => { p.AddRange(pp); return p; });
+        }
+
+        public async Task DownloadInstallers(S3Helper s3, string localPathBase)
+        {
+            await Task.WhenAll(
+                this.Aggregate(new ConcurrentQueue<Task>(),
+                    (tasks, product) =>
+                    {
+                        var uri = new AmazonS3Uri(product.AbsoluteUri);
+                        product.LocalPath = product.AbsoluteUri.MapToLocalPath(localPathBase);
+                        Directory.CreateDirectory(Path.GetDirectoryName(product.LocalPath));
+                        tasks.Enqueue(s3.DownloadAsync(uri.Bucket, uri.Key, product.LocalPath));
+                        return tasks;
+                    }
+                )
+            );
         }
 
     }

@@ -24,15 +24,31 @@ namespace s3i
                 return -1;
             }
             var s3 = new S3Helper(commandLine.Options[CommandLine.OptionType.ProfileName]);
-            // can read products and download files in parallel
+            // read product descriptions in parallel
             string baseUri = null;
             var products = await Products.ReadProducts(s3, commandLine.Args.Select(
-                (uri, i) =>
+                (uri, index) =>
                 {
-                    return baseUri = (0 == i ? uri : uri.RebaseUri(baseUri));
-                }));
-
+                    // next product path can be ralative to previous base
+                    return baseUri = (0 == index ? uri : uri.RebaseUri(baseUri));
+                }), commandLine.Options[CommandLine.OptionType.TempFolder]);
+            System.Net.ServicePointManager.DefaultConnectionLimit = 50;
+            //
+            foreach (var p in products)
+            {
+                Console.WriteLine($"{p.Name}: {p.AbsoluteUri} => {p.LocalPath}");
+                foreach (var pp in p.Props)
+                {
+                    Console.WriteLine($"  {pp.Key} = {pp.Value}");
+                }
+            }
+            // downloading files also can be parallel
+            await products.DownloadInstallers(s3, commandLine.Options[CommandLine.OptionType.TempFolder]);
             // but installation needs to be sequential
+            foreach (var p in products)
+            {
+                Console.WriteLine($"{p.Name}: {p.AbsoluteUri} => {p.LocalPath}");
+            }
             return 0;
         }
 

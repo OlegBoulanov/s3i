@@ -38,7 +38,7 @@ SecondProduct    = ../../../Distrib/SecondProduct/9.4.188/SecondProduct.msi
         [TestMethod]
         public async Task TestTwoProductProps()
         {
-            var products = await Products.FromIni(new MemoryStream(Encoding.ASCII.GetBytes(testConfig)), "https://xxx.s3.amazonaws.com/Test/Windows10");
+            var products = await Products.FromIni(new MemoryStream(Encoding.ASCII.GetBytes(testConfig)), "https://xxx.s3.amazonaws.com/Test/Windows10", "C:\\Temp\\");
             Assert.AreEqual(2, products.Count);
             Assert.AreEqual("ProductOne", products[0].Name);
             Assert.AreEqual("SecondProduct", products[1].Name);
@@ -61,8 +61,8 @@ Three    = https://xxx.s3.amazonaws.com/Test/Windows10/Distrib//SecondProduct/9.
         [TestMethod]
         public async Task TestDownloadPaths()
         {
-            var products = await Products.FromIni(new MemoryStream(Encoding.ASCII.GetBytes(manyProducts)), "https://xxx.s3.amazonaws.com/Test/Windows10/Config/OneInstance/config.ini");
-            var files = from p in products select new { product = p, local = p.AbsoluteUri.BuildLocalPath("c:/Temp/")  };
+            var products = await Products.FromIni(new MemoryStream(Encoding.ASCII.GetBytes(manyProducts)), "https://xxx.s3.amazonaws.com/Test/Windows10/Config/OneInstance/config.ini", "C:\\Temp\\");
+            var files = from p in products select new { product = p, local = p.AbsoluteUri.MapToLocalPath("c:/Temp/")  };
             Assert.AreEqual(3, products.Count);
             Assert.AreEqual(3, files.Count());
             Assert.AreEqual("c:/Temp/xxx.s3.amazonaws.com/Test/Windows10/Distrib/ProductOne/12.6.16/ProductOne.msi", files.First().local);
