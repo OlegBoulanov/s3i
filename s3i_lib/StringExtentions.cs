@@ -13,8 +13,8 @@ namespace s3i_lib
 {
     public static class StringExtentions
     {
-        static Regex rexDotSegments = new Regex(@"[^\\/]+[\\|/]\.\.[\\/]", RegexOptions.Compiled);
-        static Regex rexSlashes = new Regex(@"[\\/]+", RegexOptions.Compiled);
+        public static readonly Regex rexDotSegments = new Regex(@"[^\\/]+[\\/]\.\.[\\/]", RegexOptions.Compiled);
+        public static readonly Regex rexSlashes = new Regex(@"[\\/]+", RegexOptions.Compiled);
         public static string RemoveDotSegments(this string s)
         {
             return s.Replace(rexDotSegments, "");
@@ -26,7 +26,7 @@ namespace s3i_lib
         public static string Replace(this string s, Regex rex, string replacement)
         {
             string next = s;
-            for (var prev = next; !prev.Equals(next = rex.Replace(prev, replacement)); prev = next) ;
+            for (var prev = next; !prev.Equals(next = rex.Replace(prev, replacement, 1)); prev = next);
             return next;
         }
         public static string BuildRelativeUri(this string baseUri, string path)
@@ -44,7 +44,7 @@ namespace s3i_lib
         {
             return IsUri(uri) ? uri : Path.IsPathRooted(uri) ? uri : baseUri.BuildRelativeUri(uri);
         }
-        public static string BuildLocalPath(this string uri, string localPath)
+        public static string MapToLocalPath(this string uri, string localPath)
         {
             var builder = new UriBuilder(uri);
             var subPath = $"{builder.Host}/{builder.Path.Substring(1)}";
