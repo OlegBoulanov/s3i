@@ -53,9 +53,13 @@ namespace s3i_lib_tests
                 S3 = new AmazonS3Client(credentials);
             }
 
-            for(var i = 0; i < 10; i++)
+            for (var i = 0; i < 10; i++)
             {
                 Console.WriteLine($"(Sync):  {ReadObjectDataTest((request) => { return S3.GetObject(request); })}");
+            }
+            for (var i = 0; i < 10; i++)
+            {
+                Console.WriteLine($"(async): {ReadObjectDataTest((request) => { return S3.GetObjectAsync(request).Result; })}");
             }
 
             await Task.CompletedTask;
