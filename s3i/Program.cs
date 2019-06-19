@@ -21,6 +21,7 @@ namespace s3i
                 Console.WriteLine($"s3i - download and install msi(s) from AWS S3");
                 Console.WriteLine($"Usage:");
                 Console.WriteLine($"  s3i [(-p|--profile) <profileName>] <S3-URI of .msi, .ini, or .json> ...");
+                //Console.WriteLine($"{commandLine.Options.Aggregate($"Options:{Environment.NewLine}", (s, o) => { s += $"{o.Key} = {o.Value}{Environment.NewLine}"; return s; })}");
                 return -1;
             }
             var s3 = new S3Helper(commandLine.Options[CommandLine.OptionType.ProfileName]);
@@ -32,22 +33,35 @@ namespace s3i
                     // next product path can be ralative to previous base
                     return baseUri = (0 == index ? uri : uri.RebaseUri(baseUri));
                 }), commandLine.Options[CommandLine.OptionType.TempFolder]);
-            System.Net.ServicePointManager.DefaultConnectionLimit = 50;
+            //System.Net.ServicePointManager.DefaultConnectionLimit = 50;
             //
-            foreach (var p in products)
+            if (commandLine.Verbose)
             {
-                Console.WriteLine($"{p.Name}: {p.AbsoluteUri} => {p.LocalPath}");
-                foreach (var pp in p.Props)
+                foreach (var p in products)
                 {
-                    Console.WriteLine($"  {pp.Key} = {pp.Value}");
+                    Console.WriteLine($"{p.Name}: {p.AbsoluteUri} => {p.LocalPath}");
+                    foreach (var pp in p.Props)
+                    {
+                        Console.WriteLine($"  {pp.Key} = {pp.Value}");
+                    }
                 }
             }
             // downloading files also can be parallel
             await products.DownloadInstallers(s3, commandLine.Options[CommandLine.OptionType.TempFolder]);
             // but installation needs to be sequential
-            foreach (var p in products)
+            var commands = products.Aggregate(new List<string>(),
+                (list, p) => {
+                    list.Add($"{p.Props.Aggregate($"{commandLine.Options[CommandLine.OptionType.MsiExecCmd]} \"{p.LocalPath}\"", (s, a) => { s = $"{s} {a.Key}=\"{a.Value}\""; return s; })}");
+                    return list;
+                });
+            if (commandLine.Verbose || commandLine.DryRun)
             {
-                Console.WriteLine($"{p.Name}: {p.AbsoluteUri} => {p.LocalPath}");
+                foreach (var c in commands)
+                {
+                    var header = commandLine.DryRun ? "(DryRun) " : "(Exec) ";
+                    Console.WriteLine();
+                    Console.WriteLine($"{header}{c}");
+                }
             }
             return 0;
         }
