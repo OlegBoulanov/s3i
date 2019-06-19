@@ -7,6 +7,7 @@ using System.Threading.Tasks;
 
 using System.Text.RegularExpressions;
 using System.IO;
+using System.Net;
 using Newtonsoft.Json;
 
 using s3i_lib;
@@ -24,6 +25,7 @@ namespace s3i_lib
         public string RelativeUri { get; set; }
         public string AbsoluteUri { get; set; }
         public string LocalPath { get; set; }
+        public HttpStatusCode DownloadResult { get; set; }
         public ProductProps Props { get; protected set; } = new ProductProps();
     }
 
@@ -114,7 +116,7 @@ namespace s3i_lib
         public async Task DownloadInstallers(S3Helper s3, string localPathBase)
         {
             await Task.WhenAll(
-                this.Aggregate(new ConcurrentQueue<Task>(),
+                this.Aggregate(new ConcurrentQueue<Task<HttpStatusCode>>(),
                     (tasks, product) =>
                     {
                         var uri = new AmazonS3Uri(product.AbsoluteUri);

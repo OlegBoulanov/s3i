@@ -13,6 +13,8 @@ using Amazon.S3;
 using Amazon.S3.Model;
 using Amazon.S3.Util;
 
+using System.Net;
+
 namespace s3i_lib
 {
     public class S3Helper
@@ -29,29 +31,46 @@ namespace s3i_lib
                 S3 = new AmazonS3Client(credentials);
             }
         }
-        public async Task DownloadAsync(string bucket, string key, DateTime modifiedSinceDateUtc, Func<string, Stream, Task> processStream)
+        public async Task<HttpStatusCode> DownloadAsync(string bucket, string key, DateTime modifiedSinceDateUtc, Func<string, Stream, Task> processStream)
         {
             var request = new GetObjectRequest { BucketName = bucket, Key = key, ModifiedSinceDateUtc = modifiedSinceDateUtc };
-            using (var response = await (S3 ?? new AmazonS3Client(Credentials)).GetObjectAsync(request))
+            //using (var response = await (S3 ?? new AmazonS3Client(Credentials)).GetObjectAsync(request))
+            using (var response = (S3 ?? new AmazonS3Client(Credentials)).GetObject(request))
             {
                 using (var responseStream = response.ResponseStream)
                 {
                     await processStream?.Invoke(response.Headers["Content-Type"], responseStream);
                 }
-                //response.Dispose();
+                return response.HttpStatusCode;
             }
         }
-        public async Task DownloadAsync(string bucket, string key, string path)
+        public async Task<HttpStatusCode> DownloadAsync(string bucket, string key, string localFilePath)
         {
-            var lastWriteTimeUtc = File.GetLastWriteTimeUtc(path);
-            await DownloadAsync(bucket, key, lastWriteTimeUtc,
-                async (contentType, stream) =>
-                {
-                    using (var file = File.Create(path))
+            var lastWriteTimeUtc = File.GetLastWriteTimeUtc(localFilePath);
+            try
+            {
+                return await DownloadAsync(bucket, key, lastWriteTimeUtc,
+                    async (contentType, stream) =>
                     {
-                        await stream.CopyToAsync(file);
-                    }
-                });
+                        using (var file = File.Create(localFilePath))
+                        {
+                            await stream.CopyToAsync(file);
+                        }
+                    });
+            }
+            catch (AmazonS3Exception x)
+            {
+                switch (x.StatusCode)
+                {
+                    case HttpStatusCode.NotModified:
+                        return x.StatusCode;
+                    case HttpStatusCode.NotFound:
+                        //File.Delete(localFilePath);
+                        throw;
+                    default:
+                        throw;
+                }
+            }
         }
     }
 }

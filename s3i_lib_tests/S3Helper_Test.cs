@@ -6,7 +6,14 @@ using System.IO;
 using System.Linq;
 using System.Threading.Tasks;
 
+using Amazon.Runtime;
+using Amazon.Runtime.CredentialManagement;
+
+using Amazon.S3;
+using Amazon.S3.Model;
 using Amazon.S3.Util;
+
+using System.Diagnostics;
 
 using s3i_lib;
 
@@ -35,5 +42,45 @@ namespace s3i_lib_tests
             Console.WriteLine($"Done: {lines.Count}");
             Assert.AreEqual(testObjectLineCount, lines.Count);
         }
+
+        [TestMethod]
+        public async Task ReadObjectDataAsync()
+        {
+            IAmazonS3 S3 = null;
+            var chain = new CredentialProfileStoreChain();
+            if (chain.TryGetAWSCredentials(testProfileName, out AWSCredentials credentials))
+            {
+                S3 = new AmazonS3Client(credentials);
+            }
+
+            for(var i = 0; i < 10; i++)
+            {
+                Console.WriteLine($"(Sync):  {ReadObjectDataTest((request) => { return S3.GetObject(request); })}");
+            }
+
+            await Task.CompletedTask;
+        }
+
+        public TimeSpan ReadObjectDataTest(Func<GetObjectRequest, GetObjectResponse> getObject)
+        {
+            var clock = Stopwatch.StartNew();
+            // as in here: https://docs.aws.amazon.com/AmazonS3/latest/dev/RetrievingObjectUsingNetSDK.html
+            var uri = new AmazonS3Uri(testObjectS3Uri);
+            var request = new GetObjectRequest
+            {
+                BucketName = uri.Bucket,
+                Key = uri.Key,
+            };
+            using (GetObjectResponse response = getObject(request))
+            using (Stream responseStream = response.ResponseStream)
+            using (StreamReader reader = new StreamReader(responseStream))
+            {
+                var responseBody = reader.ReadToEnd();
+            }
+            return clock.Elapsed;
+        }
     }
+
 }
+
+
