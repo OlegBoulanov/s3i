@@ -53,7 +53,7 @@ namespace s3i_lib
         public static async Task<Products> FromIni(Stream stream, string baseUri, string tempFilePath)
         {
             var products = new Products();
-            await IniReader.Read(stream, async (sectionName, keyName, keyValue) =>
+            await IniReader.Read(stream, (sectionName, keyName, keyValue) =>
             {
                 if (sectionProducts.Equals(sectionName, StringComparison.InvariantCultureIgnoreCase))
                 {
@@ -64,7 +64,7 @@ namespace s3i_lib
                     var product = products.FirstOrDefault((p) => { return sectionName.Equals(p.Name); });
                     if(default(ProductInfo) != product) product.Props.Add(keyName, keyValue);
                 }
-                await Task.CompletedTask;
+                //await Task.CompletedTask;
             });
             products.ForEach((p) =>
             {
@@ -100,10 +100,10 @@ namespace s3i_lib
         public static async Task<Products> ReadProducts(S3Helper s3, IEnumerable<string> uris, string tempFilePath)
         {
             var arrayOfProducts = await Task.WhenAll(
-                uris.Aggregate(new ConcurrentQueue<Task<Products>>(),
+                uris.Aggregate(new List<Task<Products>>(),
                 (tasks, uri) =>
                 {
-                    tasks.Enqueue(Task<Products>.Run(() =>
+                    tasks.Add(Task<Products>.Run(() =>
                     {
                         return ReadProducts(s3, uri, tempFilePath);
                     }));
@@ -116,13 +116,13 @@ namespace s3i_lib
         public async Task DownloadInstallers(S3Helper s3, string localPathBase)
         {
             await Task.WhenAll(
-                this.Aggregate(new ConcurrentQueue<Task<HttpStatusCode>>(),
+                this.Aggregate(new List<Task<HttpStatusCode>>(),
                     (tasks, product) =>
                     {
                         var uri = new AmazonS3Uri(product.AbsoluteUri);
                         product.LocalPath = product.AbsoluteUri.MapToLocalPath(localPathBase);
                         Directory.CreateDirectory(Path.GetDirectoryName(product.LocalPath));
-                        tasks.Enqueue(s3.DownloadAsync(uri.Bucket, uri.Key, product.LocalPath));
+                        tasks.Add(s3.DownloadAsync(uri.Bucket, uri.Key, product.LocalPath));
                         return tasks;
                     }
                 )

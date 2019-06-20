@@ -12,7 +12,7 @@ namespace s3i_lib
     public class IniReader
     {
         static readonly Regex rexSectionName = new Regex(@"^\s*\[([^\]]+)\]\s*$", RegexOptions.Compiled);
-        public static async Task Read(Stream stream, Func<string, string, string, Task> onNewKeyValue)
+        public static async Task Read(Stream stream, Action<string, string, string> onNewKeyValue)
         {
             using (var reader = new StreamReader(stream))
             {
@@ -34,7 +34,7 @@ namespace s3i_lib
                         break;
                     }
                     if (string.IsNullOrWhiteSpace(keyName) || string.IsNullOrWhiteSpace(keyValue)) continue;
-                    await onNewKeyValue.Invoke(sectionName, keyName, keyValue);
+                    onNewKeyValue.Invoke(sectionName, keyName, keyValue);
                 }
             }
         }
