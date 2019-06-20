@@ -1,6 +1,7 @@
 ﻿using System;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 
+using System.Collections.Generic;
 using System.Collections.Concurrent;
 using System.IO;
 using System.Linq;
@@ -50,7 +51,7 @@ namespace s3i_lib_tests
             var chain = new CredentialProfileStoreChain();
             if (chain.TryGetAWSCredentials(testProfileName, out AWSCredentials credentials))
             {
-                S3 = new AmazonS3Client(credentials);
+                S3 = new AmazonS3Client(credentials, Amazon.RegionEndpoint.USEast1);
             }
 
             for (var i = 0; i < 10; i++)
@@ -61,6 +62,15 @@ namespace s3i_lib_tests
             {
                 Console.WriteLine($"(async): {ReadObjectDataTest((request) => { return S3.GetObjectAsync(request).Result; })}");
             }
+            var tasks = new List<Task>();
+            for (var i = 0; i < 10; i++)
+            {
+                tasks.Add(Task.Run(() =>
+                {
+                    Console.WriteLine($"(tasks): {ReadObjectDataTestAsync(async (request) => { return await S3.GetObjectAsync(request); }).Result}");
+                }));
+            }
+            await Task.WhenAll(tasks);
 
             await Task.CompletedTask;
         }
@@ -70,16 +80,27 @@ namespace s3i_lib_tests
             var clock = Stopwatch.StartNew();
             // as in here: https://docs.aws.amazon.com/AmazonS3/latest/dev/RetrievingObjectUsingNetSDK.html
             var uri = new AmazonS3Uri(testObjectS3Uri);
-            var request = new GetObjectRequest
-            {
-                BucketName = uri.Bucket,
-                Key = uri.Key,
-            };
+            var request = new GetObjectRequest { BucketName = uri.Bucket, Key = uri.Key, };
             using (GetObjectResponse response = getObject(request))
             using (Stream responseStream = response.ResponseStream)
             using (StreamReader reader = new StreamReader(responseStream))
             {
                 var responseBody = reader.ReadToEnd();
+            }
+            return clock.Elapsed;
+        }
+
+        public async Task<TimeSpan> ReadObjectDataTestAsync(Func<GetObjectRequest, Task<GetObjectResponse>> getObject)
+        {
+            var clock = Stopwatch.StartNew();
+            // as in here: https://docs.aws.amazon.com/AmazonS3/latest/dev/RetrievingObjectUsingNetSDK.html
+            var uri = new AmazonS3Uri(testObjectS3Uri);
+            var request = new GetObjectRequest { BucketName = uri.Bucket, Key = uri.Key, };
+            using (GetObjectResponse response = await getObject(request))
+            using (Stream responseStream = response.ResponseStream)
+            using (StreamReader reader = new StreamReader(responseStream))
+            {
+                var responseBody = await reader.ReadToEndAsync();
             }
             return clock.Elapsed;
         }

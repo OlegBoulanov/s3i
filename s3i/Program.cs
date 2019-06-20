@@ -24,6 +24,7 @@ namespace s3i
                 //Console.WriteLine($"{commandLine.Options.Aggregate($"Options:{Environment.NewLine}", (s, o) => { s += $"{o.Key} = {o.Value}{Environment.NewLine}"; return s; })}");
                 return -1;
             }
+            var clock = System.Diagnostics.Stopwatch.StartNew();
             var s3 = new S3Helper(commandLine.Options[CommandLine.OptionType.ProfileName]);
             // read product descriptions in parallel
             string baseUri = null;
@@ -63,6 +64,8 @@ namespace s3i
                     Console.WriteLine($"{header}{c}");
                 }
             }
+            Console.WriteLine();
+            Console.WriteLine($"Elapsed: {clock.Elapsed}");
             return 0;
         }
 
