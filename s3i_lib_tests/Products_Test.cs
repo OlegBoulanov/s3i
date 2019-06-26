@@ -73,14 +73,21 @@ Three    = https://xxx.s3.amazonaws.com/Test/Windows10/Distrib//SecondProduct/9.
         public async Task ReadTwoFiles()
         {
             var s3 = new S3Helper("s3i");
-            var clock = System.Diagnostics.Stopwatch.StartNew();
-            var prods = await Products.ReadProducts(s3, 
-                new List<string> {
+            for (var i = 0; i < 3000; i++) {
+                var clock = System.Diagnostics.Stopwatch.StartNew();
+                var prods = await Products.ReadProducts(s3,
+                    new List<string> {
                     "https://install.elizacorp.com.s3.amazonaws.com/Test/Windows10/Config/s3i/1/Products.ini",
                     "https://install.elizacorp.com.s3.amazonaws.com/Test/Windows10/Config/s3i/2/Products.ini",
-                }, 
-                "D:/Temp/");
-            Assert.AreEqual(3, prods.Count);
+                    },
+                    "D:/Temp/");
+                var ms = clock.ElapsedMilliseconds;
+                if (100 < ms)
+                {
+                    Console.WriteLine($"{DateTime.Now:HH:mm:ss.fff} [{i:0000}] {clock.Elapsed:mm\\:ss\\.fff} {new string('*', (int)(ms/100))}");
+                }
+                Assert.AreEqual(3, prods.Count);
+            }
         }
     }
 }
