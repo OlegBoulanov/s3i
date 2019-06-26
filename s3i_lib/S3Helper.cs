@@ -21,21 +21,32 @@ namespace s3i_lib
     {
         public AWSCredentials Credentials { get; protected set; }
         public AmazonS3Client S3 { get; protected set; }
+        public AmazonS3Config Config { get; protected set; }
         public S3Helper(string profileName)
         {
+            Config = new AmazonS3Config
+            {
+                //DisableLogging = false,
+                //LogMetrics = true,
+                MaxErrorRetry = 3,
+                ReadWriteTimeout = TimeSpan.FromSeconds(4)
+            };
             var chain = new CredentialProfileStoreChain();
             AWSCredentials credentials = null;
             if (chain.TryGetAWSCredentials(profileName, out credentials))
             {
                 Credentials = credentials;
-                S3 = new AmazonS3Client(credentials);
+                S3 = new AmazonS3Client(credentials, Config);
+                //S3.BeforeRequestEvent += (o, e) => { Console.WriteLine($"{DateTime.Now:HH:mm:ss.fff} {e}"); };
+                //S3.AfterResponseEvent += (o, e) => { Console.WriteLine($"{DateTime.Now:HH:mm:ss.fff} {e}"); };
+                S3.ExceptionEvent += (o, e) => { Console.WriteLine($"{DateTime.Now:HH:mm:ss.fff} {e}"); };
             }
         }
         public async Task<HttpStatusCode> DownloadAsync(string bucket, string key, DateTime modifiedSinceDateUtc, Func<string, Stream, Task> processStream)
         {
             var request = new GetObjectRequest { BucketName = bucket, Key = key, ModifiedSinceDateUtc = modifiedSinceDateUtc };
-            //using (var response = await (S3 ?? new AmazonS3Client(Credentials)).GetObjectAsync(request))
-            using (var response = (S3 ?? new AmazonS3Client(Credentials)).GetObject(request))
+            //using (var response = (S3 ?? new AmazonS3Client(Credentials)).GetObject(request))
+            using (var response = await (S3 ?? new AmazonS3Client(Credentials)).GetObjectAsync(request))
             {
                 using (var responseStream = response.ResponseStream)
                 {
