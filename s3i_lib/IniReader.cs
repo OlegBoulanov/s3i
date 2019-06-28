@@ -7,16 +7,16 @@ using System.Threading.Tasks;
 using System.IO;
 using System.Text.RegularExpressions;
 
-namespace s3i.Readers
+namespace s3i_lib
 {
-    class IniReader
+    public class IniReader
     {
         static readonly Regex rexSectionName = new Regex(@"^\s*\[([^\]]+)\]\s*$", RegexOptions.Compiled);
-        public static void Read(Stream stream, Action<string, string, string> onNewKeyValue)
+        public static async Task Read(Stream stream, Action<string, string, string> onNewKeyValue)
         {
             using (var reader = new StreamReader(stream))
             {
-                for (string sectionName = null, line; null != (line = reader.ReadLine());)
+                for (string sectionName = null, line; null != (line = await reader.ReadLineAsync());)
                 {
                     line = line.Split(';')[0];
                     var m = rexSectionName.Match(line);
@@ -34,7 +34,7 @@ namespace s3i.Readers
                         break;
                     }
                     if (string.IsNullOrWhiteSpace(keyName) || string.IsNullOrWhiteSpace(keyValue)) continue;
-                    onNewKeyValue?.Invoke(sectionName, keyName, keyValue);
+                    onNewKeyValue.Invoke(sectionName, keyName, keyValue);
                 }
             }
         }
