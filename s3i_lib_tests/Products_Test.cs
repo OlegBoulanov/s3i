@@ -73,7 +73,8 @@ Three    = https://xxx.s3.amazonaws.com/Test/Windows10/Distrib//SecondProduct/9.
         public async Task ReadTwoFiles()
         {
             var s3 = new S3Helper("s3i");
-            for (var i = 0; i < 3000; i++) {
+            var maxAttempts = 1;// 3000;
+            for (var i = 0; i < maxAttempts; i++) {
                 var clock = System.Diagnostics.Stopwatch.StartNew();
                 var prods = await Products.ReadProducts(s3,
                     new List<string> {
