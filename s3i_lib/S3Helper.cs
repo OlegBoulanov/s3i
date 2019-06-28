@@ -29,7 +29,7 @@ namespace s3i_lib
                 //DisableLogging = false,
                 //LogMetrics = true,
                 MaxErrorRetry = 3,
-                ReadWriteTimeout = TimeSpan.FromSeconds(4)
+                ReadWriteTimeout = TimeSpan.FromSeconds(16),
             };
             var chain = new CredentialProfileStoreChain();
             AWSCredentials credentials = null;
@@ -37,9 +37,9 @@ namespace s3i_lib
             {
                 Credentials = credentials;
                 S3 = new AmazonS3Client(credentials, Config);
-                //S3.BeforeRequestEvent += (o, e) => { Console.WriteLine($"{DateTime.Now:HH:mm:ss.fff} {e}"); };
-                //S3.AfterResponseEvent += (o, e) => { Console.WriteLine($"{DateTime.Now:HH:mm:ss.fff} {e}"); };
-                S3.ExceptionEvent += (o, e) => { Console.WriteLine($"{DateTime.Now:HH:mm:ss.fff} {e}"); };
+                //S3.BeforeRequestEvent += (o, e) => { Console.WriteLine($"{DateTime.Now:HH:mm:ss.fff} {e.GetType()}"); };
+                //S3.AfterResponseEvent += (o, e) => { Console.WriteLine($"{DateTime.Now:HH:mm:ss.fff} {e.GetType()}"); };
+                //S3.ExceptionEvent += (o, e) => { Console.WriteLine($"{DateTime.Now:HH:mm:ss.fff} S3Helper: {o} => {e.GetType()}"); };
             }
         }
         public async Task<HttpStatusCode> DownloadAsync(string bucket, string key, DateTime modifiedSinceDateUtc, Func<string, Stream, Task> processStream)

@@ -38,34 +38,42 @@ namespace s3i
             //
             if (commandLine.Verbose)
             {
+                Console.WriteLine($"Products [{products.Count}]:");
                 foreach (var p in products)
                 {
-                    Console.WriteLine($"{p.Name}: {p.AbsoluteUri} => {p.LocalPath}");
+                    Console.WriteLine($"  {p.Name}: {p.AbsoluteUri} => {p.LocalPath}");
                     foreach (var pp in p.Props)
                     {
-                        Console.WriteLine($"  {pp.Key} = {pp.Value}");
+                        Console.WriteLine($"    {pp.Key} = {pp.Value}");
                     }
                 }
             }
             // downloading files also can be parallel
             await products.DownloadInstallers(s3, commandLine.Options[CommandLine.OptionType.TempFolder]);
             // but installation needs to be sequential
-            var commands = products.Aggregate(new List<string>(),
-                (list, p) => {
-                    list.Add($"{p.Props.Aggregate($"{commandLine.Options[CommandLine.OptionType.MsiExecCmd]} \"{p.LocalPath}\"", (s, a) => { s = $"{s} {a.Key}=\"{a.Value}\""; return s; })}");
-                    return list;
-                });
-            if (commandLine.Verbose || commandLine.DryRun)
+            var msiExecKeys = Installer.msiExecKeysInstall;
+            var msiArgs = "";
+            var installTimeout = TimeSpan.FromMinutes(3);
+            foreach(var product in products)
             {
-                foreach (var c in commands)
+                var installer = new Installer(product);
+                var commandArgs = installer.FormatCommand(msiExecKeys, msiArgs);
+                if (commandLine.Verbose || commandLine.DryRun)
                 {
-                    var header = commandLine.DryRun ? "(DryRun) " : "(Exec) ";
+                    var header = commandLine.DryRun ? "(DryRun)" : "(Install)";
                     Console.WriteLine();
-                    Console.WriteLine($"{header}{c}");
+                    Console.WriteLine($"{header} {Installer.MsiExec} {commandArgs}");
+                }
+                if (!commandLine.DryRun)
+                {
+                    installer.RunInstall(commandArgs, installTimeout);
                 }
             }
-            Console.WriteLine();
-            Console.WriteLine($"Elapsed: {clock.Elapsed}");
+            if (commandLine.Verbose)
+            {
+                Console.WriteLine();
+                Console.WriteLine($"Elapsed: {clock.Elapsed}");
+            }
             return 0;
         }
 

@@ -17,13 +17,9 @@ namespace s3i_lib
         public static readonly Regex rexSlashes = new Regex(@"[\\/]+", RegexOptions.Compiled);
         public static string RemoveDotSegments(this string s)
         {
-            return s.Replace(rexDotSegments, "");
+            return s.ReplaceAll(rexDotSegments, "");
         }
-        public static string ReplaceSlashes(this string s, string slash = "/")
-        {
-            return s.Replace(rexSlashes, slash);
-        }
-        public static string Replace(this string s, Regex rex, string replacement)
+        public static string ReplaceAll(this string s, Regex rex, string replacement)
         {
             string next = s;
             for (var prev = next; !prev.Equals(next = rex.Replace(prev, replacement, 1)); prev = next);
@@ -48,7 +44,17 @@ namespace s3i_lib
         {
             var builder = new UriBuilder(uri);
             var subPath = $"{builder.Host}/{builder.Path.Substring(1)}";
-            return Path.Combine(localPath, subPath).ReplaceSlashes("/");
+            return Path.Combine(localPath, subPath).Replace('/', Path.DirectorySeparatorChar).Replace('\\', Path.DirectorySeparatorChar);
+        }
+        public static string Quote(this string s, string quote, params char [] spaces)
+        {
+            if (string.IsNullOrEmpty(quote)) quote = "\"";
+            if (0 == spaces.Length) spaces = new char[] { ' ', '\t' };
+            if (0 <= s.IndexOfAny(spaces))
+            {
+                return $"{quote}{s}{quote}";
+            }
+            return s;
         }
     }
 }

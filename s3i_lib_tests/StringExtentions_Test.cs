@@ -16,8 +16,8 @@ namespace s3i_lib_tests
         {
             Assert.AreEqual(@"a/b\d/e/../g\x.y", StringExtentions.rexDotSegments.Replace(@"a/b\c\../d/e/f/..\../g\x.y", @""));
             Assert.AreEqual(@"a/b\d/g\x.y", StringExtentions.rexDotSegments.Replace(@"a/b\d/e/../g\x.y", @""));
-            Assert.AreEqual(@"a/b\d/g\x.y", @"a/b\c\../d/e/f/..\../g\x.y".Replace(StringExtentions.rexDotSegments, @""));
-            Assert.AreEqual(@"a/b/c/g/x.y", @"a/b/c/d/e/f/../../../g/x.y".Replace(StringExtentions.rexDotSegments, @""));
+            Assert.AreEqual(@"a/b\d/g\x.y", @"a/b\c\../d/e/f/..\../g\x.y".ReplaceAll(StringExtentions.rexDotSegments, @""));
+            Assert.AreEqual(@"a/b/c/g/x.y", @"a/b/c/d/e/f/../../../g/x.y".ReplaceAll(StringExtentions.rexDotSegments, @""));
             Assert.AreEqual("https://bucket.s3.amazonaws.com/directory1/die2/dir3/file.ext", "https://bucket.s3.amazonaws.com/directory1/die2/dir3/file.ext".RemoveDotSegments());
             Assert.AreEqual("https://bucket.s3.amazonaws.com/directory1/dir3/file.ext", "https://bucket.s3.amazonaws.com/directory1/die2/../dir3/file.ext".RemoveDotSegments());
             Assert.AreEqual("https://install.elizacorp.com.s3.amazonaws.com/Test/Windows10/Distrib/Minnie/9.4.188/Minnie.msi", 
@@ -59,6 +59,16 @@ namespace s3i_lib_tests
             Assert.AreEqual("C:/Temp/subdir/bucket/dir1/dir2/dir345/file99.ext88", "https://bucket/dir1/dir2/dir345/file99.ext88".MapToLocalPath("C:\\Temp\\subdir"));
             Assert.AreEqual("C:/Temp/subdir/install.elizacorp.com.s3.amazonaws.com/Test/Windows10/Config/s3i/1/Products.ini", "https://install.elizacorp.com.s3.amazonaws.com/Test/Windows10/Config/s3i/1/Products.ini".MapToLocalPath("C:\\Temp\\subdir"));
             Assert.AreEqual("C:/Temp/subdir/install.elizacorp.com.s3.amazonaws.com/Test/Windows10/Config/s3i/1/Products.ini", "https://install.elizacorp.com.s3.amazonaws.com/Test/Windows10/Config/s3i/1/Products.ini".MapToLocalPath("C:\\Temp\\subdir"));
+        }
+        [TestMethod]
+        public void TestQuoting()
+        {
+            Assert.AreEqual("", "".Quote(""));
+            Assert.AreEqual("abc", "abc".Quote(""));
+            Assert.AreEqual("\"a b c\"", "a b c".Quote(null));
+            Assert.AreEqual("\"a b c\"", "a b c".Quote(""));
+            Assert.AreEqual("\"ab\tc\"", "ab\tc".Quote(""));
+            Assert.AreEqual("***a b c***", "a b c".Quote("***"));
         }
     }
 }
