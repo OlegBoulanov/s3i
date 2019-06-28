@@ -9,11 +9,11 @@
   <!-- change for a major upgrade -->
   <?define ProductCode=*?>
 
-  <!-- NEVER CHANGE - IT'S ACTUALLY THE PRODUCT ID -->
+  <!-- NEVER CHANGE UpgradeCode - actually it is PRODUCT ID -->
   <?define UpgradeCode={e34c5e85-21ad-4a6c-b4ef-be5925074846}?>
 
 
-  <Product UpgradeCode="$(var.UpgradeCode)" Id="$(var.ProductCode)" Version="$(var.ProductVersion)" Name="s3i" Language="1033" Manufacturer="$(var.Manufacturer)">
+  <Product UpgradeCode="$(var.UpgradeCode)" Id="$(var.ProductCode)" Version="$(var.ProductVersion)" Name="$(var.ProductName)" Language="1033" Manufacturer="$(var.Manufacturer)">
 		<Package InstallerVersion="300" Compressed="yes" InstallScope="perMachine" />
     <Media Id="1" Cabinet="$(var.ProductName).cab" EmbedCab="yes" />
 
