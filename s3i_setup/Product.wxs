@@ -26,6 +26,10 @@
       <![CDATA[Installed OR (WIXNETFX4RELEASEINSTALLED >= "#$(var.NetFx472)")]]>
     </Condition>
 
+    <util:Group Id="AdminGroup" Name="Administrators"/>
+
+    <Property Id="ARPCOMMENTS">Installatio</Property>
+    <Property Id="ARPURLINFOABOUT">https://github.com/OlegBoulanov/s3i/</Property>
 
     <Directory Id="TARGETDIR" Name="SourceDir">
       <!--
