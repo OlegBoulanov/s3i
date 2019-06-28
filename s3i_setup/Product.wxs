@@ -54,6 +54,7 @@
         <File Id="s3i.exe" Name="s3i.exe" KeyPath="yes"/>
         <File Id="s3i.exe.config" Name="s3i.exe.config"/>
         <File Id="s3i_lib.dll" Name="s3i_lib.dll" Vital="yes"/>
+        <Environment Id="path" Name="PATH" Value="[Product_Root]" Action="set" System="yes" Part="last" Permanent="no"/>
       </Component>
       <Component Id="AWSSDK" Guid="{F61F6544-DBBF-472D-93D2-3714E0C1D4DB}">
         <File Id="AWSSDK.Core.dll" Name="AWSSDK.Core.dll" Source="$(var.s3i.TargetDir)AWSSDK.Core.dll" Vital="yes"/>
