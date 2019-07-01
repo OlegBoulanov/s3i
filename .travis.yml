@@ -8,4 +8,5 @@ deploy:
    - s3i_setup/bin/Release/s3i.msi
 skip_cleanup: true
 on:
-    tags: true
+  all_branches: true
+  tags: true
