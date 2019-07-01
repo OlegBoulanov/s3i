@@ -12,6 +12,7 @@ EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution Items", "{26BA2AE3-05FD-45B2-B99B-B283F3D784D0}"
 	ProjectSection(SolutionItems) = preProject
 		.gitignore = .gitignore
+		.travis.yaml = .travis.yaml
 		README.md = README.md
 	EndProjectSection
 EndProject
