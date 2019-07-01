@@ -20,12 +20,19 @@ namespace s3i
             {
                 Console.WriteLine($"s3i - download and install msi(s) from AWS S3");
                 Console.WriteLine($"Usage:");
-                Console.WriteLine($"  s3i [(-p|--profile) <profileName>] <S3-URI of .msi, .ini, or .json> ...");
-                //Console.WriteLine($"{commandLine.Options.Aggregate($"Options:{Environment.NewLine}", (s, o) => { s += $"{o.Key} = {o.Value}{Environment.NewLine}"; return s; })}");
+                Console.WriteLine($"  s3i [<option> <value> ...] [<flag> ...] <S3-URI of .msi, .ini, or .json> ...");
+                Console.WriteLine(commandLine.Help);
                 return -1;
             }
+            TimeSpan msiExecTimeout = TimeSpan.FromMinutes(60);
+            var s = commandLine.Options[CommandLine.OptionType.Timeout].Value;
+            if(!TimeSpan.TryParse(s, out msiExecTimeout))
+            {
+                throw new FormatException($"Invalid timeout value: {s}");
+            }
+            var tempFolder = commandLine.Options[CommandLine.OptionType.TempFolder].Value;
             var clock = System.Diagnostics.Stopwatch.StartNew();
-            var s3 = new S3Helper(commandLine.Options[CommandLine.OptionType.ProfileName]);
+            var s3 = new S3Helper(commandLine.Options[CommandLine.OptionType.ProfileName].Value);
             // read product descriptions in parallel
             string baseUri = null;
             var products = await Products.ReadProducts(s3, commandLine.Args.Select(
@@ -33,10 +40,12 @@ namespace s3i
                 {
                     // next product path can be ralative to previous base
                     return baseUri = (0 == index ? uri : uri.RebaseUri(baseUri));
-                }), commandLine.Options[CommandLine.OptionType.TempFolder]);
+                }), tempFolder);
             //System.Net.ServicePointManager.DefaultConnectionLimit = 50;
             //
-            if (commandLine.Verbose)
+            var verbose = commandLine.Flags[CommandLine.FlagType.Verbose].Value;
+            var dryrun = commandLine.Flags[CommandLine.FlagType.DryRun].Value;
+            if (verbose)
             {
                 Console.WriteLine($"Products [{products.Count}]:");
                 foreach (var p in products)
@@ -49,27 +58,26 @@ namespace s3i
                 }
             }
             // downloading files also can be parallel
-            await products.DownloadInstallers(s3, commandLine.Options[CommandLine.OptionType.TempFolder]);
+            await products.DownloadInstallers(s3, tempFolder);
             // but installation needs to be sequential
-            var msiExecKeys = Installer.msiExecKeysInstall;
-            var msiArgs = "";
-            var installTimeout = TimeSpan.FromMinutes(3);
+            var msiExecKeys = commandLine.Options[CommandLine.OptionType.MsiExecKeys].Value;
+            var msiArgs = commandLine.Options[CommandLine.OptionType.MsiExtraArgs].Value;
             foreach(var product in products)
             {
                 var installer = new Installer(product);
                 var commandArgs = installer.FormatCommand(msiExecKeys, msiArgs);
-                if (commandLine.Verbose || commandLine.DryRun)
+                if (verbose || dryrun)
                 {
-                    var header = commandLine.DryRun ? "(DryRun)" : "(Install)";
+                    var header = dryrun ? "(DryRun)" : "(Install)";
                     Console.WriteLine();
-                    Console.WriteLine($"{header} {Installer.MsiExec} {commandArgs}");
+                    Console.WriteLine($"{header} [{msiExecTimeout}] {Installer.MsiExec} {commandArgs}");
                 }
-                if (!commandLine.DryRun)
+                if (!dryrun)
                 {
-                    installer.RunInstall(commandArgs, installTimeout);
+                    installer.RunInstall(commandArgs, msiExecTimeout);
                 }
             }
-            if (commandLine.Verbose)
+            if (verbose)
             {
                 Console.WriteLine();
                 Console.WriteLine($"Elapsed: {clock.Elapsed}");
