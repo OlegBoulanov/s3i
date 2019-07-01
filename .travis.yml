@@ -6,7 +6,6 @@ deploy:
     secure: iQVHzxksmKBcOJK4VHYDmRIm0KfJXT/CrRDNsAaRpB0SYxjeC/xQfYnyS9eDOvN8/ptxbPepcHJuVYRXEbipQIukYdfaJTZwHfcXOJ5eglK5CPE41F4dGrpEOGODbKSBze4zcJa6kx6B0mXZ9hNQhW8AYIavMCU8828+uUmhf2H7UFkBSvop+loCdP7YY29bKjZewDzvKFHj45LLyMywppxT6pnIUFdbpnX9dTido8cCEBgYHHQCghASdAN2nVzLNw2X/CXOcdW9spYqHyayzEoyX09NSdoPymwKOiRtjm0enoogTEhr0HQRtHGK8qAewBwIZa41hlyzaEpZKMnHakoCtPtQO9Q0YVj8v/cgTqsRof6+pSzHjVtG9cl/YvSVeejfeLnEn+Tj2YOAkZwh3MLvKWVRC7YG2zTZ+MjwlT4R/I+6oCUGNUf4j8Qefuh8j4SnrVlaGa+/UuL9F0SSgF0/2YNKjFD7fjaw3gJXCV3+PZECSlI8YTyeF6yNOAxmIMeqTemS6op1lCtqvWnnDOhu69qnWijIRSXEjknbv7aVyrdLTtKfb1RNUXaK+xAXmohqwc57WUdSJc2OQUITNKMoqrdx2ZbNYdTkev/IS+65Cb2hY//j74EAKgcobzZl+xYEyY+eVMCxKueWm8jkXCliSMsV7LOxtTsDZ4ZQtUk=
   file: 
    - s3i_setup/bin/Release/s3i.msi
-  on:
-    repo: OlegBoulanov/s3i
-    branch: develop
+skip_cleanup: true
+on:
     tags: true
