@@ -61,6 +61,26 @@ namespace s3i_lib
                 return sb.ToString();
             }
         }
+        public string Values
+        {
+            get
+            {
+                var sb = new StringBuilder();
+                sb.AppendLine($"Options:");
+                foreach (var o in Options.Keys)
+                {
+                    var oi = Options[o];
+                    sb.AppendLine($"  {oi.LongKey,-12} {oi.Value}");
+                }
+                sb.AppendLine($"Flags:");
+                foreach (var f in Flags.Keys)
+                {
+                    var fi = Flags[f];
+                    if(fi.Value) sb.AppendLine($"  {fi.LongKey,-12}");
+                }
+                return sb.ToString();
+            }
+        }
         public static CommandLine Parse(params string [] args)
         {
             var commandLine = new CommandLine();

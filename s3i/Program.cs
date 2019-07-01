@@ -24,6 +24,8 @@ namespace s3i
                 Console.WriteLine(commandLine.Help);
                 return -1;
             }
+            var verbose = commandLine.Flags[CommandLine.FlagType.Verbose].Value;
+            var dryrun = commandLine.Flags[CommandLine.FlagType.DryRun].Value;
             TimeSpan msiExecTimeout = TimeSpan.FromMinutes(60);
             var s = commandLine.Options[CommandLine.OptionType.Timeout].Value;
             if(!TimeSpan.TryParse(s, out msiExecTimeout))
@@ -33,6 +35,11 @@ namespace s3i
             var tempFolder = commandLine.Options[CommandLine.OptionType.TempFolder].Value;
             var clock = System.Diagnostics.Stopwatch.StartNew();
             var s3 = new S3Helper(commandLine.Options[CommandLine.OptionType.ProfileName].Value);
+            if (verbose)
+            {
+                Console.WriteLine("Command line args:");
+                Console.WriteLine(commandLine.Values);
+            }
             // read product descriptions in parallel
             string baseUri = null;
             var products = await Products.ReadProducts(s3, commandLine.Args.Select(
@@ -43,8 +50,6 @@ namespace s3i
                 }), tempFolder);
             //System.Net.ServicePointManager.DefaultConnectionLimit = 50;
             //
-            var verbose = commandLine.Flags[CommandLine.FlagType.Verbose].Value;
-            var dryrun = commandLine.Flags[CommandLine.FlagType.DryRun].Value;
             if (verbose)
             {
                 Console.WriteLine($"Products [{products.Count}]:");
