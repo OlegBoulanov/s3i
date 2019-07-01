@@ -34,7 +34,7 @@ namespace s3i_lib
                 { OptionType.MsiExecCmd, new OptionInfo { BriefKey = "-e", LongKey = "--msiexec", Value = "msiexec.exe" } },
                 { OptionType.MsiExecKeys, new OptionInfo { BriefKey = "-k", LongKey = "--msikeys", Value = "/i" } },
                 { OptionType.MsiExtraArgs, new OptionInfo { BriefKey = "-a", LongKey = "--msiargs", Value = "" } },
-                { OptionType.Timeout, new OptionInfo { BriefKey = "-t", LongKey = "--timeout", Value = "00:01:00" } },
+                { OptionType.Timeout, new OptionInfo { BriefKey = "-u", LongKey = "--timeout", Value = "00:01:00" } },
             };
             Flags = new Dictionary<FlagType, FlagInfo> {
                 { FlagType.DryRun, new FlagInfo { BriefKey = "-d", LongKey = "--dryrun", Value = false } },
