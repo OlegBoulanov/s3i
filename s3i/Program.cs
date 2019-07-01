@@ -13,7 +13,12 @@ namespace s3i
 {
     class Program
     {
-        static async Task<int> Main(string[] args)
+        static int Main(string[] args)
+        {
+            // to allow compilation on c# 7.0 (mono)
+            return __Main(args).Result;
+        }
+        static async Task<int> __Main(string[] args)
         {
             var commandLine = CommandLine.Parse(args);
             if (commandLine.Args.Count < 1)
