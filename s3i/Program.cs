@@ -1,43 +1,11 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Collections.Concurrent;
 using System.Linq;
-using System.Text;
 using System.Threading.Tasks;
-
-using System.IO;
 
 using s3i_lib;
 
 namespace s3i
 {
-    class CommandLine : CommandLineBase
-    {
-        [CommandLine("AWS user profile name", "-p", "--profile")]
-        public string ProfileName { get; set; } = "default";
-
-        [CommandLine("Path to temp folder", "-t", "--temp")]
-        public string TesmpFolder { get; set; } = Environment.GetEnvironmentVariable("TEMP");
-
-        [CommandLine("MsiExec command", "-m", "--msiexec")]
-        public string MsiExecCommand { get; set; } = "msiexec.exe";
-
-        [CommandLine("MsiExec keys", "-k", "--msikeys")]
-        public string MsiExecKeys { get; set; } = "/i";
-
-        [CommandLine("MsiExec extra args", "-a", "--msiargs")]
-        public string MsiExecArgs { get; set; }
-
-        [CommandLine("Installation timeout", "-u", "--timeout")]
-        public TimeSpan Timeout { get; set; } = TimeSpan.FromMinutes(3);
-
-        [CommandLine("Dry run", "-d", "--dryrun")]
-        public bool DryRun { get; set; }
-
-        [CommandLine("Print full log info", "-v", "--verbose")]
-        public bool Verbose { get; set; }
-    }
-
     class Program
     {
         static int Main(string[] args)
@@ -47,7 +15,10 @@ namespace s3i
         }
         static async Task<int> __Main(string[] args)
         {
-            var commandLine = new CommandLine { HelpHeader = "S3 download and install" };
+            var exeFileName = System.IO.Path.GetFileName(System.Reflection.Assembly.GetExecutingAssembly().CodeBase);
+            var commandLine = new CommandLine {
+                HelpHeader = $"S3 download and install{Environment.NewLine} Usage:{Environment.NewLine}  {exeFileName} [<option> ...] <products> ..."
+            };
             commandLine.Parse(args);
             if (commandLine.Arguments.Count < 1)
             {
@@ -69,7 +40,6 @@ namespace s3i
                     // next product path can be ralative to previous base
                     return baseUri = (0 == index ? uri : uri.RebaseUri(baseUri));
                 }), commandLine.TesmpFolder);
-            //System.Net.ServicePointManager.DefaultConnectionLimit = 50;
             //
             if (commandLine.Verbose)
             {

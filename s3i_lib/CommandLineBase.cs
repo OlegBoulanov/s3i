@@ -65,8 +65,8 @@ namespace s3i_lib
                 foreach (var attr in prop.GetCustomAttributes(true))
                 {
                     if (!(attr is CommandLineAttribute cla)) continue;
-                    if (0 == count++) sb.AppendLine("Options:");
-                    sb.AppendLine($"  {cla.Keys.Aggregate((a, k) => { return $"{(string.IsNullOrEmpty(a) ? " " : $"{a},")} {k}"; })} - {cla.Help} [{prop.GetValue(this)}]");
+                    if (0 == count++) sb.AppendLine(" Options:");
+                    sb.AppendLine($"  {cla.Keys.Aggregate((a, k) => { return $"{(string.IsNullOrEmpty(a) ? " " : $"{a},")} {k}"; }),-20}  {cla.Help} [{prop.GetValue(this)}]");
                 }
             }
             return sb.ToString();
