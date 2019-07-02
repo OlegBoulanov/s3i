@@ -6,6 +6,71 @@ using System.Threading.Tasks;
 
 namespace s3i_lib
 {
+
+    public class CmdLine<OT, FT> //where OT:IEquatable<OT> where FT:IEquatable<FT>
+    {
+        public class ArgInfo<T>
+        {
+            public List<string> Keys { get; set; }
+            public string Help { get; set; }
+            public T Value { get; set; }
+            public T Default { get; set; }
+        }
+        public string HelpHeader { get; set; }
+        public IList<string> Args { get; set; } = new List<string>();
+        public IDictionary<OT, ArgInfo<string>> Options { get; set; } = new Dictionary<OT, ArgInfo<string>>();
+        public IDictionary<FT, ArgInfo<bool>> Flags { get; set; } = new Dictionary<FT, ArgInfo<bool>>();
+        public void Parse(params string[] args)
+        {
+            var currentOption = default(OT);
+            var currentFlag = default(FT);
+            foreach (var arg in args)
+            {
+                //if (string.IsNullOrWhiteSpace(arg)) continue;
+                if (default(OT).Equals(currentOption))
+                {
+                    currentOption = Options.FirstOrDefault(o => o.Value.Keys.Exists(k => k == arg)).Key;
+                    if (!default(OT).Equals(currentOption)) continue;
+                    currentFlag = Flags.FirstOrDefault(o => o.Value.Keys.Exists(k => k == arg)).Key;
+                }
+                if (!default(OT).Equals(currentOption))
+                {
+                    Options[currentOption].Value = arg;
+                    currentOption = default(OT);
+                }
+                else if (!default(FT).Equals(currentFlag))
+                {
+                    Flags[currentFlag].Value = true;
+                    currentFlag = default(FT);
+                }
+                else
+                {
+                    Args.Add(arg);
+                }
+            }
+        }
+        public string Help()
+        {
+            var sb = new StringBuilder();
+            sb.AppendLine(HelpHeader);
+            sb.AppendLine($"Options:");
+            foreach (var ok in Options.Keys)
+            {
+                var o = Options[ok];
+                sb.AppendLine($"  {o.Keys.Aggregate(" ", (a, k) => { return $"{a}, {k}"; })} [{o.Value}] - {o.Help}");
+            }
+            sb.AppendLine($"Flags:");
+            foreach (var fk in Flags.Keys)
+            {
+                var f = Flags[fk];
+                sb.AppendLine($"  {f.Keys.Aggregate(" ", (a, k) => { return $"{a}, {k}"; })} [{f.Value}] - {f.Help}");
+            }
+            return sb.ToString();
+        }
+
+    }
+
+
     public class CommandLine
     {
         public enum OptionType { None, ProfileName, TempFolder, MsiExecCmd, MsiExecKeys, MsiExtraArgs, Timeout};
