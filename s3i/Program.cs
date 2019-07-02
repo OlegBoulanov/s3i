@@ -11,6 +11,33 @@ using s3i_lib;
 
 namespace s3i
 {
+    class CommandLine : CommandLineBase
+    {
+        [CommandLine("AWS user profile name", "-p", "--profile")]
+        public string ProfileName { get; set; } = "default";
+
+        [CommandLine("Path to temp folder", "-t", "--temp")]
+        public string TesmpFolder { get; set; } = Environment.GetEnvironmentVariable("TEMP");
+
+        [CommandLine("MsiExec command", "-m", "--msiexec")]
+        public string MsiExecCommand { get; set; } = "msiexec.exe";
+
+        [CommandLine("MsiExec keys", "-k", "--msikeys")]
+        public string MsiExecKeys { get; set; } = "/i";
+
+        [CommandLine("MsiExec extra args", "-a", "--msiargs")]
+        public string MsiExecArgs { get; set; }
+
+        [CommandLine("Installation timeout", "-u", "--timeout")]
+        public TimeSpan Timeout { get; set; } = TimeSpan.FromMinutes(3);
+
+        [CommandLine("Dry run", "-d", "--dryrun")]
+        public bool DryRun { get; set; }
+
+        [CommandLine("Print full log info", "-v", "--verbose")]
+        public bool Verbose { get; set; }
+    }
+
     class Program
     {
         static int Main(string[] args)
@@ -20,42 +47,31 @@ namespace s3i
         }
         static async Task<int> __Main(string[] args)
         {
-            var commandLine = CommandLine.Parse(args);
-            if (commandLine.Args.Count < 1)
+            var commandLine = new CommandLine { HelpHeader = "S3 download and install" };
+            commandLine.Parse(args);
+            if (commandLine.Arguments.Count < 1)
             {
-                Console.WriteLine($"s3i - download and install msi(s) from AWS S3");
-                Console.WriteLine($"Usage:");
-                Console.WriteLine($"  s3i [<option> <value> ...] [<flag> ...] <S3-URI of .msi, .ini, or .json> ...");
-                Console.WriteLine(commandLine.Help);
+                Console.WriteLine(commandLine.Help());
                 return -1;
             }
-            var verbose = commandLine.Flags[CommandLine.FlagType.Verbose].Value;
-            var dryrun = commandLine.Flags[CommandLine.FlagType.DryRun].Value;
-            TimeSpan msiExecTimeout = TimeSpan.FromMinutes(60);
-            var s = commandLine.Options[CommandLine.OptionType.Timeout].Value;
-            if(!TimeSpan.TryParse(s, out msiExecTimeout))
-            {
-                throw new FormatException($"Invalid timeout value: {s}");
-            }
-            var tempFolder = commandLine.Options[CommandLine.OptionType.TempFolder].Value;
             var clock = System.Diagnostics.Stopwatch.StartNew();
-            var s3 = new S3Helper(commandLine.Options[CommandLine.OptionType.ProfileName].Value);
-            if (verbose)
-            {
-                Console.WriteLine("Command line args:");
-                Console.WriteLine(commandLine.Values);
-            }
+            var s3 = new S3Helper(commandLine.ProfileName);
+            //if (commandLine.Verbose)
+            //{
+            //    Console.WriteLine("Command line args:");
+            //    Console.WriteLine(commandLine.Values);
+            //}
             // read product descriptions in parallel
             string baseUri = null;
-            var products = await Products.ReadProducts(s3, commandLine.Args.Select(
+            var products = await Products.ReadProducts(s3, commandLine.Arguments.Select(
                 (uri, index) =>
                 {
                     // next product path can be ralative to previous base
                     return baseUri = (0 == index ? uri : uri.RebaseUri(baseUri));
-                }), tempFolder);
+                }), commandLine.TesmpFolder);
             //System.Net.ServicePointManager.DefaultConnectionLimit = 50;
             //
-            if (verbose)
+            if (commandLine.Verbose)
             {
                 Console.WriteLine($"Products [{products.Count}]:");
                 foreach (var p in products)
@@ -68,26 +84,24 @@ namespace s3i
                 }
             }
             // downloading files also can be parallel
-            await products.DownloadInstallers(s3, tempFolder);
+            await products.DownloadInstallers(s3, commandLine.TesmpFolder);
             // but installation needs to be sequential
-            var msiExecKeys = commandLine.Options[CommandLine.OptionType.MsiExecKeys].Value;
-            var msiArgs = commandLine.Options[CommandLine.OptionType.MsiExtraArgs].Value;
             foreach(var product in products)
             {
                 var installer = new Installer(product);
-                var commandArgs = installer.FormatCommand(msiExecKeys, msiArgs);
-                if (verbose || dryrun)
+                var commandArgs = installer.FormatCommand(commandLine.MsiExecKeys, commandLine.MsiExecArgs);
+                if (commandLine.Verbose || commandLine.DryRun)
                 {
-                    var header = dryrun ? "(DryRun)" : "(Install)";
+                    var header = commandLine.DryRun ? "(DryRun)" : "(Install)";
                     Console.WriteLine();
-                    Console.WriteLine($"{header} [{msiExecTimeout}] {Installer.MsiExec} {commandArgs}");
+                    Console.WriteLine($"{header} [{commandLine.Timeout}] {Installer.MsiExec} {commandArgs}");
                 }
-                if (!dryrun)
+                if (!commandLine.DryRun)
                 {
-                    installer.RunInstall(commandArgs, msiExecTimeout);
+                    installer.RunInstall(commandArgs, commandLine.Timeout);
                 }
             }
-            if (verbose)
+            if (commandLine.Verbose)
             {
                 Console.WriteLine();
                 Console.WriteLine($"Elapsed: {clock.Elapsed}");

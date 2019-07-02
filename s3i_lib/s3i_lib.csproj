@@ -41,7 +41,8 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="CommandLine.cs" />
+    <Compile Include="CommandLineAttribute.cs" />
+    <Compile Include="CommandLineBase.cs" />
     <Compile Include="Installer.cs" />
     <Compile Include="Products.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
