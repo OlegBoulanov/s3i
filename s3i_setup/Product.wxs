@@ -14,10 +14,9 @@
 
 
   <Product UpgradeCode="$(var.UpgradeCode)" Id="$(var.ProductCode)" Version="$(var.ProductVersion)" Name="$(var.ProductName)" Language="1033" Manufacturer="$(var.Manufacturer)">
-		<Package InstallerVersion="300" Compressed="yes" InstallScope="perMachine" />
-    <Media Id="1" Cabinet="$(var.ProductName).cab" EmbedCab="yes" />
 
-		<MajorUpgrade DowngradeErrorMessage="A newer version of [ProductName] is already installed." />
+    <Package InstallerVersion="300" Compressed="yes" InstallScope="perMachine" />
+    <Media Id="1" Cabinet="$(var.ProductName).cab" EmbedCab="yes" />
 
     <!-- https://msdn.microsoft.com/en-us/library/hh925568%28v=vs.110%29.aspx?f=255&MSPPError=-2147217396#net_d -->
     <?define NetFx472 = 461808 ?>
@@ -70,7 +69,8 @@
       <ComponentRef Id="AWSSDK" />
       <ComponentRef Id="Newtonsoft.Json" />
     </Feature>
-	</Product>
 
+    <MajorUpgrade AllowSameVersionUpgrades="yes" DowngradeErrorMessage="A newer version of [ProductName] ([ProductVersion]) is already installed." />
+  </Product>
 
 </Wix>
