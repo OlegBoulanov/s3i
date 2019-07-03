@@ -14,7 +14,6 @@ namespace s3i_lib
         public string RelativeUri { get; set; }
         public string AbsoluteUri { get; set; }
         public string LocalPath { get; set; }
-        public HttpStatusCode DownloadResult { get; set; }
         public ProductProps Props { get; protected set; } = new ProductProps();
     }
 }
