@@ -21,6 +21,8 @@ using s3i_lib;
 namespace s3i_lib_tests
 {
     [TestClass]
+    [TestCategory("AWS")]
+
     public class S3Helper_Test
     {
         const string testProfileName = "s3i";

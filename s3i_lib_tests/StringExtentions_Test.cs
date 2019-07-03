@@ -56,9 +56,9 @@ namespace s3i_lib_tests
         [TestMethod]
         public void MapToLocalPath()
         {
-            Assert.AreEqual("C:/Temp/subdir/bucket/dir1/dir2/dir345/file99.ext88", "https://bucket/dir1/dir2/dir345/file99.ext88".MapToLocalPath("C:\\Temp\\subdir"));
-            Assert.AreEqual("C:/Temp/subdir/install.elizacorp.com.s3.amazonaws.com/Test/Windows10/Config/s3i/1/Products.ini", "https://install.elizacorp.com.s3.amazonaws.com/Test/Windows10/Config/s3i/1/Products.ini".MapToLocalPath("C:\\Temp\\subdir"));
-            Assert.AreEqual("C:/Temp/subdir/install.elizacorp.com.s3.amazonaws.com/Test/Windows10/Config/s3i/1/Products.ini", "https://install.elizacorp.com.s3.amazonaws.com/Test/Windows10/Config/s3i/1/Products.ini".MapToLocalPath("C:\\Temp\\subdir"));
+            Assert.AreEqual("C:\\Temp\\subdir\\bucket\\dir1\\dir2\\dir345\\file99.ext88", "https://bucket/dir1/dir2/dir345/file99.ext88".MapToLocalPath("C:\\Temp\\subdir"));
+            Assert.AreEqual("C:\\Temp\\subdir\\install.elizacorp.com.s3.amazonaws.com\\Test\\Windows10\\Config\\s3i\\1\\Products.ini", "https://install.elizacorp.com.s3.amazonaws.com/Test/Windows10/Config/s3i/1/Products.ini".MapToLocalPath("C:\\Temp\\subdir"));
+            Assert.AreEqual("C:\\Temp\\subdir\\install.elizacorp.com.s3.amazonaws.com\\Test\\Windows10\\Config\\s3i\\1\\Products.ini", "https://install.elizacorp.com.s3.amazonaws.com/Test/Windows10/Config/s3i/1/Products.ini".MapToLocalPath("C:\\Temp\\subdir"));
         }
         [TestMethod]
         public void TestQuoting()
