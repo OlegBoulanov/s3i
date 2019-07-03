@@ -6,6 +6,8 @@ platform:
 - x86
 environment:
   EnableNuGetPackageRestore: true
+before_build:
+- cmd: nuget restore s3i.sln
 build:
   project: s3i.sln
   verbosity: normal
