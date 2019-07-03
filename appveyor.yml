@@ -1,4 +1,12 @@
 version: 1.0.{build}
-skip_non_tags: true
+image: Visual Studio 2019
+configuration: Release
+platform: Any CPU
 build:
-  verbosity: minimal
+  project: s3i.sln
+  verbosity: normal
+deploy:
+- provider: GitHub
+  auth_token:
+    secure: 0GagvW3n7npL5iRUius31zgyPNAhlXbSxymyQIXlKNQHjtFpZEZH3151VANvLQAH
+  artifact: s3i_setup\bin\Release\s3i.msi
