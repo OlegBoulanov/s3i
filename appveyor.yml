@@ -2,8 +2,12 @@ version: 1.0.{build}
 image: Visual Studio 2019
 configuration: Release
 platform: Any CPU
-environment:
-  EnableNuGetPackageRestore: true
+assembly_info:
+  patch: true
+  file: '**\AssemblyInfo.*'
+  assembly_version: '{version}'
+  assembly_file_version: '{version}'
+  assembly_informational_version: '{version}'
 before_build:
 - cmd: nuget restore s3i.sln
 build:
@@ -18,4 +22,4 @@ deploy:
 - provider: GitHub
   auth_token:
     secure: 0GagvW3n7npL5iRUius31zgyPNAhlXbSxymyQIXlKNQHjtFpZEZH3151VANvLQAH
-  artifact: s3i_setup\bin\Release\s3i.msi
+  artifact: /.*\.msi.msi
