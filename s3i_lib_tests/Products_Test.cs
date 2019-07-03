@@ -65,7 +65,7 @@ Three    = https://xxx.s3.amazonaws.com/Test/Windows10/Distrib//SecondProduct/9.
             var files = from p in products select new { product = p, local = p.AbsoluteUri.MapToLocalPath("c:/Temp/")  };
             Assert.AreEqual(3, products.Count);
             Assert.AreEqual(3, files.Count());
-            Assert.AreEqual("c:/Temp/xxx.s3.amazonaws.com/Test/Windows10/Distrib/ProductOne/12.6.16/ProductOne.msi", files.First().local);
+            Assert.AreEqual("c:\\Temp\\xxx.s3.amazonaws.com\\Test\\Windows10\\Distrib\\ProductOne\\12.6.16\\ProductOne.msi", files.First().local);
         }
 
 
