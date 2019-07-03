@@ -26,7 +26,7 @@ namespace s3i_lib_tests
         };
 
         [TestMethod]
-        public void Test_CmdAttr()
+        public void ParseCommandLine()
         {
             var cmd = new TestCommandLine();
             Console.WriteLine($"profile0={cmd.Profile}");

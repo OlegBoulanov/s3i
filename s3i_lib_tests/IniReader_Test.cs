@@ -14,7 +14,7 @@ namespace s3i_lib_tests
     public class IniReader_Test
     {
         [TestMethod]
-        public async Task TestMethod1()
+        public async Task ReadIniFromMemoryStream()
         {
             var sections = new Dictionary<string, Dictionary<string, string>>();
             await IniReader.Read(

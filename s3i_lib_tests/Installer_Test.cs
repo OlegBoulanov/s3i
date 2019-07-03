@@ -9,7 +9,7 @@ namespace s3i_lib_tests
     public class Installer_Test
     {
         [TestMethod]
-        public void Test1()
+        public void FormatInstallerCommandFromProductInfo()
         {
             var product = new ProductInfo { Name = "TestProduct", LocalPath = "my temp\\product.msi" };
             product.Props.Add("Prop1", "Value1");
