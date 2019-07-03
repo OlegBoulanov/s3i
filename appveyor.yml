@@ -1,11 +1,11 @@
 version: 1.0.{build}
 image: Visual Studio 2019
 configuration: Release
-platform:
-- Any CPU
-- x86
+platform: Any CPU
+environment:
+  EnableNuGetPackageRestore: true
 before_build:
-- cmd: nuget restore -DisableParallelProcessing
+- cmd: nuget restore s3i.sln
 build:
   project: s3i.sln
   verbosity: normal
