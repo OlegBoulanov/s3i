@@ -9,6 +9,11 @@ before_build:
 build:
   project: s3i.sln
   verbosity: normal
+test:
+  categories:
+    except:
+    - Study
+    - AWS
 deploy:
 - provider: GitHub
   auth_token:
