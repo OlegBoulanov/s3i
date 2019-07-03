@@ -4,10 +4,8 @@ configuration: Release
 platform:
 - Any CPU
 - x86
-environment:
-  EnableNuGetPackageRestore: true
 before_build:
-- cmd: nuget restore s3i.sln
+- cmd: nuget restore -DisableParallelProcessing
 build:
   project: s3i.sln
   verbosity: normal
