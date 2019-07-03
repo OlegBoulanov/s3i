@@ -6,6 +6,7 @@ using System.Threading.Tasks;
 
 namespace s3i_lib
 {
+    [System.AttributeUsage(System.AttributeTargets.Field, AllowMultiple=false)]
     public class CommandLineAttribute : Attribute
     {
         public string Help { get; set; }
