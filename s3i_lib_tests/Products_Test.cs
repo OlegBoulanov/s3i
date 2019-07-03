@@ -12,6 +12,7 @@ using s3i_lib;
 namespace s3i_lib_tests
 {
     [TestClass]
+    [TestCategory("AWS")]
     public class Products_Test
     {
         static string testConfig = @"[$Products$]
