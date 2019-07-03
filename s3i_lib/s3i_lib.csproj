@@ -44,6 +44,8 @@
     <Compile Include="CommandLineAttribute.cs" />
     <Compile Include="CommandLineBase.cs" />
     <Compile Include="Installer.cs" />
+    <Compile Include="ProductInfo.cs" />
+    <Compile Include="ProductProps.cs" />
     <Compile Include="Products.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="IniReader.cs" />
