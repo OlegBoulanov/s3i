@@ -30,6 +30,7 @@ namespace s3i_lib
                 //LogMetrics = true,
                 MaxErrorRetry = 3,
                 ReadWriteTimeout = TimeSpan.FromSeconds(16),
+                Timeout = TimeSpan.FromSeconds(20)
             };
             var chain = new CredentialProfileStoreChain();
             AWSCredentials credentials = null;
