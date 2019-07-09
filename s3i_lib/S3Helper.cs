@@ -21,7 +21,11 @@ namespace s3i_lib
     {
         public AWSCredentials Credentials { get; protected set; }
         public AmazonS3ClientMap Clients { get; protected set; }
-        public S3Helper(string profileName, AmazonS3Client client = null)
+        public S3Helper(string profileName)
+            :this(profileName, null)
+        {
+        }
+        public S3Helper(string profileName, AmazonS3Client client)
         {
             var chain = new CredentialProfileStoreChain();
             AWSCredentials credentials = null;
