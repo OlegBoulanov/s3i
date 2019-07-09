@@ -10,9 +10,12 @@ using System.Threading.Tasks;
 using Amazon.Runtime;
 using Amazon.Runtime.CredentialManagement;
 
+using Amazon;
 using Amazon.S3;
 using Amazon.S3.Model;
 using Amazon.S3.Util;
+
+using System.Net;
 
 using System.Diagnostics;
 
@@ -25,16 +28,51 @@ namespace s3i_lib_tests
 
     public class S3Helper_Test
     {
-        const string testProfileName = "s3i";
-        const string testObjectS3Uri = "https://install.elizacorp.com.s3.amazonaws.com/Test/Windows10/Config/s3i/1/Products.ini";
-        const int testObjectLineCount = 94;
+        const string testProfileName = "test.s3i";
+        const string testBucketName = "test.s3i";
+        const string testBucketRegion = "us-east-2";
+        const string testKey = "misc/AccessingBucket.txt";
+        const string testObjectS3Uri = "https://" + testBucketName + ".s3." + testBucketRegion + ".amazonaws.com/" + testKey;
+        const string testIniS3Uri = "https://s3.us-east-2.amazonaws.com/test.s3i/config/Site01/Group01/Product.ini";
+        const int testObjectLineCount = 49;
+
+        AmazonS3Client GetClient(RegionEndpoint region = null)
+        {
+            AmazonS3Client s3 = null;
+            var chain = new CredentialProfileStoreChain();
+            AWSCredentials credentials = null;
+            if (chain.TryGetAWSCredentials(testProfileName, out credentials))
+            {
+                s3 = new AmazonS3Client(credentials, region ?? RegionEndpoint.USEast1);
+            }
+            return s3;
+        }
+
+        [TestMethod]
+        public void GetTestObject()
+        {
+            var s3 = GetClient(RegionEndpoint.USEast2);
+            Assert.IsNotNull(s3);
+            var response = s3.GetObject(new GetObjectRequest { BucketName = testBucketName, Key = testKey });
+            Assert.AreEqual(HttpStatusCode.OK, response.HttpStatusCode);
+        }
+
+        [TestMethod]
+        public void GetTestBucketLocation()
+        {
+            var s3 = GetClient(RegionEndpoint.USEast1);
+            Assert.IsNotNull(s3);
+            var response = s3.GetBucketLocation(new GetBucketLocationRequest { BucketName = testBucketName });
+            Assert.AreEqual(HttpStatusCode.OK, response.HttpStatusCode);
+            Assert.AreEqual(S3Region.USE2, response.Location);
+        }
 
         [TestMethod]
         public async Task S3Download()
         {
-            var s3 = new S3Helper(testProfileName);
+            var s3 = new S3Helper(testProfileName);//, new AmazonS3Client(RegionEndpoint.USEast2));
             Assert.IsNotNull(s3.Credentials);
-            Assert.IsNotNull(s3.S3);
+            Assert.IsNotNull(s3.Clients);
             var uri = new AmazonS3Uri(testObjectS3Uri);
             var lines = new ConcurrentQueue<string>();
             await s3.DownloadAsync(
@@ -49,78 +87,18 @@ namespace s3i_lib_tests
             Assert.AreEqual(testObjectLineCount, lines.Count);
         }
 
-        //[TestMethod]
-        //public async Task ReadObjectDataAsync()
-        //{
-        //    IAmazonS3 S3 = null;
-        //    var chain = new CredentialProfileStoreChain();
-        //    if (chain.TryGetAWSCredentials(testProfileName, out AWSCredentials credentials))
-        //    {
-        //        S3 = new AmazonS3Client(credentials, Amazon.RegionEndpoint.USEast1);
-        //    }
-
-        //    for (var i = 0; i < 10; i++)
-        //    {
-        //        Console.WriteLine($"(Sync):  {ReadObjectDataTest((request) => { return S3.GetObject(request); })}");
-        //    }
-        //    for (var i = 0; i < 10; i++)
-        //    {
-        //        Console.WriteLine($"(async): {ReadObjectDataTest((request) => { return S3.GetObjectAsync(request).Result; })}");
-        //    }
-        //    var tasks = new List<Task>();
-        //    for (var i = 0; i < 10; i++)
-        //    {
-        //        tasks.Add(Task.Run(() =>
-        //        {
-        //            Console.WriteLine($"(tasks): {ReadObjectDataTestAsync(async (request) => { return await S3.GetObjectAsync(request); }).Result}");
-        //        }));
-        //    }
-        //    await Task.WhenAll(tasks);
-
-        //    await Task.CompletedTask;
-        //}
-
-        //public TimeSpan ReadObjectDataTest(Func<GetObjectRequest, GetObjectResponse> getObject)
-        //{
-        //    var clock = Stopwatch.StartNew();
-        //    // as in here: https://docs.aws.amazon.com/AmazonS3/latest/dev/RetrievingObjectUsingNetSDK.html
-        //    var uri = new AmazonS3Uri(testObjectS3Uri);
-        //    var request = new GetObjectRequest { BucketName = uri.Bucket, Key = uri.Key, };
-        //    using (GetObjectResponse response = getObject(request))
-        //    using (Stream responseStream = response.ResponseStream)
-        //    using (StreamReader reader = new StreamReader(responseStream))
-        //    {
-        //        var responseBody = reader.ReadToEnd();
-        //    }
-        //    return clock.Elapsed;
-        //}
-
-        //public async Task<TimeSpan> ReadObjectDataTestAsync(Func<GetObjectRequest, Task<GetObjectResponse>> getObject)
-        //{
-        //    var clock = Stopwatch.StartNew();
-        //    // as in here: https://docs.aws.amazon.com/AmazonS3/latest/dev/RetrievingObjectUsingNetSDK.html
-        //    var uri = new AmazonS3Uri(testObjectS3Uri);
-        //    var request = new GetObjectRequest { BucketName = uri.Bucket, Key = uri.Key, };
-        //    using (GetObjectResponse response = await getObject(request))
-        //    using (Stream responseStream = response.ResponseStream)
-        //    using (StreamReader reader = new StreamReader(responseStream))
-        //    {
-        //        var responseBody = await reader.ReadToEndAsync();
-        //    }
-        //    return clock.Elapsed;
-        //}
-        
+       
         [TestMethod]
         public async Task ReadTwoIniFilesFromS3()
         {
             var s3 = new S3Helper(testProfileName);
-            var maxAttempts = 1;// 3000;
+            var maxAttempts = 3;// 3000;
             for (var i = 0; i < maxAttempts; i++) {
                 var clock = System.Diagnostics.Stopwatch.StartNew();
                 var prods = await Products.ReadProducts(s3,
                     new List<string> {
-                    "https://install.elizacorp.com.s3.amazonaws.com/Test/Windows10/Config/s3i/1/Products.ini",
-                    "https://install.elizacorp.com.s3.amazonaws.com/Test/Windows10/Config/s3i/2/Products.ini",
+                        testIniS3Uri,
+                        testIniS3Uri,
                     },
                     "D:/Temp/");
                 var ms = clock.ElapsedMilliseconds;
@@ -128,7 +106,7 @@ namespace s3i_lib_tests
                 {
                     Console.WriteLine($"{DateTime.Now:HH:mm:ss.fff} [{i:0000}] {clock.Elapsed:mm\\:ss\\.fff} {new string('*', (int)(ms/100))}");
                 }
-                Assert.AreEqual(3, prods.Count);
+                Assert.AreEqual(2, prods.Count);
             }
         }
     }
