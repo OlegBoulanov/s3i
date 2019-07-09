@@ -41,6 +41,7 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="AmazonS3ClientMap.cs" />
     <Compile Include="CommandLineAttribute.cs" />
     <Compile Include="CommandLineBase.cs" />
     <Compile Include="Installer.cs" />

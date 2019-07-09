@@ -20,34 +20,22 @@ namespace s3i_lib
     public class S3Helper
     {
         public AWSCredentials Credentials { get; protected set; }
-        public AmazonS3Client S3 { get; protected set; }
-        public AmazonS3Config Config { get; protected set; }
-        public S3Helper(string profileName)
+        public AmazonS3ClientMap Clients { get; protected set; }
+        public S3Helper(string profileName, AmazonS3Client client = null)
         {
-            Config = new AmazonS3Config
-            {
-                //DisableLogging = false,
-                //LogMetrics = true,
-                MaxErrorRetry = 3,
-                ReadWriteTimeout = TimeSpan.FromSeconds(16),
-                Timeout = TimeSpan.FromSeconds(20)
-            };
             var chain = new CredentialProfileStoreChain();
             AWSCredentials credentials = null;
             if (chain.TryGetAWSCredentials(profileName, out credentials))
             {
                 Credentials = credentials;
-                S3 = new AmazonS3Client(credentials, Config);
-                //S3.BeforeRequestEvent += (o, e) => { Console.WriteLine($"{DateTime.Now:HH:mm:ss.fff} {e.GetType()}"); };
-                //S3.AfterResponseEvent += (o, e) => { Console.WriteLine($"{DateTime.Now:HH:mm:ss.fff} {e.GetType()}"); };
-                //S3.ExceptionEvent += (o, e) => { Console.WriteLine($"{DateTime.Now:HH:mm:ss.fff} S3Helper: {o} => {e.GetType()}"); };
+                Clients = new AmazonS3ClientMap(credentials, client);
             }
         }
         public async Task<HttpStatusCode> DownloadAsync(string bucket, string key, DateTime modifiedSinceDateUtc, Func<string, Stream, Task> processStream)
         {
             var request = new GetObjectRequest { BucketName = bucket, Key = key, ModifiedSinceDateUtc = modifiedSinceDateUtc };
-            //using (var response = (S3 ?? new AmazonS3Client(Credentials)).GetObject(request))
-            using (var response = await (S3 ?? new AmazonS3Client(Credentials)).GetObjectAsync(request))
+            var regionClient = await Clients.GetClientAsync(bucket);
+            using (var response = await (regionClient.GetObjectAsync(request)))
             {
                 using (var responseStream = response.ResponseStream)
                 {
