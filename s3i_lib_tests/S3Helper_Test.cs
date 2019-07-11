@@ -92,6 +92,8 @@ namespace s3i_lib_tests
         public async Task ReadTwoIniFilesFromS3()
         {
             var s3 = new S3Helper(testProfileName);
+            Assert.IsNotNull(s3.Credentials);
+            Assert.IsNotNull(s3.Clients);
             var maxAttempts = 3;// 3000;
             for (var i = 0; i < maxAttempts; i++) {
                 var clock = System.Diagnostics.Stopwatch.StartNew();
