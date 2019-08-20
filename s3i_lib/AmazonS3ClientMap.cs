@@ -1,7 +1,5 @@
-﻿using System;
+﻿
 using System.Collections.Concurrent;
-using System.Linq;
-using System.Text;
 using System.Threading.Tasks;
 
 using System.Net;
@@ -15,7 +13,7 @@ namespace s3i_lib
     public class AmazonS3ClientMap
     {
         protected ConcurrentDictionary<string, string> bucket2region = new ConcurrentDictionary<string, string>();
-        protected ConcurrentDictionary<string, AmazonS3Client> region2client = new ConcurrentDictionary<string, AmazonS3Client>();    // region -> client
+        protected ConcurrentDictionary<string, AmazonS3Client> region2client = new ConcurrentDictionary<string, AmazonS3Client>();
         public AWSCredentials Credentials { get; protected set; }
         public AmazonS3Client Client { get; protected set; }
         public AmazonS3ClientMap(AWSCredentials credentials, AmazonS3Client client = null)
@@ -34,7 +32,7 @@ namespace s3i_lib
                 {
                     case HttpStatusCode.OK:
                         regionName = bucketLocationResponse.Location?.Value;
-                        if (string.IsNullOrWhiteSpace(regionName)) regionName = RegionEndpoint.USEast1.SystemName;
+                        if (string.IsNullOrWhiteSpace(regionName)) regionName = Client.Config.RegionEndpoint.SystemName;
                         if (bucket2region.TryAdd(bucketName, regionName)) { }
                         break;
                 }
