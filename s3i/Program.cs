@@ -39,7 +39,7 @@ namespace s3i
                 {
                     // next product path can be ralative to previous base
                     return baseUri = (0 == index ? uri : uri.RebaseUri(baseUri));
-                }), commandLine.TesmpFolder);
+                }), commandLine.TempFolder);
             //
             if (commandLine.Verbose)
             {
@@ -54,7 +54,7 @@ namespace s3i
                 }
             }
             // downloading files also can be parallel
-            await products.DownloadInstallers(s3, commandLine.TesmpFolder);
+            await products.DownloadInstallers(s3, commandLine.TempFolder);
             // but installation needs to be sequential
             foreach(var product in products)
             {

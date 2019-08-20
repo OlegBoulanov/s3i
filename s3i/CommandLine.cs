@@ -10,7 +10,7 @@ namespace s3i
         public string ProfileName { get; set; } = "default";
 
         [CommandLine("Path to temp folder", "-t", "--temp")]
-        public string TesmpFolder { get; set; } = Environment.GetEnvironmentVariable("TEMP");
+        public string TempFolder { get; set; } = Environment.GetEnvironmentVariable("TEMP");
 
         [CommandLine("MsiExec command", "-m", "--msiexec")]
         public string MsiExecCommand { get; set; } = "msiexec.exe";
