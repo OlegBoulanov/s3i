@@ -33,12 +33,10 @@ namespace s3i
             //    Console.WriteLine(commandLine.Values);
             //}
             // read product descriptions in parallel
-            string baseUri = null;
             var products = await Products.ReadProducts(s3, commandLine.Arguments.Select(
                 (uri, index) =>
                 {
-                    // next product path can be ralative to previous base
-                    return baseUri = (0 == index ? uri : uri.RebaseUri(baseUri));
+                    return uri;
                 }), commandLine.TempFolder);
             //
             if (commandLine.Verbose)
