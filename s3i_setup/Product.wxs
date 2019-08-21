@@ -26,7 +26,7 @@
 
     <util:Group Id="AdminGroup" Name="Administrators"/>
 
-    <Property Id="SERVICEARGS"> </Property>
+    <Property Id="SERVICEARGS" Admin="yes"> </Property>
 
     <Property Id="ARPCOMMENTS">Install products from AWS S3 buckets</Property>
     <Property Id="ARPURLINFOABOUT">https://github.com/OlegBoulanov/s3i/</Property>
@@ -60,11 +60,13 @@
       <Component Id="s3i_service" Guid="{B0238396-CF59-471E-8793-2A407D45E411}">
         <File Id="s3i_service.exe" Name="$(var.s3i_service_exe)" Source="$(var.s3i_service.TargetDir)$(var.s3i_service_exe)" Vital="yes"/>
         <!-- service -->
-        <ServiceInstall Id="s3i_service_install" Name="s3i" DisplayName="s3i service" Description="Install products from AWS S3 buckets" Start="auto" Arguments="[SERVICEARGS]" ErrorControl="normal" Type="ownProcess" Vital="yes">
+        <ServiceInstall Id="s3i_service_install" Name="s3i" DisplayName="s3i service" Description="Install products from AWS S3 buckets" Start="auto" ErrorControl="normal" Type="ownProcess" Vital="yes">
           <util:ServiceConfig ServiceName="s3i" ResetPeriodInDays="1" RestartServiceDelayInSeconds="30" FirstFailureActionType="restart" SecondFailureActionType="none" ThirdFailureActionType="none" />
           <ServiceDependency Id="LanmanServer"/>
         </ServiceInstall>
-        <ServiceControl Id="s3i_service_control" Name="s3i" Start="install" Stop="both" Remove="uninstall"/>
+        <ServiceControl Id="s3i_service_control" Name="s3i" Start="install" Stop="both" Remove="uninstall">
+          <ServiceArgument>[SERVICEARGS]</ServiceArgument>
+        </ServiceControl>
       </Component>      
       <Component Id="AWSSDK" Guid="{F61F6544-DBBF-472D-93D2-3714E0C1D4DB}">
         <File Id="AWSSDK.Core.dll" Name="AWSSDK.Core.dll" Source="$(var.s3i.TargetDir)AWSSDK.Core.dll" Vital="yes"/>
