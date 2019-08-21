@@ -26,7 +26,7 @@
 
     <util:Group Id="AdminGroup" Name="Administrators"/>
 
-    <Property Id="SERVICEARGS" Admin="yes"> </Property>
+    <Property Id="COMMANDLINEARGS" Admin="yes"> </Property>
 
     <Property Id="ARPCOMMENTS">Install products from AWS S3 buckets</Property>
     <Property Id="ARPURLINFOABOUT">https://github.com/OlegBoulanov/s3i/</Property>
@@ -55,6 +55,10 @@
         <File Id="s3i.exe" Name="s3i.exe" KeyPath="yes"/>
         <File Id="s3i.exe.config" Name="s3i.exe.config"/>
         <File Id="s3i_lib.dll" Name="s3i_lib.dll" Vital="yes"/>
+        <!-- set configuration properties from command line PROPS -->
+        <?define XPathPrefix=//configuration/userSettings/s3i.Properties.Settings/setting?>
+        <!-- see App.config layout -->
+        <util:XmlConfig Id="CommandLineArgs" ElementPath="$(var.XPathPrefix)[\[]@name='CommandLineArgs'[\]]/value" Value="[COMMANDLINEARGS]" File="[#s3i.exe.config]" Action="create" Node="value" On="install"/>
         <Environment Id="path" Name="PATH" Value="[Product_Root]" Action="set" System="yes" Part="last" Permanent="no"/>
       </Component>
       <Component Id="s3i_service" Guid="{B0238396-CF59-471E-8793-2A407D45E411}">
@@ -64,9 +68,7 @@
           <util:ServiceConfig ServiceName="s3i" ResetPeriodInDays="1" RestartServiceDelayInSeconds="30" FirstFailureActionType="restart" SecondFailureActionType="none" ThirdFailureActionType="none" />
           <ServiceDependency Id="LanmanServer"/>
         </ServiceInstall>
-        <ServiceControl Id="s3i_service_control" Name="s3i" Start="install" Stop="both" Remove="uninstall">
-          <ServiceArgument>[SERVICEARGS]</ServiceArgument>
-        </ServiceControl>
+        <ServiceControl Id="s3i_service_control" Name="s3i" Start="install" Stop="both" Remove="uninstall" />
       </Component>      
       <Component Id="AWSSDK" Guid="{F61F6544-DBBF-472D-93D2-3714E0C1D4DB}">
         <File Id="AWSSDK.Core.dll" Name="AWSSDK.Core.dll" Source="$(var.s3i.TargetDir)AWSSDK.Core.dll" Vital="yes"/>

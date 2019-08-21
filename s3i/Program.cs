@@ -1,6 +1,8 @@
 ﻿using System;
 using System.Linq;
+using System.Configuration;
 using System.Threading.Tasks;
+
 
 using s3i_lib;
 
@@ -20,10 +22,28 @@ namespace s3i
                 HelpHeader = $"S3 download and install{Environment.NewLine} Usage:{Environment.NewLine}  {exeFileName} [<option> ...] <products> ..."
             };
             commandLine.Parse(args);
+
             if (commandLine.Arguments.Count < 1)
             {
-                Console.WriteLine(commandLine.Help());
-                return -1;
+                // no args provided, try to use saved
+                if (commandLine.PrintHelp)
+                {
+                    Console.WriteLine(commandLine.Help());
+                    return -1;
+                }
+                var defaultArgs = Properties.Settings.Default.CommandLineArgs.Split(new char[] { ' ' }, StringSplitOptions.RemoveEmptyEntries);
+                commandLine.Parse(defaultArgs);
+                if (commandLine.Arguments.Count < 1)
+                {
+                    Console.WriteLine(commandLine.Help());
+                    return -1;
+                }
+            }
+            else
+            {
+                // user provided args, save those
+                Properties.Settings.Default.CommandLineArgs = args.Aggregate("", (a, s) => { return $"{a} {s}"; });
+                Properties.Settings.Default.Save();
             }
             var clock = System.Diagnostics.Stopwatch.StartNew();
             var s3 = new S3Helper(commandLine.ProfileName);
