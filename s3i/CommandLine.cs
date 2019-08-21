@@ -6,6 +6,8 @@ namespace s3i
 {
     public class CommandLine : CommandLineBase
     {
+        [CommandLine("Print help info", "-h", "--help")]
+        public bool PrintHelp { get; set; } = false;
         [CommandLine("AWS user profile name", "-p", "--profile")]
         public string ProfileName { get; set; } = "default";
 
@@ -25,7 +27,7 @@ namespace s3i
         public TimeSpan Timeout { get; set; } = TimeSpan.FromMinutes(3);
 
         [CommandLine("Dry run", "-d", "--dryrun")]
-        public bool DryRun { get; set; }
+        public bool DryRun { get; set; } = false;
 
         [CommandLine("Print full log info", "-v", "--verbose")]
         public bool Verbose { get; set; }
