@@ -9,7 +9,7 @@ namespace s3i
         [CommandLine("AWS user profile name", "-p", "--profile")]
         public string ProfileName { get; set; } = "default";
 
-        [CommandLine("Path to temp folder", "-t", "--temp")]
+        [CommandLine("Path to temp folder", "-e", "--temp")]
         public string TempFolder { get; set; } = Environment.GetEnvironmentVariable("TEMP");
 
         [CommandLine("MsiExec command", "-m", "--msiexec")]
@@ -21,7 +21,7 @@ namespace s3i
         [CommandLine("MsiExec extra args", "-a", "--msiargs")]
         public string MsiExecArgs { get; set; }
 
-        [CommandLine("Installation timeout", "-u", "--timeout")]
+        [CommandLine("Installation timeout", "-t", "--timeout")]
         public TimeSpan Timeout { get; set; } = TimeSpan.FromMinutes(3);
 
         [CommandLine("Dry run", "-d", "--dryrun")]
