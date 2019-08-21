@@ -26,7 +26,18 @@ namespace s3i_service
         {
             var exeFilePath = new Uri(System.Reflection.Assembly.GetExecutingAssembly().CodeBase).AbsolutePath;
             var s3i_path = $"{Path.GetDirectoryName(exeFilePath)}{Path.DirectorySeparatorChar}s3i.exe";
-            s3i_process = Process.Start(s3i_path, args.Aggregate("", (a, s) => { return $"{a} {s}"; }));
+            var commandLineArgs = args.Aggregate("", (a, s) => { return $"{a} {s}"; });
+            if (!string.IsNullOrWhiteSpace(commandLineArgs))
+            {
+                try
+                {
+                    s3i_process = Process.Start(s3i_path, commandLineArgs);
+                }
+                catch(Exception x)
+                {
+                    EventLog.WriteEntry($"OnStart(): Error running {s3i_path} {commandLineArgs}{Environment.NewLine}{x.Message}{Environment.NewLine}{x.StackTrace}", EventLogEntryType.Error);
+                }
+            }
         }
 
         protected override void OnStop()
