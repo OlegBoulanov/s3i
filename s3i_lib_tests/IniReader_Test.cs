@@ -24,7 +24,8 @@ namespace s3i_lib_tests
                 "; comment this completely\n" +
                 "[Something]\n" +
                 "  prop1 =  value11 ; comment\n" +
-                "prop2 = value22")),
+                "prop2 = value22\n" +
+                "prop3 = ;;; comment")),
                 async (section, key, value) =>
                 {
                     if (!sections.ContainsKey(section)) sections.Add(section, new Dictionary<string, string>());
@@ -33,6 +34,8 @@ namespace s3i_lib_tests
                 });
             Assert.AreEqual(2, sections.Count);
             Assert.AreEqual("value11", sections["Something"]["prop1"]);
+            Assert.AreEqual("value22", sections["Something"]["prop2"]);
+            Assert.AreEqual("", sections["Something"]["prop3"]);
         }
     }
 }
