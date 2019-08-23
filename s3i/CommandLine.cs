@@ -31,5 +31,7 @@ namespace s3i
 
         [CommandLine("Print full log info", "-v", "--verbose")]
         public bool Verbose { get; set; }
+        [CommandLine("Clear stored command line and exit", "-r", "--reset")]
+        public bool ResetDefaultCommandLine { get; set; }
     }
 }

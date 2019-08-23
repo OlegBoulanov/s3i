@@ -22,6 +22,12 @@ namespace s3i
                 HelpHeader = $"S3 download and install{Environment.NewLine} Usage:{Environment.NewLine}  {exeFileName} [<option> ...] <products> ..."
             };
             commandLine.Parse(args);
+            if (commandLine.ResetDefaultCommandLine)
+            {
+                Properties.Settings.Default.CommandLineArgs = String.Empty;
+                Properties.Settings.Default.Save();
+                return 0;
+            }
             if (commandLine.Arguments.Count < 1)
             {
                 var defaultCommandLine = Properties.Settings.Default.CommandLineArgs;
