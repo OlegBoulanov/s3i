@@ -22,16 +22,17 @@ namespace s3i
                 HelpHeader = $"S3 download and install{Environment.NewLine} Usage:{Environment.NewLine}  {exeFileName} [<option> ...] <products> ..."
             };
             commandLine.Parse(args);
-
             if (commandLine.Arguments.Count < 1)
             {
+                var defaultCommandLine = Properties.Settings.Default.CommandLineArgs;
+                if(!string.IsNullOrEmpty(defaultCommandLine)) commandLine.HelpTail = $"Default command line: {defaultCommandLine}";
                 // no args provided, try to use saved
                 if (commandLine.PrintHelp)
                 {
                     Console.WriteLine(commandLine.Help());
                     return -1;
                 }
-                var defaultArgs = Properties.Settings.Default.CommandLineArgs.Split(new char[] { ' ' }, StringSplitOptions.RemoveEmptyEntries);
+                var defaultArgs = defaultCommandLine.Split(new char[] { ' ' }, StringSplitOptions.RemoveEmptyEntries);
                 commandLine.Parse(defaultArgs);
                 if (commandLine.Arguments.Count < 1)
                 {
