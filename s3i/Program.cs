@@ -17,9 +17,11 @@ namespace s3i
         }
         static async Task<int> __Main(string[] args)
         {
-            var exeFileName = System.IO.Path.GetFileName(System.Reflection.Assembly.GetExecutingAssembly().CodeBase);
+            var assembly = System.Reflection.Assembly.GetExecutingAssembly();
+            var exeFileName = System.IO.Path.GetFileName(assembly.CodeBase);
+            var version = assembly.GetName().Version;
             var commandLine = new CommandLine {
-                HelpHeader = $"S3 download and install{Environment.NewLine} Usage:{Environment.NewLine}  {exeFileName} [<option> ...] <products> ..."
+                HelpHeader = $"S3 download and install v{version}{Environment.NewLine} Usage:{Environment.NewLine}  {exeFileName} [<option> ...] <products> ..."
             };
             commandLine.Parse(args);
             if (commandLine.ResetDefaultCommandLine)
