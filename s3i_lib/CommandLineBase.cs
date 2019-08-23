@@ -12,6 +12,7 @@ namespace s3i_lib
     {
         public List<string> Arguments { get; protected set; }
         public string HelpHeader { get; set; }
+        public string HelpTail { get; set; }
         public void Parse(params string[] args)
         {
             Arguments = new List<string>();
@@ -69,6 +70,7 @@ namespace s3i_lib
                     sb.AppendLine($"  {cla.Keys.Aggregate((a, k) => { return $"{(string.IsNullOrEmpty(a) ? " " : $"{a},")} {k}"; }),-20}  {cla.Help} [{prop.GetValue(this)}]");
                 }
             }
+            if (!string.IsNullOrEmpty(HelpTail)) sb.AppendLine(HelpTail);
             return sb.ToString();
         }
         void SetProperty(string name, object value)

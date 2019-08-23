@@ -1,6 +1,8 @@
 ﻿using System;
 using System.Linq;
+using System.Configuration;
 using System.Threading.Tasks;
+
 
 using s3i_lib;
 
@@ -15,15 +17,45 @@ namespace s3i
         }
         static async Task<int> __Main(string[] args)
         {
-            var exeFileName = System.IO.Path.GetFileName(System.Reflection.Assembly.GetExecutingAssembly().CodeBase);
-            var commandLine = new CommandLine {
-                HelpHeader = $"S3 download and install{Environment.NewLine} Usage:{Environment.NewLine}  {exeFileName} [<option> ...] <products> ..."
+            var assembly = System.Reflection.Assembly.GetExecutingAssembly();
+            var exeFileName = System.IO.Path.GetFileName(assembly.CodeBase);
+            var version = assembly.GetName().Version;
+            var commandLine = new CommandLine
+            {
+                HelpHeader = $"S3 download and install v{version}{Environment.NewLine}"
+                           + $" Usage:{Environment.NewLine}"
+                           + $"  {exeFileName} [<option> ...] <products> ..."
             };
             commandLine.Parse(args);
+            if (commandLine.ResetDefaultCommandLine)
+            {
+                Properties.Settings.Default.CommandLineArgs = String.Empty;
+                Properties.Settings.Default.Save();
+                return 0;
+            }
             if (commandLine.Arguments.Count < 1)
             {
-                Console.WriteLine(commandLine.Help());
-                return -1;
+                var defaultCommandLine = Properties.Settings.Default.CommandLineArgs;
+                if(!string.IsNullOrEmpty(defaultCommandLine)) commandLine.HelpTail = $"Default command line: {defaultCommandLine}";
+                // no args provided, try to use saved
+                if (commandLine.PrintHelp)
+                {
+                    Console.WriteLine(commandLine.Help());
+                    return -1;
+                }
+                var defaultArgs = defaultCommandLine.Split(new char[] { ' ' }, StringSplitOptions.RemoveEmptyEntries);
+                commandLine.Parse(defaultArgs);
+                if (commandLine.Arguments.Count < 1)
+                {
+                    Console.WriteLine(commandLine.Help());
+                    return -1;
+                }
+            }
+            else
+            {
+                // user provided args, save those
+                Properties.Settings.Default.CommandLineArgs = args.Aggregate("", (a, s) => { return $"{a} {s}"; });
+                Properties.Settings.Default.Save();
             }
             var clock = System.Diagnostics.Stopwatch.StartNew();
             var s3 = new S3Helper(commandLine.ProfileName);

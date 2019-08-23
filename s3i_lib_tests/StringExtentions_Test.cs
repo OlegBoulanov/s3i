@@ -63,7 +63,8 @@ namespace s3i_lib_tests
         [TestMethod]
         public void TestQuoting()
         {
-            Assert.AreEqual("", "".Quote(""));
+            Assert.AreEqual("\"\"", "".Quote(null));
+            Assert.AreEqual("\"\"", "".Quote(""));
             Assert.AreEqual("abc", "abc".Quote(""));
             Assert.AreEqual("\"a b c\"", "a b c".Quote(null));
             Assert.AreEqual("\"a b c\"", "a b c".Quote(""));

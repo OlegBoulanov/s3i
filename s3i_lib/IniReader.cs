@@ -33,7 +33,7 @@ namespace s3i_lib
                         keyValue = line.Substring(pe + 1).Trim();
                         break;
                     }
-                    if (string.IsNullOrWhiteSpace(keyName) || string.IsNullOrWhiteSpace(keyValue)) continue;
+                    if (string.IsNullOrWhiteSpace(keyName)) continue;
                     onNewKeyValue.Invoke(sectionName, keyName, keyValue);
                 }
             }
