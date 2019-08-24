@@ -50,7 +50,7 @@ namespace s3i_lib
         {
             if (string.IsNullOrEmpty(quote)) quote = "\"";
             if (0 == spaces.Length) spaces = new char[] { ' ', '\t' };
-            if (0 <= s.IndexOfAny(spaces))
+            if (string.IsNullOrEmpty(s) || 0 <= s.IndexOfAny(spaces))
             {
                 return $"{quote}{s}{quote}";
             }
