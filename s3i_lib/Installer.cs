@@ -27,6 +27,7 @@ namespace s3i_lib
         {
             using (var process = Process.Start(MsiExec, commandLineArgs))
             {
+                if (timeout.TotalMilliseconds <= 0) return 0;
                 if (false == process.WaitForExit((int)timeout.TotalMilliseconds) || 0 != process.ExitCode)
                 {
                     Console.WriteLine($"{MsiExec} failed with {process.ExitCode}");
