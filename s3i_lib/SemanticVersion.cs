@@ -10,6 +10,7 @@ using System.Numerics;
 namespace s3i_lib
 {
     /// <summary>
+    /// Semantic Version 2.0 implementation
     /// See https://semver.org/
     /// Also: https://regex101.com/r/vkijKf/1/
     /// </summary>
@@ -56,13 +57,32 @@ namespace s3i_lib
             if (0 != minor) return minor;
             var patch = Patch.CompareTo(other.Patch);
             if (0 != patch) return patch;
-            if (!string.IsNullOrEmpty(Prerelease) && !string.IsNullOrEmpty(other.Prerelease))
+            // pre-release is tricky, null to be considered greater than any value
+            var thisPrereleaseEmpty = string.IsNullOrEmpty(Prerelease);
+            var otherPrereleaseEmpty = string.IsNullOrEmpty(other.Prerelease);
+            if(thisPrereleaseEmpty || otherPrereleaseEmpty)
             {
-                var prerelease = Prerelease.CompareTo(other.Prerelease);
-                if (0 != prerelease) return prerelease;
+                return !thisPrereleaseEmpty ? -1 : otherPrereleaseEmpty ? 0 : +1;
             }
-            else if (string.IsNullOrEmpty(Prerelease)) return +1; else return -1;
+            var prerelease = Prerelease.CompareTo(other.Prerelease);
+            if (0 != prerelease) return prerelease;
+            // we do not compare metadata, per standard
             return 0;
+        }
+        /// <summary>
+        /// Convert ProductVersion to SemanticVersion:
+        ///  Major = product.Major
+        ///  Minor = product.Minor
+        ///  Path = product.Build
+        ///  Prerelease = null
+        ///  Metadata = product.Patch
+        /// </summary>
+        /// <param name="productVersion">ProductVersion to convert</param>
+        /// <returns>SemanticVersion</returns>
+        public static SemanticVersion From(ProductVersion productVersion)
+        {
+            // product version patch to be ignored in semver compare, so we push it to metadata, keeping prerelease empty
+            return new SemanticVersion { Major = productVersion.Major, Minor = productVersion.Minor, Patch = productVersion.Build, Prerelease = null, Metadata = productVersion.Patch.ToString(), };
         }
         public override string ToString()
         {

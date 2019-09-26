@@ -8,6 +8,7 @@ using System.Threading.Tasks;
 namespace s3i_lib
 {
     /// <summary>
+    /// Microsoft Product Version implementation
     /// See https://docs.microsoft.com/en-us/windows/win32/msi/productversion
     /// </summary>
     public class ProductVersion : IComparable<ProductVersion>

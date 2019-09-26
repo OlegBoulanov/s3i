@@ -162,9 +162,21 @@ beta
         public void ComparePrereleases()
         {
             Less("2.3.4-pre", "2.3.4");
+            Equal("2.3.4", "2.3.4");
+            Equal("2.3.4+meta", "2.3.4");
+            Equal("2.3.4", "2.3.4+meta");
             Less("2.3.4-v12", "2.3.4-v20");
             Less("2.3.4-v.12", "2.3.4-v.20");
             Less("2.3.4-v.10", "2.3.4-v.20");
+        }
+        [TestMethod]
+        public void FromProductVersion()
+        {
+            Assert.IsTrue(ProductVersion.TryParse("1.2.3.4", out var v1234));
+            Assert.IsTrue(ProductVersion.TryParse("1.2.3.5", out var v1235));
+            Assert.IsTrue(0 == SemanticVersion.From(v1234).CompareTo(SemanticVersion.From(v1235)));
+            Assert.IsTrue(ProductVersion.TryParse("1.2.4.5", out var v1245));
+            Assert.IsTrue(0 > SemanticVersion.From(v1234).CompareTo(SemanticVersion.From(v1245)));
         }
     }
 }
