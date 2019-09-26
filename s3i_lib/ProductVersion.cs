@@ -41,8 +41,7 @@ namespace s3i_lib
             if (0 != minor) return minor;
             var build = Build.CompareTo(other.Build);
             if (0 != build) return build;
-            var patch = Patch.CompareTo(other.Patch);
-            if (0 != patch) return patch;
+            //Windows Installer ignore Patch component
             return 0;
         }
         public override string ToString()
