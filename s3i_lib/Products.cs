@@ -107,6 +107,10 @@ namespace s3i_lib
                 )
             );
         }
-
+        public Products Diff(Products products)
+        {
+            var diff = new Products();
+            return diff;
+        }
     }
 }
