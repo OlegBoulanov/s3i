@@ -64,5 +64,9 @@ namespace s3i_lib
             else if (string.IsNullOrEmpty(Prerelease)) return +1; else return -1;
             return 0;
         }
+        public override string ToString()
+        {
+            return $"{Major}.{Minor}.{Patch}{(string.IsNullOrEmpty(Prerelease) ? "" : $"-{Prerelease}")}{(string.IsNullOrEmpty(Metadata) ? "" : $"+{Metadata}")}";
+        }
     }
 }

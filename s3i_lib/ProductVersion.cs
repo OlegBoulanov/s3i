@@ -44,5 +44,9 @@ namespace s3i_lib
             if (0 != patch) return patch;
             return 0;
         }
+        public override string ToString()
+        {
+            return $"{Major}.{Minor}.{Build}.{Patch}";
+        }
     }
 }
