@@ -32,6 +32,7 @@ namespace s3i_lib_tests
         public void CanParse()
         {
             CanParse("0.0.0.0");
+            CanParse("1.2.3");
             CanParse("1.2.3.4");
             CanParse("255.255.65535.65535");
         }
@@ -43,7 +44,7 @@ namespace s3i_lib_tests
             CantParse("1.");
             CantParse("1.2");
             CantParse("1.2.");
-            CantParse("1.2.3");
+            //CantParse("1.2.3");
             CantParse("1.2.3.");
             CantParse("258.0.1.1");
             CantParse("1.290.2.3");

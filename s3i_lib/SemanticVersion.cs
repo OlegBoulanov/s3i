@@ -37,8 +37,8 @@ namespace s3i_lib
                     Major = major,
                     Minor = minor,
                     Patch = patch,
-                    Prerelease = 4 < m.Groups.Count ? m.Groups[4].Value : null,
-                    Metadata = 5 < m.Groups.Count ? m.Groups[5].Value : null,
+                    Prerelease = 4 < m.Groups.Count && m.Groups[4].Success ? m.Groups[4].Value : null,
+                    Metadata = 5 < m.Groups.Count && m.Groups[5].Success ? m.Groups[5].Value : null,
                 };
                 return true;
             }
