@@ -55,6 +55,7 @@
     <Compile Include="S3Helper.cs" />
     <Compile Include="SemanticVersion.cs" />
     <Compile Include="StringExtentions.cs" />
+    <Compile Include="UriExtensions.cs" />
   </ItemGroup>
   <ItemGroup>
     <PackageReference Include="AWSSDK.Core">
