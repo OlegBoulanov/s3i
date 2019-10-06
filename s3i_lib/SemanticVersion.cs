@@ -83,6 +83,15 @@ namespace s3i_lib
         {
             // product version patch to be ignored in semver compare, so we push it to metadata, keeping prerelease empty
             return new SemanticVersion { Major = productVersion.Major, Minor = productVersion.Minor, Patch = productVersion.Build, Prerelease = null, Metadata = productVersion.Patch.ToString(), };
+        }           
+        static char[] pathSeparatorChars = new char[] { '/', '\\' };
+        public static SemanticVersion From(string path, string separators = null)
+        {
+            return path.Split(separators?.ToCharArray() ?? pathSeparatorChars, StringSplitOptions.RemoveEmptyEntries).Aggregate((SemanticVersion)null, (a, s) => { return SemanticVersion.TryParse(s, out var v) ? v : a; });
+        }
+        public static SemanticVersion From(Uri uri)
+        {
+            return From(uri.AbsolutePath);
         }
         public override string ToString()
         {
