@@ -133,7 +133,7 @@ namespace s3i
                         {
                             Console.WriteLine($"Compared {product.AbsoluteUri} vs. {installed.AbsoluteUri} => {action}");
                         }
-                        if (Installer.Action.NoAction != action) msiExecKeys = Installer.ActionKeys[action];
+                        msiExecKeys = Installer.Action.NoAction != action ? Installer.ActionKeys[action] : "";
                     }
                 }
                 catch (FileNotFoundException) { }
