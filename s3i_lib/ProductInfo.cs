@@ -57,10 +57,15 @@ namespace s3i_lib
         }
         public static async Task<ProductInfo> FromLocal(string localPath)
         {
-            using(var fs = new FileStream(localPath, FileMode.Open))
+            var path = $"{Path.GetFileNameWithoutExtension(localPath)}{LocalInfoFileExtension}";
+            if (File.Exists(path))
             {
-                return await FromJson(fs);
+                using (var fs = new FileStream(path, FileMode.Open))
+                {
+                    return await FromJson(fs);
+                }
             }
+            return null;
         }
         #endregion
     }
