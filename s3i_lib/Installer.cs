@@ -15,8 +15,8 @@ namespace s3i_lib
 {
     public class Installer
     {
-        public enum Action { Install, Reinstall, Uninstall };
-        public Dictionary<Action, string> ActionKeys { get; protected set; } = new Dictionary<Action, string> {
+        public enum Action { NoAction, Install, Reinstall, Uninstall };
+        public static Dictionary<Action, string> ActionKeys { get; protected set; } = new Dictionary<Action, string> {
             { Action.Install, "/i" },
             { Action.Reinstall, "/fva" },
             { Action.Uninstall, "/x" },
