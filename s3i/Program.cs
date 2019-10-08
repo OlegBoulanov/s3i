@@ -1,4 +1,5 @@
 ﻿using System;
+using System.IO;
 using System.Linq;
 using System.Configuration;
 using System.Threading.Tasks;
@@ -85,11 +86,49 @@ namespace s3i
             }
             // downloading files also can be parallel
             await products.DownloadInstallers(s3, commandLine.TempFolder);
-            // but installation needs to be sequential
+            // but installation needs to be sequential due to msiexec nature
+            int exitCode = 0;
             foreach(var product in products)
             {
+                var code = await InstallProduct(product, commandLine);
+                if (0 == exitCode) exitCode = code;
+            }
+            if (commandLine.Verbose)
+            {
+                Console.WriteLine();
+                Console.WriteLine($"Elapsed: {clock.Elapsed}");
+            }
+            return exitCode;
+        }
+
+        static async Task<int> InstallProduct(ProductInfo product, CommandLine commandLine)
+        {
+            int exitCode = 0;
+            var msiExecKeys = commandLine.MsiExecKeys;
+            if (string.IsNullOrWhiteSpace(msiExecKeys))
+            {
+                // if no keys provided, determine from previous and current installations
+                try
+                {
+                    var installed = await ProductInfo.FromLocal(product.LocalPath);
+                    var action = product.CompareAndSelectAction(installed);
+                    if(commandLine.Verbose || commandLine.DryRun)
+                    {
+                        Console.WriteLine($"Compared {product.AbsoluteUri} vs. {installed.AbsoluteUri} => {action}");
+                    }
+                    if(Installer.Action.NoAction != action) msiExecKeys = Installer.ActionKeys[action];
+                }
+                catch (FileNotFoundException) { }
+                catch (Exception x)
+                {
+                    Console.WriteLine($"? '{product.Name}' can't read saved configuration: {x.GetType().Name}: {x.Message}");
+                }
+            }
+            if (!string.IsNullOrWhiteSpace(msiExecKeys))
+            {
+                // now install
                 var installer = new Installer(product);
-                var commandArgs = installer.FormatCommand(commandLine.MsiExecKeys, commandLine.MsiExecArgs);
+                var commandArgs = installer.FormatCommand(msiExecKeys, commandLine.MsiExecArgs);
                 if (commandLine.Verbose || commandLine.DryRun)
                 {
                     var header = commandLine.DryRun ? "(DryRun)" : "(Install)";
@@ -98,15 +137,26 @@ namespace s3i
                 }
                 if (!commandLine.DryRun)
                 {
-                    installer.RunInstall(commandArgs, commandLine.Timeout);
+                    exitCode = installer.RunInstall(commandArgs, commandLine.Timeout);
+                    if (0 == exitCode)
+                    {
+                        // update saved configuration
+                        try
+                        {
+                            await product.SaveToLocal();
+                        }
+                        catch (Exception x)
+                        {
+                            Console.WriteLine($"? '{product.Name}' saving configuration: {x.GetType().Name}: {x.Message}");
+                        }
+                    }
+                    else
+                    {
+                        Console.WriteLine($"? '{product.Name}' installation failed. Error 0x{exitCode:08x}({exitCode}): {Win32Helper.ErrorMessage(exitCode)}");
+                    }
                 }
             }
-            if (commandLine.Verbose)
-            {
-                Console.WriteLine();
-                Console.WriteLine($"Elapsed: {clock.Elapsed}");
-            }
-            return 0;
+            return exitCode;
         }
 
     }

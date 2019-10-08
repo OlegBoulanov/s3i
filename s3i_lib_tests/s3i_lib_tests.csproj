@@ -49,6 +49,12 @@
     <Compile Include="Products_Test.cs" />
     <Compile Include="S3Helper_Test.cs" />
     <Compile Include="StringExtentions_Test.cs" />
+    <Compile Include="ProductProps_Test.cs" />
+    <Compile Include="ProductInfo_Test.cs" />
+    <Compile Include="ProductVersion_Test.cs" />
+    <Compile Include="SemanticVersion_Test.cs" />
+    <Compile Include="Win32Helper_Test.cs" />
+    <Compile Include="UriExtensions_Test.cs" />
     <Compile Include="__Study.cs" />
   </ItemGroup>
   <ItemGroup>

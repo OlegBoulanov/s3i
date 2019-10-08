@@ -15,14 +15,18 @@ namespace s3i_lib
 {
     public class Installer
     {
-        public const string msiExecKeysInstall = "/i", msiExecKeysReinstallAll = "/fva";
+        public enum Action { NoAction, Install, Reinstall, Uninstall };
+        public static Dictionary<Action, string> ActionKeys { get; protected set; } = new Dictionary<Action, string> {
+            { Action.Install, "/i" },
+            { Action.Reinstall, "/fva" },
+            { Action.Uninstall, "/x" },
+        };
         public static string MsiExec { get; protected set; } = "msiexec.exe";
         public ProductInfo Product { get; protected set; }
         public Installer(ProductInfo product)
         {
             Product = product;
         }
-
         public int RunInstall(string commandLineArgs, TimeSpan timeout)
         {
             using (var process = Process.Start(MsiExec, commandLineArgs))
@@ -35,7 +39,6 @@ namespace s3i_lib
                 return process.ExitCode;
             }
         }
-
         public string FormatCommand(string msiExecKeys, string extraArgs)
         {
             StringBuilder sb = new StringBuilder();

@@ -42,7 +42,7 @@ SecondProduct    = ../../../Distrib/SecondProduct/9.4.188/SecondProduct.msi
             Assert.AreEqual(2, products.Count);
             Assert.AreEqual("ProductOne", products[0].Name);
             Assert.AreEqual("SecondProduct", products[1].Name);
-            Assert.AreEqual("https://xxx.s3.amazonaws.com/Test/Windows10/Distrib/ProductOne/12.6.16/ProductOne.msi", products[0].RelativeUri);
+            Assert.AreEqual("https://xxx.s3.amazonaws.com/Test/Windows10/Distrib/ProductOne/12.6.16/ProductOne.msi", products[0].AbsoluteUri);
             Assert.AreEqual(2, products[0].Props.Count);
             Assert.AreEqual("https://s3.amazonaws.com/config.company.com/Engineering/ESR/", products[0].Props["CONFIG_ROOT"]);
             Assert.AreEqual("https://s3.amazonaws.com/logs.company.com/{0:yyyy}/{0:MM}/{0:dd}/{1}/{0:yyMMdd_HH}{3:00}.log", products[0].Props["ROLLING_LOG"]);
@@ -68,6 +68,22 @@ Three    = https://xxx.s3.amazonaws.com/Test/Windows10/Distrib//SecondProduct/9.
             Assert.AreEqual("c:\\Temp\\xxx.s3.amazonaws.com\\Test\\Windows10\\Distrib\\ProductOne\\12.6.16\\ProductOne.msi", files.First().local);
         }
 
+        static string products1 = "[$products$]\nOne=https://x.amazonaws.com/one/config.ini\nTwo=https://x.amazonaws.com/one/config.ini\n[One]p11=1\np12=2\n[Two]\np21=11\np22=12\n";
+        static string products2 = "[$products$]\nOne=https://x.amazonaws.com/one/config.ini\nTwo=https://x.amazonaws.com/one/config.ini\n[One]p11=1\np12=2\n[Two]\np21=11\np22=12\n";
+        static string products3 = "[$products$]\nOne=https://x.amazonaws.com/one/config.ini\nTwo=https://x.amazonaws.com/one/config.ini\n[One]p11=1\np12=2\n[Two]\np21=11\np22=12\n";
+
+        [TestMethod]
+        public async Task TestDiff()
+        {
+            var baseUri = "https://mecompany.s3.amazonaws.com/something/config.ini";
+            var temp = "C:\\Temp\\";
+            var p1 = await Products.FromIni(new MemoryStream(Encoding.ASCII.GetBytes(products1)), baseUri, temp);
+            var p2 = await Products.FromIni(new MemoryStream(Encoding.ASCII.GetBytes(products2)), baseUri, temp);
+            var p3 = await Products.FromIni(new MemoryStream(Encoding.ASCII.GetBytes(products3)), baseUri, temp);
+
+        }
 
     }
+
 }
+
