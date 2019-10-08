@@ -86,6 +86,7 @@ namespace s3i
             // downloading files also can be parallel
             await products.DownloadInstallers(s3, commandLine.TempFolder);
             // but installation needs to be sequential
+            int exitCode = 0;
             foreach(var product in products)
             {
                 var installer = new Installer(product);
@@ -98,7 +99,12 @@ namespace s3i
                 }
                 if (!commandLine.DryRun)
                 {
-                    installer.RunInstall(commandArgs, commandLine.Timeout);
+                    var code = installer.RunInstall(commandArgs, commandLine.Timeout);
+                    if(0 != code)
+                    {
+                        Console.WriteLine($"? '{product.Name}' installation failed. Error 0x{code:08x}({code}): {Win32Helper.ErrorMessage(code)}");
+                        if (0 == exitCode) exitCode = code;
+                    }
                 }
             }
             if (commandLine.Verbose)
@@ -106,7 +112,7 @@ namespace s3i
                 Console.WriteLine();
                 Console.WriteLine($"Elapsed: {clock.Elapsed}");
             }
-            return 0;
+            return exitCode;
         }
 
     }
