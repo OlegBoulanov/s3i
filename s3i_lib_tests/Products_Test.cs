@@ -83,7 +83,20 @@ Three    = https://xxx.s3.amazonaws.com/Test/Windows10/Distrib//SecondProduct/9.
 
         }
 
+        [TestMethod]
+        public void Difference()
+        {
+            var fileNames = Directory.EnumerateFileSystemEntries("..\\..", "*.dll", SearchOption.AllDirectories).Select(e => Path.GetFileName(e)).Distinct().ToList();
+            Assert.IsTrue(2 < fileNames.Count());
+            var products = new Products();
+            products.Add(new ProductInfo { Name = "Pr1", LocalPath = fileNames[0] });
+            products.Add(new ProductInfo { Name = "Pr2", LocalPath = fileNames[1] });
+            var uninstall = products.ProductsToUninstall(fileNames);
+            Assert.AreEqual(fileNames.Count(), uninstall.Count() + products.Count());
+        }
+
     }
+
 
 }
 
