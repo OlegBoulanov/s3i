@@ -53,6 +53,7 @@
     <Compile Include="ProductInfo_Test.cs" />
     <Compile Include="ProductVersion_Test.cs" />
     <Compile Include="SemanticVersion_Test.cs" />
+    <Compile Include="Win32Helper_Test.cs" />
     <Compile Include="UriExtensions_Test.cs" />
     <Compile Include="__Study.cs" />
   </ItemGroup>
