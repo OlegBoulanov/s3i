@@ -108,20 +108,27 @@ namespace s3i
             if (string.IsNullOrWhiteSpace(msiExecKeys))
             {
                 // if no keys provided, determine from previous and current installations
-                try
+                if (File.Exists(product.LocalPath))
                 {
-                    var installed = await ProductInfo.FromLocal(product.LocalPath);
-                    var action = product.CompareAndSelectAction(installed);
-                    if(commandLine.Verbose || commandLine.DryRun)
+                    try
                     {
-                        Console.WriteLine($"Compared {product.AbsoluteUri} vs. {installed.AbsoluteUri} => {action}");
+                        var installed = await ProductInfo.FromLocal(product.LocalPath);
+                        var action = product.CompareAndSelectAction(installed);
+                        if (commandLine.Verbose || commandLine.DryRun)
+                        {
+                            Console.WriteLine($"Compared {product.AbsoluteUri} vs. {installed.AbsoluteUri} => {action}");
+                        }
+                        if (Installer.Action.NoAction != action) msiExecKeys = Installer.ActionKeys[action];
                     }
-                    if(Installer.Action.NoAction != action) msiExecKeys = Installer.ActionKeys[action];
+                    catch (FileNotFoundException) { }
+                    catch (Exception x)
+                    {
+                        Console.WriteLine($"? '{product.Name}' can't read saved configuration: {x.GetType().Name}: {x.Message}");
+                    }
                 }
-                catch (FileNotFoundException) { }
-                catch (Exception x)
+                else
                 {
-                    Console.WriteLine($"? '{product.Name}' can't read saved configuration: {x.GetType().Name}: {x.Message}");
+                    msiExecKeys = Installer.ActionKeys[Installer.Action.Install];
                 }
             }
             if (!string.IsNullOrWhiteSpace(msiExecKeys))
