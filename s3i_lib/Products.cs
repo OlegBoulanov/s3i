@@ -36,7 +36,7 @@ namespace s3i_lib
             {
                 if (sectionProducts.Equals(sectionName, StringComparison.InvariantCultureIgnoreCase))
                 {
-                    products.Add(new ProductInfo { Name = keyName, RelativeUri = keyValue });
+                    products.Add(new ProductInfo { Name = keyName, AbsoluteUri = keyValue });
                 }
                 else
                 {
@@ -47,7 +47,7 @@ namespace s3i_lib
             });
             products.ForEach((p) =>
             {
-                p.AbsoluteUri = p.RelativeUri.RebaseUri(baseUri);
+                p.AbsoluteUri = p.AbsoluteUri.RebaseUri(baseUri);
                 p.LocalPath = p.AbsoluteUri.MapToLocalPath(tempFilePath);
             });
             return products;
@@ -61,7 +61,7 @@ namespace s3i_lib
                 switch (Path.GetExtension(configFileUri).ToLower())
                 {
                     case ".msi":
-                        products.Add(new ProductInfo { Name = configFileUri, RelativeUri = configFileUri, AbsoluteUri = configFileUri });
+                        products.Add(new ProductInfo { Name = configFileUri, AbsoluteUri = configFileUri });
                         await Task.CompletedTask;
                         break;
                     case ".ini":
