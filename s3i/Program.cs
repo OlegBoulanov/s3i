@@ -122,11 +122,12 @@ namespace s3i
             if (string.IsNullOrWhiteSpace(msiExecKeys))
             {
                 // if no keys provided, determine from previous and current installations
-                if (File.Exists(product.LocalPath))
+                msiExecKeys = Installer.ActionKeys[Installer.Action.Install];
+                try
                 {
-                    try
+                    var installed = await ProductInfo.FromLocal(product.LocalPath);
+                    if (null != installed)
                     {
-                        var installed = await ProductInfo.FromLocal(product.LocalPath);
                         var action = product.CompareAndSelectAction(installed);
                         if (commandLine.Verbose || commandLine.DryRun)
                         {
@@ -134,15 +135,11 @@ namespace s3i
                         }
                         if (Installer.Action.NoAction != action) msiExecKeys = Installer.ActionKeys[action];
                     }
-                    catch (FileNotFoundException) { }
-                    catch (Exception x)
-                    {
-                        Console.WriteLine($"? '{product.Name}' can't read saved configuration: {x.GetType().Name}: {x.Message}");
-                    }
                 }
-                else
+                catch (FileNotFoundException) { }
+                catch (Exception x)
                 {
-                    msiExecKeys = Installer.ActionKeys[Installer.Action.Install];
+                    Console.WriteLine($"? '{product.Name}' can't read saved configuration: {x.GetType().Name}: {x.Message}");
                 }
             }
             if (!string.IsNullOrWhiteSpace(msiExecKeys))
