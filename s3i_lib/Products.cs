@@ -107,10 +107,9 @@ namespace s3i_lib
                 )
             );
         }
-        public Products Diff(Products products)
+        public IEnumerable<string> ProductsToUninstall(IEnumerable<string> entries)
         {
-            var diff = new Products();
-            return diff;
+            return entries.Where(e => !Exists(product => 0 == string.Compare(product.LocalPath, e, true)));
         }
     }
 }

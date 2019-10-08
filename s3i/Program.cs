@@ -4,7 +4,6 @@ using System.Linq;
 using System.Configuration;
 using System.Threading.Tasks;
 
-
 using s3i_lib;
 
 namespace s3i
@@ -65,33 +64,48 @@ namespace s3i
             //    Console.WriteLine("Command line args:");
             //    Console.WriteLine(commandLine.Values);
             //}
-            // read product descriptions in parallel
-            var products = await Products.ReadProducts(s3, commandLine.Arguments.Select(
+            int exitCode = 0;
+            try
+            {            
+                // read product descriptions in parallel
+                var products = await Products.ReadProducts(s3, commandLine.Arguments.Select(
                 (uri, index) =>
                 {
                     return uri;
                 }), commandLine.TempFolder);
-            //
-            if (commandLine.Verbose)
-            {
-                Console.WriteLine($"Products [{products.Count}]:");
-                foreach (var p in products)
+                //
+                if (commandLine.Verbose)
                 {
-                    Console.WriteLine($"  {p.Name}: {p.AbsoluteUri} => {p.LocalPath}");
-                    foreach (var pp in p.Props)
+                    Console.WriteLine($"Products [{products.Count}]:");
+                    foreach (var p in products)
                     {
-                        Console.WriteLine($"    {pp.Key} = {pp.Value}");
+                        Console.WriteLine($"  {p.Name}: {p.AbsoluteUri} => {p.LocalPath}");
+                        foreach (var pp in p.Props)
+                        {
+                            Console.WriteLine($"    {pp.Key} = {pp.Value}");
+                        }
                     }
                 }
+                // downloading files also can be parallel
+                await products.DownloadInstallers(s3, commandLine.TempFolder);
+                // but installation needs to be sequential due to msiexec nature
+                foreach (var product in products)
+                {
+                    var code = await InstallProduct(product, commandLine);
+                    if (0 == exitCode) exitCode = code;
+                }
             }
-            // downloading files also can be parallel
-            await products.DownloadInstallers(s3, commandLine.TempFolder);
-            // but installation needs to be sequential due to msiexec nature
-            int exitCode = 0;
-            foreach(var product in products)
+            catch (Exception x)
             {
-                var code = await InstallProduct(product, commandLine);
-                if (0 == exitCode) exitCode = code;
+                Console.WriteLine($"? {x.GetType().Name}: {x.Message}");
+                if (commandLine.Verbose)
+                {
+                    for (var xi = x.InnerException; null != xi; xi = xi.InnerException)
+                    {
+                        Console.WriteLine($"? {xi.GetType().Name}: {xi.Message}");
+                    }
+                }
+                exitCode = x.HResult;
             }
             if (commandLine.Verbose)
             {
@@ -108,20 +122,27 @@ namespace s3i
             if (string.IsNullOrWhiteSpace(msiExecKeys))
             {
                 // if no keys provided, determine from previous and current installations
-                try
+                if (File.Exists(product.LocalPath))
                 {
-                    var installed = await ProductInfo.FromLocal(product.LocalPath);
-                    var action = product.CompareAndSelectAction(installed);
-                    if(commandLine.Verbose || commandLine.DryRun)
+                    try
                     {
-                        Console.WriteLine($"Compared {product.AbsoluteUri} vs. {installed.AbsoluteUri} => {action}");
+                        var installed = await ProductInfo.FromLocal(product.LocalPath);
+                        var action = product.CompareAndSelectAction(installed);
+                        if (commandLine.Verbose || commandLine.DryRun)
+                        {
+                            Console.WriteLine($"Compared {product.AbsoluteUri} vs. {installed.AbsoluteUri} => {action}");
+                        }
+                        if (Installer.Action.NoAction != action) msiExecKeys = Installer.ActionKeys[action];
                     }
-                    if(Installer.Action.NoAction != action) msiExecKeys = Installer.ActionKeys[action];
+                    catch (FileNotFoundException) { }
+                    catch (Exception x)
+                    {
+                        Console.WriteLine($"? '{product.Name}' can't read saved configuration: {x.GetType().Name}: {x.Message}");
+                    }
                 }
-                catch (FileNotFoundException) { }
-                catch (Exception x)
+                else
                 {
-                    Console.WriteLine($"? '{product.Name}' can't read saved configuration: {x.GetType().Name}: {x.Message}");
+                    msiExecKeys = Installer.ActionKeys[Installer.Action.Install];
                 }
             }
             if (!string.IsNullOrWhiteSpace(msiExecKeys))
