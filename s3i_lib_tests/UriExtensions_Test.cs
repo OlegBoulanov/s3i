@@ -1,14 +1,14 @@
 ﻿using System;
-using Microsoft.VisualStudio.TestTools.UnitTesting;
+using NUnit.Framework;
 
 using s3i_lib;
 
 namespace s3i_lib_tests
 {
-    [TestClass]
+    
     public class UriExtensions_Test
     {
-        [TestMethod]
+        [Test]
         public void Compare()
         {
             Assert.AreEqual(0, new Uri("http://host/uri1").CompareTo(new Uri("https://host2/other")));

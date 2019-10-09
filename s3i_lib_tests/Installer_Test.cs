@@ -1,14 +1,14 @@
 ﻿using System;
-using Microsoft.VisualStudio.TestTools.UnitTesting;
+using NUnit.Framework;
 
 using s3i_lib;
 
 namespace s3i_lib_tests
 {
-    [TestClass]
+    
     public class Installer_Test
     {
-        [TestMethod]
+        [Test]
         public void FormatInstallerCommandFromProductInfo()
         {
             var product = new ProductInfo { Name = "TestProduct", LocalPath = "my temp\\product.msi" };

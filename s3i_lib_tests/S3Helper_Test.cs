@@ -1,5 +1,5 @@
 ﻿using System;
-using Microsoft.VisualStudio.TestTools.UnitTesting;
+using NUnit.Framework;
 
 using System.Collections.Generic;
 using System.Collections.Concurrent;
@@ -23,9 +23,6 @@ using s3i_lib;
 
 namespace s3i_lib_tests
 {
-    [TestClass]
-    [TestCategory("AWS")]
-
     public class S3Helper_Test
     {
         const string testProfileName = "test.s3i";
@@ -48,26 +45,26 @@ namespace s3i_lib_tests
             return s3;
         }
 
-        [TestMethod]
-        public void GetTestObject()
+        [Test]
+        public async Task GetTestObject()
         {
             var s3 = GetClient(RegionEndpoint.USEast2);
             Assert.IsNotNull(s3);
-            var response = s3.GetObject(new GetObjectRequest { BucketName = testBucketName, Key = testKey });
+            var response = await s3.GetObjectAsync(new GetObjectRequest { BucketName = testBucketName, Key = testKey });
             Assert.AreEqual(HttpStatusCode.OK, response.HttpStatusCode);
         }
 
-        [TestMethod]
-        public void GetTestBucketLocation()
+        [Test]
+        public async Task GetTestBucketLocation()
         {
             var s3 = GetClient(RegionEndpoint.USEast1);
             Assert.IsNotNull(s3);
-            var response = s3.GetBucketLocation(new GetBucketLocationRequest { BucketName = testBucketName });
+            var response = await s3.GetBucketLocationAsync(new GetBucketLocationRequest { BucketName = testBucketName });
             Assert.AreEqual(HttpStatusCode.OK, response.HttpStatusCode);
             Assert.AreEqual(S3Region.USE2, response.Location);
         }
 
-        [TestMethod]
+        [Test]
         public async Task S3Download()
         {
             var s3 = new S3Helper(testProfileName);//, new AmazonS3Client(RegionEndpoint.USEast2));
@@ -88,7 +85,7 @@ namespace s3i_lib_tests
         }
 
        
-        [TestMethod]
+        [Test]
         public async Task ReadTwoIniFilesFromS3()
         {
             var s3 = new S3Helper(testProfileName);

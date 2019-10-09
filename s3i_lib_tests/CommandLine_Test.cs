@@ -1,7 +1,7 @@
 ﻿using System;
 using System.Linq;
 using System.Collections.Generic;
-using Microsoft.VisualStudio.TestTools.UnitTesting;
+using NUnit.Framework;
 
 using System.ComponentModel;
 using System.Reflection;
@@ -10,7 +10,7 @@ using s3i_lib;
 
 namespace s3i_lib_tests
 {
-    [TestClass]
+    
     public class CommandLine_Test
     {
 
@@ -25,7 +25,7 @@ namespace s3i_lib_tests
             public string ExtraField { get; set; }
         };
 
-        [TestMethod]
+        [Test]
         public void ParseCommandLine()
         {
             var cmd = new TestCommandLine();
