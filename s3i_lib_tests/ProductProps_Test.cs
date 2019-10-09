@@ -1,14 +1,14 @@
 ﻿using System;
-using Microsoft.VisualStudio.TestTools.UnitTesting;
+using NUnit.Framework;
 
 using s3i_lib;
 
 namespace s3i_lib_tests
 {
-    [TestClass]
+    
     public class ProductProps_Test
     {
-        [TestMethod]
+        [Test]
         public void Compare()
         {
             Assert.AreEqual(new ProductProps(), new ProductProps { });

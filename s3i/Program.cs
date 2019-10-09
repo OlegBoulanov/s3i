@@ -170,7 +170,7 @@ namespace s3i
                     }
                     else
                     {
-                        Console.WriteLine($"? '{product.Name}' installation failed. Error 0x{exitCode:08x}({exitCode}): {Win32Helper.ErrorMessage(exitCode)}");
+                        Console.WriteLine($"? '{product.Name}' installation failed. Error 0x{exitCode:X8}({exitCode}): {Win32Helper.ErrorMessage(exitCode)}");
                     }
                 }
             }

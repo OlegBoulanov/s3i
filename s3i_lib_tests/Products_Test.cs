@@ -1,5 +1,5 @@
 ﻿using System;
-using Microsoft.VisualStudio.TestTools.UnitTesting;
+using NUnit.Framework;
 
 using System.Linq;
 using System.Collections.Generic;
@@ -11,7 +11,7 @@ using s3i_lib;
 
 namespace s3i_lib_tests
 {
-    [TestClass]
+    
     public class Products_Test
     {
         static string testConfig = @"[$Products$]
@@ -35,7 +35,7 @@ SecondProduct    = ../../../Distrib/SecondProduct/9.4.188/SecondProduct.msi
  PROMPTS_UPDATE	= https://s3.amazonaws.com/prompts.update.company.com/
  SYNC            = 00:15:00 1000 20000000 00:01:00
 ";
-        [TestMethod]
+        [Test]
         public async Task TestTwoProductProps()
         {
             var products = await Products.FromIni(new MemoryStream(Encoding.ASCII.GetBytes(testConfig)), "https://xxx.s3.amazonaws.com/Test/Windows10", "C:\\Temp\\");
@@ -58,7 +58,7 @@ One = https://xxx.s3.amazonaws.com/Test/Windows10/Distrib/ProductOne/12.6.16/Pro
 Two    = ../../Distrib/SecondProduct/9.4.188/SecondProduct.msi
 Three    = https://xxx.s3.amazonaws.com/Test/Windows10/Distrib//SecondProduct/9.4.188/SecondProduct.msi
 ";           
-        [TestMethod]
+        [Test]
         public async Task TestDownloadPaths()
         {
             var products = await Products.FromIni(new MemoryStream(Encoding.ASCII.GetBytes(manyProducts)), "https://xxx.s3.amazonaws.com/Test/Windows10/Config/OneInstance/config.ini", "C:\\Temp\\");
@@ -72,7 +72,7 @@ Three    = https://xxx.s3.amazonaws.com/Test/Windows10/Distrib//SecondProduct/9.
         static string products2 = "[$products$]\nOne=https://x.amazonaws.com/one/config.ini\nTwo=https://x.amazonaws.com/one/config.ini\n[One]p11=1\np12=2\n[Two]\np21=11\np22=12\n";
         static string products3 = "[$products$]\nOne=https://x.amazonaws.com/one/config.ini\nTwo=https://x.amazonaws.com/one/config.ini\n[One]p11=1\np12=2\n[Two]\np21=11\np22=12\n";
 
-        [TestMethod]
+        [Test]
         public async Task TestDiff()
         {
             var baseUri = "https://mecompany.s3.amazonaws.com/something/config.ini";
@@ -83,7 +83,7 @@ Three    = https://xxx.s3.amazonaws.com/Test/Windows10/Distrib//SecondProduct/9.
 
         }
 
-        [TestMethod]
+        [Test]
         public void Difference()
         {
             var fileNames = Directory.EnumerateFileSystemEntries("..\\..", "*.dll", SearchOption.AllDirectories).Select(e => Path.GetFileName(e)).Distinct().ToList();

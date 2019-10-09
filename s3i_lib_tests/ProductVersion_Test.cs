@@ -1,11 +1,11 @@
 ﻿using System;
-using Microsoft.VisualStudio.TestTools.UnitTesting;
+using NUnit.Framework;
 
 using s3i_lib;
 
 namespace s3i_lib_tests
 {
-    [TestClass]
+    
     public class ProductVersion_Test
     {
         void CanParse(string s)
@@ -28,7 +28,7 @@ namespace s3i_lib_tests
             Assert.IsTrue(ProductVersion.TryParse(two, out var v2));
             Assert.IsTrue(v1.CompareTo(v2) == 0);
         }
-        [TestMethod]
+        [Test]
         public void CanParse()
         {
             CanParse("0.0.0.0");
@@ -36,7 +36,7 @@ namespace s3i_lib_tests
             CanParse("1.2.3.4");
             CanParse("255.255.65535.65535");
         }
-        [TestMethod]
+        [Test]
         public void CantParse()
         {
             CantParse("");
@@ -51,7 +51,7 @@ namespace s3i_lib_tests
             CantParse("1.2.78000.4");
             CantParse("1.2.3.85000");
         }
-        [TestMethod]
+        [Test]
         public void Compare()
         {
             Assert.IsTrue(ProductVersion.TryParse("2.3.4.5", out var v_2_3_4_5));

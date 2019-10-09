@@ -1,14 +1,14 @@
 ﻿using System;
-using Microsoft.VisualStudio.TestTools.UnitTesting;
+using NUnit.Framework;
 
 using s3i_lib;
 
 namespace s3i_lib_tests
 {
-    [TestClass]
+    
     public class Win32Helper_Test
     {
-        [TestMethod]
+        [Test]
         public void ErrorMessage()
         {
             Assert.AreEqual("The system cannot find the file specified", Win32Helper.ErrorMessage(2));

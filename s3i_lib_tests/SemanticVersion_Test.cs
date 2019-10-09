@@ -1,11 +1,11 @@
 ﻿using System;
-using Microsoft.VisualStudio.TestTools.UnitTesting;
+using NUnit.Framework;
 
 using s3i_lib;
 
 namespace s3i_lib_tests
 {
-    [TestClass]
+    
     public class SemanticVersion_Test
     {
         void CanParse(string s)
@@ -61,7 +61,7 @@ namespace s3i_lib_tests
 99999999999999999999999.999999999999999999.99999999999999999
 1.0.0-0A.is.legal
 */
-        [TestMethod]
+        [Test]
         public void CanParse()
         {
 
@@ -118,7 +118,7 @@ beta
 9.8.7-whatever+meta+meta
 99999999999999999999999.999999999999999999.99999999999999999----RC-SNAPSHOT.12.09.1--------------------------------..12
 */
-        [TestMethod]
+        [Test]
         public void CantParse()
         { 
 
@@ -129,7 +129,7 @@ beta
             CantParse("1.1.2+.123");
             CantParse("1.2.31.2.3----RC-SNAPSHOT.12.09.1--..12+788");
         }
-        [TestMethod]
+        [Test]
         public void Compare()
         {
             Assert.IsTrue(SemanticVersion.TryParse("2.3.4-5", out var v_2_3_4_5));
@@ -138,7 +138,7 @@ beta
             Assert.IsTrue(SemanticVersion.TryParse("2.4.4-5", out var v_2_4_4_5) && v_2_3_4_5.CompareTo(v_2_4_4_5) < 0);
             Assert.IsTrue(SemanticVersion.TryParse("3.3.4-5", out var v_3_3_4_5) && v_2_3_4_5.CompareTo(v_3_3_4_5) < 0);
         }
-        [TestMethod]
+        [Test]
         public void Compare2()
         {
             Assert.IsTrue(SemanticVersion.TryParse("2.3.4", out var v_2_3_4));
@@ -148,7 +148,7 @@ beta
             Assert.IsTrue(SemanticVersion.TryParse("2.4.4", out var v_2_4_4) && v_2_3_4.CompareTo(v_2_4_4) < 0);
             Assert.IsTrue(SemanticVersion.TryParse("3.3.4-5", out var v_3_3_4_5) && v_2_3_4.CompareTo(v_3_3_4_5) < 0);
         }
-        [TestMethod]
+        [Test]
         public void CompareNumerics()
         {
             Less("2.3.4", "2.3.5");
@@ -158,7 +158,7 @@ beta
             Less("2.3.4", "2.13.4");
             Less("2.3.4", "12.3.4");
         }
-        [TestMethod]
+        [Test]
         public void ComparePrereleases()
         {
             Less("2.3.4-pre", "2.3.4");
@@ -169,7 +169,7 @@ beta
             Less("2.3.4-v.12", "2.3.4-v.20");
             Less("2.3.4-v.10", "2.3.4-v.20");
         }
-        [TestMethod]
+        [Test]
         public void FromProductVersion()
         {
             Assert.IsTrue(ProductVersion.TryParse("1.2.3.4", out var v1234));

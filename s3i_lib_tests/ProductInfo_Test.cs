@@ -1,18 +1,18 @@
 ﻿using System;
-using Microsoft.VisualStudio.TestTools.UnitTesting;
+using NUnit.Framework;
 
 using s3i_lib;
 
 namespace s3i_lib_tests
 {
-    [TestClass]
+    
     public class ProductInfo_Test
     {
-        [TestMethod]
+        [Test]
         public void Compare()
         {
         }
-        [TestMethod]
+        [Test]
         public void Serialization()
         {
             var pi = new ProductInfo { AbsoluteUri = "https://s3.something.com/install-me/me-me-me.msi", Name = "TestProduct",  };

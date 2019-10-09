@@ -1,5 +1,5 @@
 ﻿using System;
-using Microsoft.VisualStudio.TestTools.UnitTesting;
+using NUnit.Framework;
 
 using System.Threading.Tasks;
 using System.Collections.Generic;
@@ -10,10 +10,10 @@ using s3i_lib;
 
 namespace s3i_lib_tests
 {
-    [TestClass]
+    
     public class IniReader_Test
     {
-        [TestMethod]
+        [Test]
         public async Task ReadIniFromMemoryStream()
         {
             var sections = new Dictionary<string, Dictionary<string, string>>();

@@ -1,5 +1,5 @@
 ﻿using System;
-using Microsoft.VisualStudio.TestTools.UnitTesting;
+using NUnit.Framework;
 
 using System.Diagnostics;
 using System.Threading;
@@ -7,10 +7,11 @@ using System.Threading.Tasks;
 
 namespace s3i_lib__Study
 {
-    [TestClass]
-    [TestCategory("Study")]
+    [TestFixture]
+    [Category("Study")]
     public class __WhatTypeIsAsyncLambda__
     {
+
         class Processor
         {
             // These methods can even have the same name, I named them differently for illutrative purposes only
@@ -20,7 +21,7 @@ namespace s3i_lib__Study
 
         const int millisecondsToWait = 1000;
 
-        [TestMethod]
+        [Test]
         public async Task Test_SyncAction()
         {
             var watch = Stopwatch.StartNew();
@@ -28,7 +29,7 @@ namespace s3i_lib__Study
             Assert.IsTrue(millisecondsToWait / 2 < watch.Elapsed.TotalMilliseconds);
         }
 
-        [TestMethod]
+        [Test]
         public async Task Test_AsyncFunc()
         {
             var watch = Stopwatch.StartNew();
@@ -36,7 +37,7 @@ namespace s3i_lib__Study
             Assert.IsTrue(millisecondsToWait / 2 < watch.Elapsed.TotalMilliseconds);
         }
 
-        [TestMethod]
+        [Test]
         public async Task Test_AsyncAction()
         {
             var watch = Stopwatch.StartNew();
