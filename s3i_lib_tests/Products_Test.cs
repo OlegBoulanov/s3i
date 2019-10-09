@@ -8,6 +8,7 @@ using System.Text;
 using System.Threading.Tasks;
 
 using s3i_lib;
+using System.Reflection;
 
 namespace s3i_lib_tests
 {
@@ -84,17 +85,70 @@ Three    = https://xxx.s3.amazonaws.com/Test/Windows10/Distrib//SecondProduct/9.
         }
 
         [Test]
-        public void Difference()
+        public void ProductsToUninstall()
         {
-            var fileNames = Directory.EnumerateFileSystemEntries("..\\..", "*.dll", SearchOption.AllDirectories).Select(e => Path.GetFileName(e)).Distinct().ToList();
-            Assert.IsTrue(2 < fileNames.Count());
+            var tempFilePath = "X:\\temp\\";
             var products = new Products();
-            products.Add(new ProductInfo { Name = "Pr1", LocalPath = fileNames[0] });
-            products.Add(new ProductInfo { Name = "Pr2", LocalPath = fileNames[1] });
-            var uninstall = products.ProductsToUninstall(fileNames);
-            Assert.AreEqual(fileNames.Count(), uninstall.Count() + products.Count());
+            products.AddRange(new List<string> {
+                "https://download/from/here/p1.msi",
+                "https://download/from/here/p2.msi",
+                "https://download/from/there/p3.msi",
+                "https://download/from/somewhere/p4.msi",
+            }.Aggregate(new Products(), (ps, s) =>
+            {
+                ps.Add(new ProductInfo { Name = Path.GetFileNameWithoutExtension(s), AbsoluteUri = s, LocalPath = s.MapToLocalPath(tempFilePath) }); return ps;
+            }));
+            Assert.That(products.Count, Is.EqualTo(4));
+            var existing = new List<string> {
+                products[0].LocalPath,
+                $"{tempFilePath}CrazyVirus.msi",
+                products[3].LocalPath,
+                $"{tempFilePath}SomethingElse.msi",
+            };
+            var uninstall = products.FilesToUninstall(existing).ToList();
+            Assert.That(uninstall.Count(), Is.EqualTo(2));
+            Assert.That(uninstall[0], Is.EqualTo(existing[1]));
+            Assert.That(uninstall[1], Is.EqualTo(existing[3]));
         }
 
+        [Test]
+        [Category("Study")]
+        public void TestEnumeration()
+        {
+            var tempFilePath = Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location);
+            var dlls = Directory.EnumerateFileSystemEntries(tempFilePath, "AWSSDK*.dll", SearchOption.AllDirectories).Select(s => Path.Combine(tempFilePath, s)).ToList();
+            Assert.That(dlls.Count(), Is.EqualTo(2));
+            Assert.That(dlls[0], Is.EqualTo($"{tempFilePath}\\AWSSDK.Core.dll"));
+            Assert.That(dlls[1], Is.EqualTo($"{tempFilePath}\\AWSSDK.S3.dll"));
+        }
+
+        [Test]
+        public void Separate()
+        {
+            var tempFilePath = "X:\\temp\\";
+            var installed = new List<string> {
+                "https://download/here/Prod01/9.4.7/p1.msi",
+                "https://download/here/Prod02/3.3.5/p2.msi",
+                "https://download/there/Prod03/12.5.8/p3.msi",
+                $"{tempFilePath}SomethingElse.msi",
+            };
+            var products = new Products { 
+                new ProductInfo { Name = "Prod01", AbsoluteUri = "https://download/here/Prod01/9.4.8/p1.msi", LocalPath = $"{tempFilePath}\\Prod01\\p1.msi", },
+                new ProductInfo { Name = "Prod02", AbsoluteUri = "https://download/here/Prod02/3.3.5/p2.msi", LocalPath = $"{tempFilePath}\\Prod02\\p2.msi", },
+                new ProductInfo { Name = "Prod03", AbsoluteUri = "https://download/there/Prod03/12.5.4/p3.msi", LocalPath = $"{tempFilePath}\\Prod03\\p3.msi", },
+                new ProductInfo { Name = "Prod04", AbsoluteUri = "https://download/from/Prod04/p4.msi", LocalPath = $"{tempFilePath}\\Prod04\\p4.msi", },
+            };
+            var ppp = products[0].MapToLocalPath(tempFilePath);
+            Assert.That(products.Count, Is.EqualTo(4));
+            var (uninstall, install) = products.Separate(installed, localPath =>
+            {
+                var uri = installed.Find(e => 0 == e.MapToLocalPath(tempFilePath).CompareTo(localPath));
+                return new ProductInfo { Name = Path.GetFileNameWithoutExtension(uri), AbsoluteUri = uri, };
+            });
+            Assert.That(uninstall.Count(), Is.EqualTo(4));
+            Assert.That(uninstall.ElementAt(0), Is.EqualTo(installed[1]));
+            Assert.That(uninstall.ElementAt(1), Is.EqualTo(installed[3]));
+        }
     }
 
 

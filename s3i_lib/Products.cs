@@ -48,7 +48,7 @@ namespace s3i_lib
             products.ForEach((p) =>
             {
                 p.AbsoluteUri = p.AbsoluteUri.RebaseUri(baseUri);
-                p.LocalPath = p.AbsoluteUri.MapToLocalPath(tempFilePath);
+                p.LocalPath = p.MapToLocalPath(tempFilePath);
             });
             return products;
         }
@@ -99,7 +99,7 @@ namespace s3i_lib
                     (tasks, product) =>
                     {
                         var uri = new AmazonS3Uri(product.AbsoluteUri);
-                        product.LocalPath = product.AbsoluteUri.MapToLocalPath(localPathBase);
+                        product.LocalPath = product.MapToLocalPath(localPathBase);
                         Directory.CreateDirectory(Path.GetDirectoryName(product.LocalPath));
                         tasks.Add(s3.DownloadAsync(uri.Bucket, uri.Key, product.LocalPath));
                         return tasks;
@@ -107,9 +107,47 @@ namespace s3i_lib
                 )
             );
         }
-        public IEnumerable<string> ProductsToUninstall(IEnumerable<string> entries)
+        public IEnumerable<string> FindFilesToUninstall(string tempFilePath)
         {
-            return entries.Where(e => !Exists(product => 0 == string.Compare(product.LocalPath, e, true)));
+            return FilesToUninstall(Directory.EnumerateFileSystemEntries(tempFilePath, "*.msi", SearchOption.AllDirectories).Select(s => Path.Combine(tempFilePath, s)));
+        }
+        public static Func<string, string, bool> defaultPathCompare = (s1, s2) => { return 0 == string.Compare(s1, s2, true); };
+        public IEnumerable<string> FilesToUninstall(IEnumerable<string> entries, Func<string, string, bool> compare = null)
+        {
+            if (null == compare) compare = defaultPathCompare;
+            return entries.Where(e => !Exists(product => compare(product.LocalPath, e)));
+        }
+        public (IEnumerable<string> filesToUninstall, IEnumerable<ProductInfo> productsToInstall) Separate(string tempFilePath)
+        {
+            return Separate(FindFilesToUninstall(tempFilePath), p => { return ProductInfo.FindInstalled(tempFilePath).Result; });
+        }
+        public (IEnumerable<string> filesToUninstall, IEnumerable<ProductInfo> productsToInstall) Separate(IEnumerable<string> files, Func<string, ProductInfo> findInstalledProduct)
+        {
+            var uninstall = new List<string>(FilesToUninstall(files));
+            var install = new List<ProductInfo>();
+            foreach(var product in this) 
+            {
+                var installedProduct = findInstalledProduct(product.LocalPath);
+                if (null == installedProduct)
+                {
+                    install.Add(product);
+                    continue;
+                }
+                switch (product.CompareAndSelectAction(installedProduct))
+                {
+                    case Installer.Action.Install:
+                        install.Add(product);
+                        break;
+                    case Installer.Action.Reinstall:
+                        uninstall.Add(product.LocalPath);
+                        install.Add(product);
+                        break;
+                    case Installer.Action.Uninstall:
+                        uninstall.Add(product.LocalPath);
+                        break;
+                }
+            }
+            return (uninstall, install);
         }
     }
 }

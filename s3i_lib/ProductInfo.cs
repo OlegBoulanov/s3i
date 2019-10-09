@@ -16,6 +16,14 @@ namespace s3i_lib
         [JsonIgnore]
         public string LocalPath { get; set; }
         public ProductProps Props { get; protected set; } = new ProductProps();
+        public string MapToLocalPath(string basePath)
+        {
+            return MapToLocalPath(basePath, Name, Path.GetFileName(AbsoluteUri));
+        }
+        public static string MapToLocalPath(string basePath, string productName, string fileName)
+        {
+            return $"{Path.Combine(Path.Combine(basePath, productName), fileName)}";
+        }
         public Installer.Action CompareAndSelectAction(ProductInfo installedProduct)
         {
             // use absolute uri to compare versions
@@ -55,7 +63,7 @@ namespace s3i_lib
                 await ToJson(fs);
             }
         }
-        public static async Task<ProductInfo> FromLocal(string localPath)
+        public static async Task<ProductInfo> FindInstalled(string localPath)
         {
             var path = $"{Path.GetFileNameWithoutExtension(localPath)}{LocalInfoFileExtension}";
             if (File.Exists(path))
@@ -68,5 +76,9 @@ namespace s3i_lib
             return null;
         }
         #endregion
+        public override string ToString()
+        {
+            return $"{Name}: {AbsoluteUri}";
+        }
     }
 }
