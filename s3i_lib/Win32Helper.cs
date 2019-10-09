@@ -13,7 +13,7 @@ namespace s3i_lib
         public static string ErrorMessage(int code)
         {
             var msg = new Win32Exception(code).Message;
-            // NetCore 3.0: adds a dot in the end
+            // NetStandard: adds a dot in the end
             // NetFramework: does not
             return msg.EndsWith(".") ? msg.Substring(0, msg.Length - 1) : msg;
         }
