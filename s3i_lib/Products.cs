@@ -15,12 +15,6 @@ namespace s3i_lib
 {
     public class Products : List<ProductInfo>
     {
-        public Products() { }
-        public Products(IEnumerable<ProductInfo> p) { AddRange(p); }
-        public string ToJson()
-        {
-            return JsonConvert.SerializeObject(this, Formatting.Indented);
-        }
         public static async Task<Products> FromJson(Stream stream)
         {
             using(var reader = new StreamReader(stream))
@@ -48,7 +42,7 @@ namespace s3i_lib
             products.ForEach((p) =>
             {
                 p.AbsoluteUri = p.AbsoluteUri.RebaseUri(baseUri);
-                p.LocalPath = p.AbsoluteUri.MapToLocalPath(tempFilePath);
+                p.LocalPath = p.MapToLocalPath(tempFilePath);
             });
             return products;
         }
@@ -78,6 +72,7 @@ namespace s3i_lib
         }
         public static async Task<Products> ReadProducts(S3Helper s3, IEnumerable<string> uris, string tempFilePath)
         {
+            var products = new Products();
             var arrayOfProducts = await Task.WhenAll(
                 uris.Aggregate(new List<Task<Products>>(),
                 (tasks, uri) =>
@@ -88,7 +83,8 @@ namespace s3i_lib
                     }));
                     return tasks;
                 }));
-            return new Products(arrayOfProducts.SelectMany(x => x));
+            products.AddRange(arrayOfProducts.SelectMany(x => x));
+            return products;
             //return arrayOfProducts.Aggregate(new Products(), (p, pp) => { p.AddRange(pp); return p; });
         }
 
@@ -99,7 +95,7 @@ namespace s3i_lib
                     (tasks, product) =>
                     {
                         var uri = new AmazonS3Uri(product.AbsoluteUri);
-                        product.LocalPath = product.AbsoluteUri.MapToLocalPath(localPathBase);
+                        product.LocalPath = product.MapToLocalPath(localPathBase);
                         Directory.CreateDirectory(Path.GetDirectoryName(product.LocalPath));
                         tasks.Add(s3.DownloadAsync(uri.Bucket, uri.Key, product.LocalPath));
                         return tasks;
@@ -107,9 +103,57 @@ namespace s3i_lib
                 )
             );
         }
-        public IEnumerable<string> ProductsToUninstall(IEnumerable<string> entries)
+        /// <summary>
+        /// Finds locally cached installer files which need to be uninstalled completely because they are no longer in the products
+        /// </summary>
+        /// <param name="rootFolderAndMask">Cache folder path and file mask, like C:\Cache\*.msi</param>
+        /// <returns></returns>
+        public IEnumerable<string> FindFilesToUninstall(string rootFolderAndMask)
         {
-            return entries.Where(e => !Exists(product => 0 == string.Compare(product.LocalPath, e, true)));
+            return FilesToUninstall(Directory.EnumerateFiles(rootFolderAndMask, $"*{Path.GetExtension(rootFolderAndMask)}", SearchOption.AllDirectories).Select(s => Path.Combine(rootFolderAndMask, s)));
+        }
+        public static Func<string, string, bool> defaultPathCompare = (s1, s2) => { return 0 == string.Compare(s1, s2, true); };
+        public IEnumerable<string> FilesToUninstall(IEnumerable<string> entries, Func<string, string, bool> compare = null)
+        {
+            if (null == compare) compare = defaultPathCompare;
+            return entries.Where(e => !Exists(product => compare(product.LocalPath, e)));
+        }
+        /// <summary>
+        /// Separates product list into two: downgraded, and products to install or reinstall, based on already cached products
+        /// </summary>
+        /// <param name="rootFolder">Cache folder to look for installed product information (*.json)</param>
+        /// <returns></returns>
+        public (IEnumerable<string> filesToUninstall, IEnumerable<ProductInfo> productsToInstall) Separate(string rootFolder)
+        {
+            return Separate(p => { return ProductInfo.FindInstalled(rootFolder).Result; });
+        }
+        public (IEnumerable<string> filesToUninstall, IEnumerable<ProductInfo> productsToInstall) Separate(Func<string, ProductInfo> findInstalledProduct)
+        {
+            var uninstall = new List<string>();
+            var install = new List<ProductInfo>();
+            foreach(var product in this) 
+            {
+                var installedProduct = findInstalledProduct(product.LocalPath);
+                if (null == installedProduct)
+                {
+                    install.Add(product);
+                    continue;
+                }
+                switch (product.CompareAndSelectAction(installedProduct))
+                {
+                    case Installer.Action.Install:
+                        install.Add(product);
+                        break;
+                    case Installer.Action.Reinstall:
+                        uninstall.Add(product.LocalPath);
+                        install.Add(product);
+                        break;
+                    case Installer.Action.Uninstall:
+                        uninstall.Add(product.LocalPath);
+                        break;
+                }
+            }
+            return (uninstall, install);
         }
     }
 }
