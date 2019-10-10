@@ -107,9 +107,14 @@ namespace s3i_lib
                 )
             );
         }
-        public IEnumerable<string> FindFilesToUninstall(string tempFilePath)
+        /// <summary>
+        /// Finds locally cached installer files which need to be uninstalled completely because they are no longer in the products
+        /// </summary>
+        /// <param name="rootFolderAndMask">Cache folder path and file mask, like C:\Cache\*.msi</param>
+        /// <returns></returns>
+        public IEnumerable<string> FindFilesToUninstall(string rootFolderAndMask)
         {
-            return FilesToUninstall(Directory.EnumerateFileSystemEntries(tempFilePath, "*.msi", SearchOption.AllDirectories).Select(s => Path.Combine(tempFilePath, s)));
+            return FilesToUninstall(Directory.EnumerateFileSystemEntries(rootFolderAndMask, $"*{Path.GetExtension(rootFolderAndMask)}", SearchOption.AllDirectories).Select(s => Path.Combine(rootFolderAndMask, s)));
         }
         public static Func<string, string, bool> defaultPathCompare = (s1, s2) => { return 0 == string.Compare(s1, s2, true); };
         public IEnumerable<string> FilesToUninstall(IEnumerable<string> entries, Func<string, string, bool> compare = null)
@@ -117,13 +122,18 @@ namespace s3i_lib
             if (null == compare) compare = defaultPathCompare;
             return entries.Where(e => !Exists(product => compare(product.LocalPath, e)));
         }
-        public (IEnumerable<string> filesToUninstall, IEnumerable<ProductInfo> productsToInstall) Separate(string tempFilePath)
+        /// <summary>
+        /// Separates product list into two: downgraded, and products to install or reinstall, based on already cached products
+        /// </summary>
+        /// <param name="rootFolder">Cache folder to look for installed product information (*.json)</param>
+        /// <returns></returns>
+        public (IEnumerable<string> filesToUninstall, IEnumerable<ProductInfo> productsToInstall) Separate(string rootFolder)
         {
-            return Separate(FindFilesToUninstall(tempFilePath), p => { return ProductInfo.FindInstalled(tempFilePath).Result; });
+            return Separate(p => { return ProductInfo.FindInstalled(rootFolder).Result; });
         }
-        public (IEnumerable<string> filesToUninstall, IEnumerable<ProductInfo> productsToInstall) Separate(IEnumerable<string> files, Func<string, ProductInfo> findInstalledProduct)
+        public (IEnumerable<string> filesToUninstall, IEnumerable<ProductInfo> productsToInstall) Separate(Func<string, ProductInfo> findInstalledProduct)
         {
-            var uninstall = new List<string>(FilesToUninstall(files));
+            var uninstall = new List<string>();
             var install = new List<ProductInfo>();
             foreach(var product in this) 
             {

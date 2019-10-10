@@ -126,38 +126,43 @@ Three    = https://xxx.s3.amazonaws.com/Test/Windows10/Distrib//SecondProduct/9.
         [Test]
         public void Separate()
         {
-            var tempFilePath = "X:\\temp\\";
-            //Assert.That(new SemanticVersion_Test())
             Assert.That(SemanticVersion.From("https://download/here/Prod01/9.4.7/p1.msi").CompareTo(SemanticVersion.From("https://download/here/Prod01/9.4.8+upgrade/p1.msi")), Is.LessThan(0));
             Assert.That(SemanticVersion.From("https://download/here/Prod02/3.3.5/p2.msi").CompareTo(SemanticVersion.From("https://download/here/Prod02/3.3.5+keep/p2.msi")), Is.EqualTo(0));
             Assert.That(SemanticVersion.From("https://download/there/Prod03/12.5.8/p3.msi").CompareTo(SemanticVersion.From("https://download/there/Prod03/12.5.4+downgrade/p3.msi")), Is.GreaterThan(0));
             //Assert.That(SemanticVersion.From("https://download/here/Prod01/9.4.7/p1.msi").CompareTo(SemanticVersion.From("https://download/here/Prod01/9.4.8+upgrade/p1.msi")), Is.LessThan(0));
             var installed = new Dictionary<string, string> {
-                { $"{tempFilePath}\\Prod01\\p1.msi", "https://download/here/Prod01/9.4.7/p1.msi" },
-                { $"{tempFilePath}\\Prod02\\p2.msi", "https://download/here/Prod02/3.3.5/p2.msi" },
-                { $"{tempFilePath}\\Prod03\\p3.msi", "https://download/there/Prod03/12.5.8/p3.msi" },
-                { $"{tempFilePath}\\ProdXX\\px.msi", "https://download/there/ProdXX/1.2.5.8+uninstall/px.msi" },
+                { "Prod01\\p1.msi", "https://download/here/Prod01/9.4.7/p1.msi" },
+                { "Prod02\\p2.msi", "https://download/here/Prod02/3.3.5/p2.msi" },
+                { "Prod03\\p3.msi", "https://download/there/Prod03/12.5.8/p3.msi" },
+                { "ProdXX\\px.msi", "https://download/there/ProdXX/1.2.5.8+uninstall/px.msi" },
             };
             var products = new Products { 
-                new ProductInfo { Name = "Prod01", AbsoluteUri = "https://download/here/Prod01/9.4.8+upgrade/p1.msi", LocalPath = $"{tempFilePath}\\Prod01\\p1.msi", },
-                new ProductInfo { Name = "Prod02", AbsoluteUri = "https://download/here/Prod02/3.3.5+keep/p2.msi", LocalPath = $"{tempFilePath}\\Prod02\\p2.msi", },
-                new ProductInfo { Name = "Prod03", AbsoluteUri = "https://download/there/Prod03/12.5.4+downgrade/p3.msi", LocalPath = $"{tempFilePath}\\Prod03\\p3.msi", },
-                new ProductInfo { Name = "Prod04", AbsoluteUri = "https://download/from/Prod04/1.2.3+install/p4.msi", LocalPath = $"{tempFilePath}\\Prod04\\p4.msi", },
+                new ProductInfo { Name = "Prod01", AbsoluteUri = "https://download/here/Prod01/9.4.8+upgrade/p1.msi", LocalPath = "Prod01\\p1.msi", },
+                new ProductInfo { Name = "Prod02", AbsoluteUri = "https://download/here/Prod02/3.3.5+keep/p2.msi", LocalPath = "Prod02\\p2.msi", },
+                new ProductInfo { Name = "Prod03", AbsoluteUri = "https://download/there/Prod03/12.5.4+downgrade/p3.msi", LocalPath = "Prod03\\p3.msi", },
+                new ProductInfo { Name = "Prod04", AbsoluteUri = "https://download/from/Prod04/1.2.3+install/p4.msi", LocalPath = "Prod04\\p4.msi", },
             };
-            //var ppp = products[0].MapToLocalPath(tempFilePath);
-            //Assert.That(products.Count, Is.EqualTo(4));
-            var (uninstall, install) = products.Separate(installed.Values, localPath =>
+            var remove = products.FilesToUninstall(installed.Keys);
+            var (uninstall, install) = products.Separate(localPath =>
             {
                 var uri = installed.ContainsKey(localPath) ? installed[localPath] : null;
                 return new ProductInfo { AbsoluteUri = uri, };
             });
-            Console.WriteLine($"Uninstall:");
-            foreach(var u in uninstall) Console.WriteLine($"  {u}");
-            Console.WriteLine($"Install:");
-            foreach(var i in install) Console.WriteLine($"  {i}");
-            Assert.That(uninstall.Count(), Is.EqualTo(4));
-            //Assert.That(uninstall.ElementAt(0), Is.EqualTo(installed[1]));
-            //Assert.That(uninstall.ElementAt(1), Is.EqualTo(installed[3]));
+            //Console.WriteLine($"Remove:");
+            //foreach (var r in remove) Console.WriteLine($"  {r}"); 
+            //Console.WriteLine($"Uninstall:");
+            //foreach(var u in uninstall) Console.WriteLine($"  {u}");
+            //Console.WriteLine($"Install:");
+            //foreach(var i in install) Console.WriteLine($"  {i}");
+            Assert.That(remove.Count(), Is.EqualTo(1));
+            Assert.That(remove.ElementAt(0), Is.EqualTo("ProdXX\\px.msi"));
+            Assert.That(uninstall.Count(), Is.EqualTo(1));
+            Assert.That(uninstall.ElementAt(0), Is.EqualTo("Prod03\\p3.msi"));
+            Assert.That(install.Count(), Is.EqualTo(4));
+            Assert.That(install.ElementAt(0).AbsoluteUri, Is.EqualTo("https://download/here/Prod01/9.4.8+upgrade/p1.msi"));
+            Assert.That(install.ElementAt(1).AbsoluteUri, Is.EqualTo("https://download/here/Prod02/3.3.5+keep/p2.msi"));
+            Assert.That(install.ElementAt(2).AbsoluteUri, Is.EqualTo("https://download/there/Prod03/12.5.4+downgrade/p3.msi"));
+            Assert.That(install.ElementAt(3).AbsoluteUri, Is.EqualTo("https://download/from/Prod04/1.2.3+install/p4.msi"));
         }
     }
 
