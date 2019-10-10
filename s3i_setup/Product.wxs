@@ -89,5 +89,7 @@
 
     <MajorUpgrade DowngradeErrorMessage="A newer than [ProductVersion] version of [ProductName] is already installed." />
   </Product>
+ 
+  
 
 </Wix>
