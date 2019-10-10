@@ -26,6 +26,7 @@ namespace s3i_lib
         }
         public Installer.Action CompareAndSelectAction(ProductInfo installedProduct)
         {
+            if(null == installedProduct) return Installer.Action.Install;
             // use absolute uri to compare versions
             var versionIsNewer = AbsoluteUri.CompareTo(installedProduct.AbsoluteUri);
             // if new is greater, install

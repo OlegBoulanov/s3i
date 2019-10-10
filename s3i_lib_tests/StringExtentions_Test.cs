@@ -11,6 +11,8 @@ namespace s3i_lib_tests
     
     public class StringExtentions_Test
     {
+        char x = Path.DirectorySeparatorChar;
+
         [Test]
         public void RemoveDotSegments()
         {
@@ -37,10 +39,9 @@ namespace s3i_lib_tests
         [Test]
         public void RebaseUri()
         {
-            Assert.AreEqual("https://bucket/dir1/dir2/dir3/file.ext",
-                "https://bucket/dir1/dir2/dir3/file.ext".RebaseUri("https://bucket.s3.amazonaws.com/directory1/dir2/dir3/file.ext"));
+            Assert.AreEqual("https://bucket/dir1/dir2/dir3/file.ext", "https://bucket/dir1/dir2/dir3/file.ext".RebaseUri("https://bucket.s3.amazonaws.com/directory1/dir2/dir3/file.ext"));
             Assert.AreEqual("c:/dir3/file.ext", "c:/dir3/file.ext".RebaseUri("https://bucket/dir1/dir2/dir345/file99.ext88"));
-            Assert.AreEqual("\\dir1\\dir2\\dir3/file.ext", Path.Combine(Path.GetDirectoryName("/dir1/dir2/dir345/file99.ext88"), "../dir3/file.ext").RemoveDotSegments());
+            Assert.AreEqual("{x}dir1{x}dir2{x}dir3/file.ext", Path.Combine(Path.GetDirectoryName("/dir1/dir2/dir345/file99.ext88"), "../dir3/file.ext").RemoveDotSegments());
             Assert.AreEqual("https://bucket:443/dir1/dir2/dir3/file.ext", "../dir3/file.ext".RebaseUri("https://bucket/dir1/dir2/dir345/file99.ext88"));
             Assert.AreEqual("https://bucket:443/dir1/dir2/dir3/", "../dir3/".RebaseUri("https://bucket/dir1/dir2/dir345/file99.ext88"));
         }
@@ -56,9 +57,9 @@ namespace s3i_lib_tests
         [Test]
         public void MapToLocalPath()
         {
-            Assert.AreEqual("C:\\Temp\\subdir\\bucket\\dir1\\dir2\\dir345\\file99.ext88", "https://bucket/dir1/dir2/dir345/file99.ext88".MapToLocalPath("C:\\Temp\\subdir"));
-            Assert.AreEqual("C:\\Temp\\subdir\\another.bucket.com.s3.amazonaws.com\\Test\\Windows10\\Config\\s3i\\1\\Products.ini", "https://another.bucket.com.s3.amazonaws.com/Test/Windows10/Config/s3i/1/Products.ini".MapToLocalPath("C:\\Temp\\subdir"));
-            Assert.AreEqual("C:\\Temp\\subdir\\another.bucket.com.s3.amazonaws.com\\Test\\Windows10\\Config\\s3i\\1\\Products.ini", "https://another.bucket.com.s3.amazonaws.com/Test/Windows10/Config/s3i/1/Products.ini".MapToLocalPath("C:\\Temp\\subdir"));
+            Assert.AreEqual($"C:{x}Temp{x}subdir{x}bucket{x}dir1{x}dir2{x}dir345{x}file99.ext88", "https://bucket/dir1/dir2/dir345/file99.ext88".MapToLocalPath("C:\\Temp\\subdir"));
+            Assert.AreEqual($"C:{x}Temp{x}subdir{x}another.bucket.com.s3.amazonaws.com{x}Test{x}Windows10{x}Config{x}s3i{x}1{x}Products.ini", "https://another.bucket.com.s3.amazonaws.com/Test/Windows10/Config/s3i/1/Products.ini".MapToLocalPath("C:\\Temp\\subdir"));
+            Assert.AreEqual($"C:{x}Temp{x}subdir{x}another.bucket.com.s3.amazonaws.com{x}Test{x}Windows10{x}Config{x}s3i{x}1{x}Products.ini", "https://another.bucket.com.s3.amazonaws.com/Test/Windows10/Config/s3i/1/Products.ini".MapToLocalPath("C:\\Temp\\subdir"));
         }
         [Test]
         public void TestQuoting()

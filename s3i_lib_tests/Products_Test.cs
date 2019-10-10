@@ -66,7 +66,8 @@ Three    = https://xxx.s3.amazonaws.com/Test/Windows10/Distrib//SecondProduct/9.
             var files = from p in products select new { product = p, local = p.AbsoluteUri.MapToLocalPath("c:/Temp/")  };
             Assert.AreEqual(3, products.Count);
             Assert.AreEqual(3, files.Count());
-            Assert.AreEqual("c:\\Temp\\xxx.s3.amazonaws.com\\Test\\Windows10\\Distrib\\ProductOne\\12.6.16\\ProductOne.msi", files.First().local);
+            var x = Path.DirectorySeparatorChar;
+            Assert.AreEqual($"c:{x}Temp{x}xxx.s3.amazonaws.com{x}Test{x}Windows10{x}Distrib{x}ProductOne{x}12.6.16{x}ProductOne.msi", files.First().local);
         }
 
         static string products1 = "[$products$]\nOne=https://x.amazonaws.com/one/config.ini\nTwo=https://x.amazonaws.com/one/config.ini\n[One]p11=1\np12=2\n[Two]\np21=11\np22=12\n";
@@ -118,36 +119,41 @@ Three    = https://xxx.s3.amazonaws.com/Test/Windows10/Distrib//SecondProduct/9.
             var tempFilePath = Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location);
             var dlls = Directory.EnumerateFileSystemEntries(tempFilePath, "AWSSDK*.dll", SearchOption.AllDirectories).Select(s => Path.Combine(tempFilePath, s)).ToList();
             Assert.That(dlls.Count(), Is.EqualTo(2));
-            Assert.That(dlls[0], Is.EqualTo($"{tempFilePath}\\AWSSDK.Core.dll"));
-            Assert.That(dlls[1], Is.EqualTo($"{tempFilePath}\\AWSSDK.S3.dll"));
+            Assert.That(dlls.Contains($"{Path.Combine(tempFilePath, "AWSSDK.Core.dll")}"));
+            Assert.That(dlls.Contains($"{Path.Combine(tempFilePath, "AWSSDK.S3.dll")}"));
         }
 
         [Test]
         public void Separate()
         {
             var tempFilePath = "X:\\temp\\";
-            var installed = new List<string> {
-                "https://download/here/Prod01/9.4.7/p1.msi",
-                "https://download/here/Prod02/3.3.5/p2.msi",
-                "https://download/there/Prod03/12.5.8/p3.msi",
-                $"{tempFilePath}SomethingElse.msi",
+            //Assert.That(new SemanticVersion_Test())
+            var installed = new Dictionary<string, string> {
+                { $"{tempFilePath}\\Prod01\\p1.msi", "https://download/here/Prod01/9.4.7/p1.msi" },
+                { $"{tempFilePath}\\Prod02\\p2.msi", "https://download/here/Prod02/3.3.5/p2.msi" },
+                { $"{tempFilePath}\\Prod03\\p3.msi", "https://download/there/Prod03/12.5.8/p3.msi" },
+                { $"{tempFilePath}\\ProdXX\\px.msi", "https://download/there/ProdXX/1.2.5.8+uninstall/px.msi" },
             };
             var products = new Products { 
-                new ProductInfo { Name = "Prod01", AbsoluteUri = "https://download/here/Prod01/9.4.8/p1.msi", LocalPath = $"{tempFilePath}\\Prod01\\p1.msi", },
-                new ProductInfo { Name = "Prod02", AbsoluteUri = "https://download/here/Prod02/3.3.5/p2.msi", LocalPath = $"{tempFilePath}\\Prod02\\p2.msi", },
-                new ProductInfo { Name = "Prod03", AbsoluteUri = "https://download/there/Prod03/12.5.4/p3.msi", LocalPath = $"{tempFilePath}\\Prod03\\p3.msi", },
-                new ProductInfo { Name = "Prod04", AbsoluteUri = "https://download/from/Prod04/p4.msi", LocalPath = $"{tempFilePath}\\Prod04\\p4.msi", },
+                new ProductInfo { Name = "Prod01", AbsoluteUri = "https://download/here/Prod01/9.4.8+upgrade/p1.msi", LocalPath = $"{tempFilePath}\\Prod01\\p1.msi", },
+                new ProductInfo { Name = "Prod02", AbsoluteUri = "https://download/here/Prod02/3.3.5+keep/p2.msi", LocalPath = $"{tempFilePath}\\Prod02\\p2.msi", },
+                new ProductInfo { Name = "Prod03", AbsoluteUri = "https://download/there/Prod03/12.5.4+downgrade/p3.msi", LocalPath = $"{tempFilePath}\\Prod03\\p3.msi", },
+                new ProductInfo { Name = "Prod04", AbsoluteUri = "https://download/from/Prod04/1.2.3+install/p4.msi", LocalPath = $"{tempFilePath}\\Prod04\\p4.msi", },
             };
-            var ppp = products[0].MapToLocalPath(tempFilePath);
-            Assert.That(products.Count, Is.EqualTo(4));
-            var (uninstall, install) = products.Separate(installed, localPath =>
+            //var ppp = products[0].MapToLocalPath(tempFilePath);
+            //Assert.That(products.Count, Is.EqualTo(4));
+            var (uninstall, install) = products.Separate(installed.Values, localPath =>
             {
-                var uri = installed.Find(e => 0 == e.MapToLocalPath(tempFilePath).CompareTo(localPath));
-                return new ProductInfo { Name = Path.GetFileNameWithoutExtension(uri), AbsoluteUri = uri, };
+                var uri = installed.ContainsKey(localPath) ? installed[localPath] : null;
+                return new ProductInfo { AbsoluteUri = uri, };
             });
+            Console.WriteLine($"Uninstall:");
+            foreach(var u in uninstall) Console.WriteLine($"  {u}");
+            Console.WriteLine($"Install:");
+            foreach(var i in install) Console.WriteLine($"  {i}");
             Assert.That(uninstall.Count(), Is.EqualTo(4));
-            Assert.That(uninstall.ElementAt(0), Is.EqualTo(installed[1]));
-            Assert.That(uninstall.ElementAt(1), Is.EqualTo(installed[3]));
+            //Assert.That(uninstall.ElementAt(0), Is.EqualTo(installed[1]));
+            //Assert.That(uninstall.ElementAt(1), Is.EqualTo(installed[3]));
         }
     }
 

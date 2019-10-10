@@ -11,6 +11,17 @@ using Amazon.S3.Util;
 
 namespace s3i_lib
 {
+    public static class PathExtensions
+    {
+        public static bool IsFullPath(this string path)
+        {
+            return !String.IsNullOrWhiteSpace(path)
+                && path.IndexOfAny(System.IO.Path.GetInvalidPathChars().ToArray()) == -1
+                && Path.IsPathRooted(path)
+                && !Path.GetPathRoot(path).Equals(Path.DirectorySeparatorChar.ToString(), StringComparison.Ordinal);
+        }
+    }
+
     public static class StringExtentions
     {
         public static readonly Regex rexDotSegments = new Regex(@"[^\\/]+[\\/]\.\.[\\/]", RegexOptions.Compiled);
@@ -38,7 +49,7 @@ namespace s3i_lib
         }
         public static string RebaseUri(this string uri, string baseUri)
         {
-            return IsUri(uri) ? uri : Path.IsPathRooted(uri) ? uri : baseUri.BuildRelativeUri(uri);
+            return IsUri(uri) ? uri : uri.IsFullPath() ? uri : baseUri.BuildRelativeUri(uri);
         }
         public static string MapToLocalPath(this string uri, string localPath)
         {
