@@ -24,10 +24,10 @@ namespace s3i
             int exitCode = 0;
             var assembly = Assembly.GetExecutingAssembly();
             var exeFileName = Path.GetFileName(assembly.Location);
-            var version = assembly.GetName().Version;
+            var version = FileVersionInfo.GetVersionInfo(assembly.Location);
             var commandLine = new CommandLine
             {
-                HelpHeader = $"S3 download and install v{version}{Environment.NewLine}"
+                HelpHeader = $"{version.ProductName}: S3 download and install v{version.ProductVersion}{Environment.NewLine}"
                            + $" Usage:{Environment.NewLine}"
                            + $"  {exeFileName} [<option> ...] <products> ..."
             };
