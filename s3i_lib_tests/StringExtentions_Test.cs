@@ -11,7 +11,7 @@ namespace s3i_lib_tests
     
     public class StringExtentions_Test
     {
-        char x = Path.DirectorySeparatorChar;
+        readonly char x = Path.DirectorySeparatorChar;
 
         [Test]
         public void RemoveDotSegments()
@@ -41,7 +41,7 @@ namespace s3i_lib_tests
         {
             Assert.AreEqual("https://bucket/dir1/dir2/dir3/file.ext", "https://bucket/dir1/dir2/dir3/file.ext".RebaseUri("https://bucket.s3.amazonaws.com/directory1/dir2/dir3/file.ext"));
             Assert.AreEqual("c:/dir3/file.ext", "c:/dir3/file.ext".RebaseUri("https://bucket/dir1/dir2/dir345/file99.ext88"));
-            Assert.AreEqual("{x}dir1{x}dir2{x}dir3/file.ext", Path.Combine(Path.GetDirectoryName("/dir1/dir2/dir345/file99.ext88"), "../dir3/file.ext").RemoveDotSegments());
+            Assert.AreEqual($"{x}dir1{x}dir2{x}dir3/file.ext", Path.Combine(Path.GetDirectoryName("/dir1/dir2/dir345/file99.ext88"), "../dir3/file.ext").RemoveDotSegments());
             Assert.AreEqual("https://bucket:443/dir1/dir2/dir3/file.ext", "../dir3/file.ext".RebaseUri("https://bucket/dir1/dir2/dir345/file99.ext88"));
             Assert.AreEqual("https://bucket:443/dir1/dir2/dir3/", "../dir3/".RebaseUri("https://bucket/dir1/dir2/dir345/file99.ext88"));
         }
