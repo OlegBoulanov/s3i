@@ -79,9 +79,14 @@ namespace s3i
                         Console.WriteLine($"  {p.Name}: {p.AbsoluteUri} => {p.LocalPath}");
                         foreach (var pp in p.Props) Console.WriteLine($"    {pp.Key} = {pp.Value}");
                     }
-                }                
+                }
+                if (!Directory.Exists(commandLine.TempFolder))
+                {
+                    if (commandLine.Verbose) Console.WriteLine($"Create {commandLine.TempFolder}");
+                    Directory.CreateDirectory(commandLine.TempFolder);
+                }
                 // installed products (cached installer files) we don't need anymore
-                remove = products.FindFilesToUninstall(Path.Combine(commandLine.TempFolder, "*.msi"));
+                remove = products.FindFilesToUninstall(Path.Combine(commandLine.TempFolder, $"*{Installer.InstallerFileExtension}"));
                 if (commandLine.Verbose)
                 {
                     if (0 < remove.Count())
@@ -89,8 +94,12 @@ namespace s3i
                         Console.WriteLine($"Remove [{remove.Count()}]:");
                         foreach (var f in remove) Console.WriteLine($"  {f}");
                     }
-                }                // list of files to uninstall for downgrade or props change, and list of products to install/upgrade
-                (uninstall, install) = products.Separate(commandLine.TempFolder);
+                }                
+                // Prepare a list of files to uninstall for downgrade or props change, and another list of products to install/upgrade
+                (uninstall, install) = products.Separate(localMsiFile => {
+                    var localInfoFile = Path.ChangeExtension(localMsiFile, ProductInfo.LocalInfoFileExtension);
+                    return ProductInfo.FindInstalled(localInfoFile).Result;
+                });
                 if (commandLine.Verbose)
                 {
                     if (0 < uninstall.Count())

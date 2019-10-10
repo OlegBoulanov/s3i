@@ -17,8 +17,8 @@ namespace s3i
         [CommandLine("MsiExec command", "-m", "--msiexec")]
         public string MsiExecCommand { get; set; } = "msiexec.exe";
 
-        [CommandLine("MsiExec keys", "-k", "--msikeys")]
-        public string MsiExecKeys { get; set; } = "";
+        //[CommandLine("MsiExec keys", "-k", "--msikeys")]
+        //public string MsiExecKeys { get; set; } = "";
 
         [CommandLine("MsiExec extra args", "-a", "--msiargs")]
         public string MsiExecArgs { get; set; }

@@ -110,22 +110,15 @@ namespace s3i_lib
         /// <returns></returns>
         public IEnumerable<string> FindFilesToUninstall(string rootFolderAndMask)
         {
-            return FilesToUninstall(Directory.EnumerateFiles(rootFolderAndMask, $"*{Path.GetExtension(rootFolderAndMask)}", SearchOption.AllDirectories).Select(s => Path.Combine(rootFolderAndMask, s)));
+            var root = Path.GetDirectoryName(rootFolderAndMask);
+            var mask = $"*{Path.GetExtension(rootFolderAndMask)}";
+            return FilesToUninstall(Directory.EnumerateFiles(root, mask, SearchOption.AllDirectories).Select(s => Path.Combine(root, s)));
         }
         public static Func<string, string, bool> defaultPathCompare = (s1, s2) => { return 0 == string.Compare(s1, s2, true); };
         public IEnumerable<string> FilesToUninstall(IEnumerable<string> entries, Func<string, string, bool> compare = null)
         {
             if (null == compare) compare = defaultPathCompare;
             return entries.Where(e => !Exists(product => compare(product.LocalPath, e)));
-        }
-        /// <summary>
-        /// Separates product list into two: downgraded, and products to install or reinstall, based on already cached products
-        /// </summary>
-        /// <param name="rootFolder">Cache folder to look for installed product information (*.json)</param>
-        /// <returns></returns>
-        public (IEnumerable<string> filesToUninstall, IEnumerable<ProductInfo> productsToInstall) Separate(string rootFolder)
-        {
-            return Separate(p => { return ProductInfo.FindInstalled(rootFolder).Result; });
         }
         public (IEnumerable<string> filesToUninstall, IEnumerable<ProductInfo> productsToInstall) Separate(Func<string, ProductInfo> findInstalledProduct)
         {
@@ -139,7 +132,8 @@ namespace s3i_lib
                     install.Add(product);
                     continue;
                 }
-                switch (product.CompareAndSelectAction(installedProduct))
+                var installerAction = product.CompareAndSelectAction(installedProduct);
+                switch (installerAction)
                 {
                     case Installer.Action.Install:
                         install.Add(product);
