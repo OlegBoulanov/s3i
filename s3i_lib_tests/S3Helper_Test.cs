@@ -24,7 +24,6 @@ using s3i_lib;
 namespace s3i_lib_tests
 {
     [TestFixture]
-    [Category("AWS")]
     public class S3Helper_Test
     {
         const string testProfileName = "test.s3i";
@@ -48,6 +47,7 @@ namespace s3i_lib_tests
         }
 
         [Test]
+        [Category("AWS")]
         public async Task GetTestObject()
         {
             var s3 = GetClient(RegionEndpoint.USEast2);
@@ -57,6 +57,7 @@ namespace s3i_lib_tests
         }
 
         [Test]
+        [Category("AWS")]
         public async Task GetTestBucketLocation()
         {
             var s3 = GetClient(RegionEndpoint.USEast1);
@@ -67,6 +68,7 @@ namespace s3i_lib_tests
         }
 
         [Test]
+        [Category("AWS")]
         public async Task S3Download()
         {
             var s3 = new S3Helper(testProfileName);//, new AmazonS3Client(RegionEndpoint.USEast2));
@@ -88,6 +90,7 @@ namespace s3i_lib_tests
 
        
         [Test]
+        [Category("AWS")]
         public async Task ReadTwoIniFilesFromS3()
         {
             var s3 = new S3Helper(testProfileName);
