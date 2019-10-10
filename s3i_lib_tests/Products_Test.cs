@@ -128,6 +128,10 @@ Three    = https://xxx.s3.amazonaws.com/Test/Windows10/Distrib//SecondProduct/9.
         {
             var tempFilePath = "X:\\temp\\";
             //Assert.That(new SemanticVersion_Test())
+            Assert.That(SemanticVersion.From("https://download/here/Prod01/9.4.7/p1.msi").CompareTo(SemanticVersion.From("https://download/here/Prod01/9.4.8+upgrade/p1.msi")), Is.LessThan(0));
+            Assert.That(SemanticVersion.From("https://download/here/Prod02/3.3.5/p2.msi").CompareTo(SemanticVersion.From("https://download/here/Prod02/3.3.5+keep/p2.msi")), Is.EqualTo(0));
+            Assert.That(SemanticVersion.From("https://download/there/Prod03/12.5.8/p3.msi").CompareTo(SemanticVersion.From("https://download/there/Prod03/12.5.4+downgrade/p3.msi")), Is.GreaterThan(0));
+            //Assert.That(SemanticVersion.From("https://download/here/Prod01/9.4.7/p1.msi").CompareTo(SemanticVersion.From("https://download/here/Prod01/9.4.8+upgrade/p1.msi")), Is.LessThan(0));
             var installed = new Dictionary<string, string> {
                 { $"{tempFilePath}\\Prod01\\p1.msi", "https://download/here/Prod01/9.4.7/p1.msi" },
                 { $"{tempFilePath}\\Prod02\\p2.msi", "https://download/here/Prod02/3.3.5/p2.msi" },
