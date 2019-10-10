@@ -15,12 +15,6 @@ namespace s3i_lib
 {
     public class Products : List<ProductInfo>
     {
-        public Products() { }
-        public Products(IEnumerable<ProductInfo> p) { AddRange(p); }
-        public string ToJson()
-        {
-            return JsonConvert.SerializeObject(this, Formatting.Indented);
-        }
         public static async Task<Products> FromJson(Stream stream)
         {
             using(var reader = new StreamReader(stream))
@@ -78,6 +72,7 @@ namespace s3i_lib
         }
         public static async Task<Products> ReadProducts(S3Helper s3, IEnumerable<string> uris, string tempFilePath)
         {
+            var products = new Products();
             var arrayOfProducts = await Task.WhenAll(
                 uris.Aggregate(new List<Task<Products>>(),
                 (tasks, uri) =>
@@ -88,7 +83,8 @@ namespace s3i_lib
                     }));
                     return tasks;
                 }));
-            return new Products(arrayOfProducts.SelectMany(x => x));
+            products.AddRange(arrayOfProducts.SelectMany(x => x));
+            return products;
             //return arrayOfProducts.Aggregate(new Products(), (p, pp) => { p.AddRange(pp); return p; });
         }
 
@@ -114,7 +110,7 @@ namespace s3i_lib
         /// <returns></returns>
         public IEnumerable<string> FindFilesToUninstall(string rootFolderAndMask)
         {
-            return FilesToUninstall(Directory.EnumerateFileSystemEntries(rootFolderAndMask, $"*{Path.GetExtension(rootFolderAndMask)}", SearchOption.AllDirectories).Select(s => Path.Combine(rootFolderAndMask, s)));
+            return FilesToUninstall(Directory.EnumerateFiles(rootFolderAndMask, $"*{Path.GetExtension(rootFolderAndMask)}", SearchOption.AllDirectories).Select(s => Path.Combine(rootFolderAndMask, s)));
         }
         public static Func<string, string, bool> defaultPathCompare = (s1, s2) => { return 0 == string.Compare(s1, s2, true); };
         public IEnumerable<string> FilesToUninstall(IEnumerable<string> entries, Func<string, string, bool> compare = null)
