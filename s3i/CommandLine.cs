@@ -8,17 +8,18 @@ namespace s3i
     {
         [CommandLine("Print help info", "-h", "--help")]
         public bool PrintHelp { get; set; } = false;
+
         [CommandLine("AWS user profile name", "-p", "--profile")]
         public string ProfileName { get; set; } = "default";
 
-        [CommandLine("Path to temp folder", "-e", "--temp")]
+        [CommandLine("Environment variable name (default command line)", "-e", "--envvar")]
+        public string EnvironmentVariableName { get; set; } = "s3i_args";
+
+        [CommandLine("Path to temp folder", "-x", "--temp")]
         public string TempFolder { get; set; } = Environment.GetEnvironmentVariable("TEMP");
 
         [CommandLine("MsiExec command", "-m", "--msiexec")]
         public string MsiExecCommand { get; set; } = "msiexec.exe";
-
-        //[CommandLine("MsiExec keys", "-k", "--msikeys")]
-        //public string MsiExecKeys { get; set; } = "";
 
         [CommandLine("MsiExec extra args", "-a", "--msiargs")]
         public string MsiExecArgs { get; set; }
@@ -31,7 +32,6 @@ namespace s3i
 
         [CommandLine("Print full log info", "-v", "--verbose")]
         public bool Verbose { get; set; }
-        [CommandLine("Clear stored command line and exit", "-r", "--reset")]
-        public bool ResetDefaultCommandLine { get; set; }
+
     }
 }
