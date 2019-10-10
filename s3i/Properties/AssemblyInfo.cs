@@ -8,7 +8,7 @@ using System.Runtime.InteropServices;
 [assembly: AssemblyTitle("s3i")]
 [assembly: AssemblyDescription("Msi installation helper")]
 [assembly: AssemblyConfiguration("")]
-[assembly: AssemblyCompany("Eliza Corporation")]
+[assembly: AssemblyCompany("Oleg Boulanov")]
 [assembly: AssemblyProduct("s3i")]
 [assembly: AssemblyCopyright("Copyright © Oleg Boulanov 2019")]
 [assembly: AssemblyTrademark("")]
