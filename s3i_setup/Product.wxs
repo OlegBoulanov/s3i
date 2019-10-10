@@ -53,7 +53,7 @@
       <Component Id="s3i_command" Guid="{36119CD0-A673-4695-BA85-3D109D2F76DE}">
         <RemoveFolder Id="Product_Root" On="uninstall"/>
         <File Id="s3i.exe" Name="s3i.exe" KeyPath="yes"/>
-        <File Id="s3i.exe.config" Name="s3i.exe.config"/>
+        <!--File Id="s3i.exe.config" Name="s3i.exe.config"/-->
         <File Id="s3i_lib.dll" Name="s3i_lib.dll" Vital="yes"/>
         <!-- set configuration properties from command line PROPS -->
         <?define XPathPrefix=//configuration/userSettings/s3i.Properties.Settings/setting?>
