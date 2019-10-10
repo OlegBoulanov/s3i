@@ -37,7 +37,7 @@ namespace s3i_lib
                         break;
                 }
             }
-            return region2client.GetOrAdd(regionName, (_regionName) =>
+            return null == regionName ? null : region2client.GetOrAdd(regionName, (_regionName) =>
             {
                 return new AmazonS3Client(Credentials, new AmazonS3Config { RegionEndpoint = RegionEndpoint.GetBySystemName(_regionName), SignatureVersion = "4" });
             });

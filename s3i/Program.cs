@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.IO;
 using System.Linq;
 using System.Configuration;
@@ -29,16 +30,13 @@ namespace s3i
                            + $"  {exeFileName} [<option> ...] <products> ..."
             };
             commandLine.Parse(args);
-            if (commandLine.ResetDefaultCommandLine)
-            {
-                Properties.Settings.Default.CommandLineArgs = String.Empty;
-                Properties.Settings.Default.Save();
-                return 0;
-            }
             if (commandLine.Arguments.Count < 1)
             {
-                var defaultCommandLine = Properties.Settings.Default.CommandLineArgs;
-                if(!string.IsNullOrEmpty(defaultCommandLine)) commandLine.HelpTail = $"Default command line: {defaultCommandLine}";
+                // no command args provided, try to obtain from env var
+                var cmd2expand = $"%{commandLine.EnvironmentVariableName}%";
+                var defaultCommandLine = Environment.ExpandEnvironmentVariables(cmd2expand);
+                if (0 == string.Compare(cmd2expand, defaultCommandLine)) defaultCommandLine = null;
+                if(!string.IsNullOrEmpty(defaultCommandLine)) commandLine.HelpTail = $"Default command line ({cmd2expand}): {defaultCommandLine}";
                 // no args provided, try to use saved
                 if (commandLine.PrintHelp)
                 {
@@ -52,12 +50,6 @@ namespace s3i
                     Console.WriteLine(commandLine.Help());
                     return -1;
                 }
-            }
-            else
-            {
-                // user provided args, save those
-                Properties.Settings.Default.CommandLineArgs = args.Aggregate("", (a, s) => { return $"{a} {s}"; });
-                Properties.Settings.Default.Save();
             }
             //
             var clock = System.Diagnostics.Stopwatch.StartNew();
@@ -78,9 +70,14 @@ namespace s3i
                         Console.WriteLine($"  {p.Name}: {p.AbsoluteUri} => {p.LocalPath}");
                         foreach (var pp in p.Props) Console.WriteLine($"    {pp.Key} = {pp.Value}");
                     }
-                }                
+                }
+                if (!Directory.Exists(commandLine.TempFolder))
+                {
+                    if (commandLine.Verbose) Console.WriteLine($"Create {commandLine.TempFolder}");
+                    Directory.CreateDirectory(commandLine.TempFolder);
+                }
                 // installed products (cached installer files) we don't need anymore
-                remove = products.FindFilesToUninstall(Path.Combine(commandLine.TempFolder, "*.msi"));
+                remove = products.FindFilesToUninstall(Path.Combine(commandLine.TempFolder, $"*{Installer.InstallerFileExtension}"));
                 if (commandLine.Verbose)
                 {
                     if (0 < remove.Count())
@@ -88,8 +85,12 @@ namespace s3i
                         Console.WriteLine($"Remove [{remove.Count()}]:");
                         foreach (var f in remove) Console.WriteLine($"  {f}");
                     }
-                }                // list of files to uninstall for downgrade or props change, and list of products to install/upgrade
-                (uninstall, install) = products.Separate(commandLine.TempFolder);
+                }                
+                // Prepare a list of files to uninstall for downgrade or props change, and another list of products to install/upgrade
+                (uninstall, install) = products.Separate(localMsiFile => {
+                    var localInfoFile = Path.ChangeExtension(localMsiFile, ProductInfo.LocalInfoFileExtension);
+                    return ProductInfo.FindInstalled(localInfoFile).Result;
+                });
                 if (commandLine.Verbose)
                 {
                     if (0 < uninstall.Count())
@@ -137,6 +138,10 @@ namespace s3i
             {
                 Console.WriteLine();
                 Console.WriteLine($"Elapsed: {clock.Elapsed}");
+            }
+            if (Debugger.IsAttached)
+            {
+                Console.Write("Press Enter..."); Console.ReadLine();
             }
             return exitCode;
         }

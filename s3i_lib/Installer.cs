@@ -17,6 +17,7 @@ namespace s3i_lib
     {
         public enum Action { NoAction, Install, Reinstall, Uninstall };
         public static string MsiExec { get; protected set; } = "msiexec.exe";
+        public static string InstallerFileExtension { get; protected set; } = ".msi";
         public static int RunInstall(string commandLineArgs, TimeSpan timeout)
         {
             using (var process = Process.Start(MsiExec, commandLineArgs))

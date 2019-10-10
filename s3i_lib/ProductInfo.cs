@@ -56,17 +56,15 @@ namespace s3i_lib
             }
         }
         public static string LocalInfoFileExtension { get; } = ".json";
-        public async Task SaveToLocal()
+        public async Task SaveToLocal(string path)
         {
-            var path = $"{Path.GetFileNameWithoutExtension(LocalPath)}{LocalInfoFileExtension}";
-            using(var fs = new FileStream(path, FileMode.Create))
+            using (var fs = new FileStream(path, FileMode.Create))
             {
                 await ToJson(fs);
             }
         }
-        public static async Task<ProductInfo> FindInstalled(string localPath)
+        public static async Task<ProductInfo> FindInstalled(string path)
         {
-            var path = $"{Path.GetFileNameWithoutExtension(localPath)}{LocalInfoFileExtension}";
             if (File.Exists(path))
             {
                 using (var fs = new FileStream(path, FileMode.Open))
