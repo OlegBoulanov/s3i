@@ -20,6 +20,8 @@ namespace s3i
         }
         static async Task<int> __Main(string[] args)
         {
+            var clock = System.Diagnostics.Stopwatch.StartNew();
+            int exitCode = 0;
             var assembly = Assembly.GetExecutingAssembly();
             var exeFileName = Path.GetFileName(assembly.Location);
             var version = assembly.GetName().Version;
@@ -35,27 +37,44 @@ namespace s3i
                 // no command args provided, try to obtain from env var
                 var cmd2expand = $"%{commandLine.EnvironmentVariableName}%";
                 var defaultCommandLine = Environment.ExpandEnvironmentVariables(cmd2expand);
-                if (0 == string.Compare(cmd2expand, defaultCommandLine)) defaultCommandLine = null;
+                if (0 == string.Compare(cmd2expand, defaultCommandLine)) defaultCommandLine = string.Empty;
                 if(!string.IsNullOrEmpty(defaultCommandLine)) commandLine.HelpTail = $"Default command line ({cmd2expand}): {defaultCommandLine}";
                 // no args provided, try to use saved
                 if (commandLine.PrintHelp)
                 {
                     Console.WriteLine(commandLine.Help());
-                    return -1;
                 }
-                var defaultArgs = defaultCommandLine.Split(new char[] { ' ' }, StringSplitOptions.RemoveEmptyEntries);
-                commandLine.Parse(defaultArgs);
-                if (commandLine.Arguments.Count < 1)
+                else
                 {
-                    Console.WriteLine(commandLine.Help());
-                    return -1;
+                    var defaultArgs = defaultCommandLine.Split(new char[] { ' ' }, StringSplitOptions.RemoveEmptyEntries);
+                    commandLine.Parse(defaultArgs);
+                    if (commandLine.Arguments.Count < 1)
+                    {
+                        Console.WriteLine(commandLine.Help());
+                    }
                 }
             }
-            //
-            var clock = System.Diagnostics.Stopwatch.StartNew();
+            if (0 < commandLine.Arguments.Count)
+            {
+                exitCode = await ProcessAndExecute(commandLine);
+            }
+            if (commandLine.Verbose)
+            {
+                Console.WriteLine();
+                Console.WriteLine($"Elapsed: {clock.Elapsed}");
+            }
+            if (Debugger.IsAttached)
+            {
+                Console.Write("Press Enter..."); Console.ReadLine();
+            }
+            return exitCode;
+        }
+
+        static async Task<int> ProcessAndExecute(CommandLine commandLine)
+        {
+            var exitCode = 0;
             var s3 = new S3Helper(commandLine.ProfileName);
 
-            int exitCode = 0;
             Products products = null;
             IEnumerable<string> remove = null, uninstall = null;
             IEnumerable<ProductInfo> install = null;
@@ -85,9 +104,10 @@ namespace s3i
                         Console.WriteLine($"Remove [{remove.Count()}]:");
                         foreach (var f in remove) Console.WriteLine($"  {f}");
                     }
-                }                
+                }
                 // Prepare a list of files to uninstall for downgrade or props change, and another list of products to install/upgrade
-                (uninstall, install) = products.Separate(localMsiFile => {
+                (uninstall, install) = products.Separate(localMsiFile =>
+                {
                     var localInfoFile = Path.ChangeExtension(localMsiFile, ProductInfo.LocalInfoFileExtension);
                     return ProductInfo.FindInstalled(localInfoFile).Result;
                 });
@@ -134,18 +154,8 @@ namespace s3i
                     if (0 == exitCode && 0 != err) { exitCode = err; break; }
                 }
             }
-            if (commandLine.Verbose)
-            {
-                Console.WriteLine();
-                Console.WriteLine($"Elapsed: {clock.Elapsed}");
-            }
-            if (Debugger.IsAttached)
-            {
-                Console.Write("Press Enter..."); Console.ReadLine();
-            }
             return exitCode;
         }
-
 
     }
 }
