@@ -2,6 +2,9 @@
 using System.Collections.Generic;
 using System.Text;
 
+using Amazon.Runtime;
+using Amazon.S3;
+
 namespace s3i_lib
 {
     public static class ExceptionExtensions
@@ -13,7 +16,8 @@ namespace s3i_lib
         public static string Format(this Exception x, int indent)
         {
             var sb = new StringBuilder();
-            sb.AppendLine($"{x.GetType().Name}: {x.Message}");
+            if (x is AmazonS3Exception ax) sb.AppendLine($"{ax.GetType().Name}: {ax.ErrorType}, {ax.ErrorCode}, {ax.Message}");
+            else sb.AppendLine($"{x.GetType().Name}: {x.Message}");
             if (0 < indent)
             {
                 var spaceCount = indent;
