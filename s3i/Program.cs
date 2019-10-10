@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.IO;
 using System.Linq;
 using System.Configuration;
@@ -137,6 +138,10 @@ namespace s3i
             {
                 Console.WriteLine();
                 Console.WriteLine($"Elapsed: {clock.Elapsed}");
+            }
+            if (Debugger.IsAttached)
+            {
+                Console.Write("Press Enter..."); Console.ReadLine();
             }
             return exitCode;
         }
