@@ -14,12 +14,7 @@ namespace s3i_lib
         public bool Succeeded { get { return !Failed; } }
         #endregion
         #region Constructors
-        public Outcome(R result, params E[] errors)
-        {
-            Result = result;
-            Failed = 0 < errors.Count();
-            Errors = Failed ? new List<E>(errors) : null;
-        }
+        public Outcome(R result, params E[] errors) : this(result, errors.ToList()) { }
         public Outcome(R result, IEnumerable<E> errors)
         {
             Result = result;
@@ -42,10 +37,10 @@ namespace s3i_lib
         #endregion
         #region Shortcuts
         public static implicit operator R(Outcome<R, E> outcome) { return outcome.Result; }
+        public static implicit operator Outcome<R, E>(R result) { return new Outcome<R, E>(result); }
         public static Outcome<R, E> Success(R result) { return new Outcome<R, E>(result); }
         public static Outcome<R, E> Failure(params E[] errors) { return new Outcome<R, E>(default, errors); }
         public static Outcome<R, E> Failure(IEnumerable<E> errors) { return new Outcome<R, E>(default, errors); }
-        public static implicit operator Outcome<R, E>(R result) { return new Outcome<R, E>(result); }
         #endregion
     }
 }
