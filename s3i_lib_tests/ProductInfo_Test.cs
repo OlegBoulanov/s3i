@@ -23,6 +23,7 @@ namespace s3i_lib_tests
                 "{\n"
                 + "  \"Name\": \"TestProduct\",\n"
                 + "  \"AbsoluteUri\": \"https://s3.something.com/install-me/me-me-me.msi\",\n"
+                + "  \"LocalPath\": null,\n"
                 + "  \"Props\": {\n"
                 + "    \"prop1\": \"value1\",\n"
                 + "    \"prop2\": \"value2\"\n"

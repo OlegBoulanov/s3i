@@ -157,7 +157,7 @@ Three    = https://xxx.s3.amazonaws.com/Test/Windows10/Distrib//SecondProduct/9.
             Assert.That(remove.Count(), Is.EqualTo(1));
             Assert.That(remove.ElementAt(0), Is.EqualTo("ProdXX\\px.msi"));
             Assert.That(uninstall.Count(), Is.EqualTo(1));
-            Assert.That(uninstall.ElementAt(0), Is.EqualTo("Prod03\\p3.msi"));
+            Assert.That(uninstall.ElementAt(0).AbsoluteUri, Is.EqualTo("https://download/there/Prod03/12.5.8/p3.msi"));
             Assert.That(install.Count(), Is.EqualTo(4));
             Assert.That(install.ElementAt(0).AbsoluteUri, Is.EqualTo("https://download/here/Prod01/9.4.8+upgrade/p1.msi"));
             Assert.That(install.ElementAt(1).AbsoluteUri, Is.EqualTo("https://download/here/Prod02/3.3.5+keep/p2.msi"));
