@@ -129,7 +129,7 @@ namespace s3i_lib
         {
             var root = Path.GetDirectoryName(rootFolderAndMask);
             var mask = $"*{Path.GetExtension(rootFolderAndMask)}";
-            var files = Directory.EnumerateFiles(root, mask, SearchOption.AllDirectories);
+            var files = Directory.Exists(root) ? Directory.EnumerateFiles(root, mask, SearchOption.AllDirectories) : new List<string>();
             return FilesToUninstall(files.Select(s => Path.Combine(root, s)));
         }
         public static Func<string, string, bool> defaultPathCompare = (s1, s2) => { return 0 == string.Compare(s1, s2, true); };
