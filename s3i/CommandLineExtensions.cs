@@ -98,5 +98,12 @@ namespace s3i
             }
             return retCode;
         }
+
+        public static Outcome<bool, string> Validate(this CommandLine commandLine)
+        {
+            if (string.IsNullOrWhiteSpace(commandLine.StagingFolder)) return Outcome<bool, string>.Failure("Staging folder is not specified, you may want to set TEMP or HOME environment variable");
+            if (!commandLine.StagingFolder.EndsWith(Path.DirectorySeparatorChar)) commandLine.StagingFolder += Path.DirectorySeparatorChar;
+            return true;
+        }
     }
 }
