@@ -14,16 +14,15 @@ namespace s3i
     {
         static string DryRunHeader { get; } = "(DryRun)";
         static string ExecuteHeader { get; } = "(Execute)";
-        public static T LogAndExecute<T>(this CommandLine commandLine, string info, Func<T> func, Func<Exception, T> onException, Action<string> log)
+        public static T LogAndExecute<T>(this CommandLine commandLine, string info, Func<bool, T> func, Func<Exception, T> onException, Action<string> log)
         {
-            if (commandLine.DryRun || commandLine.Verbose)
+            if (commandLine.Verbose)
             {
                 log($"{(commandLine.DryRun ? DryRunHeader : commandLine.Verbose ? ExecuteHeader : "")} {info}");
             }
-            if (commandLine.DryRun) return default(T);
             try
             {
-                return func();
+                return func(commandLine.DryRun);
             }
             catch(Exception x)
             {
@@ -34,8 +33,8 @@ namespace s3i
         public static int DeleteStagingFolder(this CommandLine commandLine)
         {
             return commandLine.LogAndExecute($"Delete staging folder {commandLine.StagingFolder}",
-                () => { 
-                    if(Directory.Exists(commandLine.StagingFolder)) Directory.Delete(commandLine.StagingFolder, true); 
+                (run) => { 
+                    if(run && Directory.Exists(commandLine.StagingFolder)) Directory.Delete(commandLine.StagingFolder, true); 
                     return 0; 
                 },
                 x => x.HResult,
@@ -45,7 +44,7 @@ namespace s3i
         public static int DownloadProducts(this CommandLine commandLine, IEnumerable<ProductInfo> products, S3Helper s3, TimeSpan timeout)
         {
             return commandLine.LogAndExecute($"Download {products.Count()} product{products.Count().Plural()}:{products.Aggregate(new StringBuilder(), (sb, p) => { sb.AppendLine(); sb.Append($"  {p.AbsoluteUri}"); return sb; }, sb => sb.ToString())}",
-                () => { Products.DownloadInstallers(products, s3, commandLine.StagingFolder).Wait(timeout); return 0; },
+                (run) => { if(run) Products.DownloadInstallers(products, s3, commandLine.StagingFolder).Wait(timeout); return 0; },
                 x => x.HResult,
                 s => Console.WriteLine(s)
                 );
@@ -53,7 +52,7 @@ namespace s3i
         public static int Uninstall(this CommandLine commandLine, string msiFilePath, bool deleteAllFiles)
         {
             var retCode = commandLine.LogAndExecute($"Uninstall {msiFilePath}",
-                () => Installer.Uninstall(msiFilePath, commandLine.MsiExecArgs, commandLine.Timeout),
+                (run) => run ? Installer.Uninstall(msiFilePath, commandLine.MsiExecArgs, commandLine.DryRun, commandLine.Timeout) : 0,
                 x => x.HResult,
                 s => Console.WriteLine(s)
                 );
@@ -66,8 +65,8 @@ namespace s3i
                 foreach (var f in Directory.EnumerateFiles(Path.GetDirectoryName(msiFilePath), $"{Path.GetFileNameWithoutExtension(msiFilePath)}.*", SearchOption.TopDirectoryOnly))
                 {
                     var res = commandLine.LogAndExecute($"Delete {f}",
-                        () => { 
-                            File.Delete(f); 
+                        (run) => { 
+                            if(run) File.Delete(f); 
                             return 0; 
                         },
                         x => x.HResult,
@@ -82,7 +81,7 @@ namespace s3i
         public static int Install(this CommandLine commandLine, ProductInfo product)
         {
             var retCode = commandLine.LogAndExecute($"Install {product.LocalPath}",
-                () => Installer.Install(product.LocalPath, product.Props, commandLine.MsiExecArgs, commandLine.Timeout),
+                (run) => run ? Installer.Install(product.LocalPath, product.Props, commandLine.MsiExecArgs, commandLine.DryRun, commandLine.Timeout) : 0,
                 x => x.HResult,
                 s => Console.WriteLine(s)
                 );

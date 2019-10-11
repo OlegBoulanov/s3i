@@ -81,8 +81,8 @@ namespace s3i
             var s3 = new S3Helper(commandLine.ProfileName);
 
             Products products = null;
-            IEnumerable<string> remove = null;
-            IEnumerable<ProductInfo> uninstall = null, install = null;
+            IEnumerable<string> remove = new List<string>();
+            IEnumerable<ProductInfo> uninstall = new List<ProductInfo>(), install = null;
             try
             {
                 products = await Products.ReadProducts(s3, commandLine.Arguments.Select((uri, index) => { return uri; }), commandLine.StagingFolder);
@@ -106,13 +106,22 @@ namespace s3i
                     }
                 }
                 // Prepare a list of files to uninstall for downgrade or props change, and another list of products to install/upgrade
-                (uninstall, install) = products.Separate(localMsiFile =>
+                if (commandLine.ClearStagingFolder)
                 {
-                    var localInfoFile = Path.ChangeExtension(localMsiFile, ProductInfo.LocalInfoFileExtension);
-                    var installedProduct = ProductInfo.FindInstalled(localInfoFile).Result;
-                    if (string.IsNullOrEmpty(installedProduct.LocalPath)) installedProduct.LocalPath = localMsiFile;    // if was not serialized
-                    return installedProduct;
-                });
+                    commandLine.DeleteStagingFolder();
+                    install = products;
+                }
+                else
+                {
+                    (uninstall, install) = products.Separate(localMsiFile =>
+                    {
+                        var localInfoFile = Path.ChangeExtension(localMsiFile, ProductInfo.LocalInfoFileExtension);
+                        var installedProduct = ProductInfo.FindInstalled(localInfoFile).Result;
+                    // some backward compatibility in case if was not serialized
+                    if (null != installedProduct && string.IsNullOrEmpty(installedProduct.LocalPath)) installedProduct.LocalPath = localMsiFile;
+                        return installedProduct;
+                    });
+                }
                 if (commandLine.Verbose)
                 {
                     if (0 < uninstall.Count())
@@ -135,30 +144,25 @@ namespace s3i
             // Ok, now we can proceed with changes:
             if (0 == exitCode)
             {
-                // 1) Clean installation flushing existing history and ability to recover
-                if (commandLine.ClearStagingFolder)
-                {
-                    commandLine.DeleteStagingFolder();
-                }
-                // 2) Uninstall what's not needed anymore...
+                // 1) Uninstall what's not needed anymore...
                 foreach (var f in remove)
                 {
                     var err = commandLine.Uninstall(f, true);
                     if (0 == exitCode && 0 != err) { exitCode = err; break; }
                 }
-                // 3) Uninstall whose to be changed
+                // 2) Uninstall whose to be changed
                 foreach (var f in uninstall)
                 {
                     var err = commandLine.Uninstall(f.LocalPath, false);
                     if (0 == exitCode && 0 != err) { exitCode = err; break; }
                 }
-                // 4) Download/cache existing and new
+                // 3) Download/cache existing and new
                 if (true)
                 {
                     var err = commandLine.DownloadProducts(install, s3, commandLine.Timeout);
                     if (0 == exitCode && 0 != err) { exitCode = err; }
                 }
-                // 5) Install changed and new
+                // 4) Install changed and new
                 foreach (var p in install)
                 {
                     var err = commandLine.Install(p);

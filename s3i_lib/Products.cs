@@ -129,13 +129,14 @@ namespace s3i_lib
         {
             var root = Path.GetDirectoryName(rootFolderAndMask);
             var mask = $"*{Path.GetExtension(rootFolderAndMask)}";
-            return FilesToUninstall(Directory.EnumerateFiles(root, mask, SearchOption.AllDirectories).Select(s => Path.Combine(root, s)));
+            var files = Directory.EnumerateFiles(root, mask, SearchOption.AllDirectories);
+            return FilesToUninstall(files.Select(s => Path.Combine(root, s)));
         }
         public static Func<string, string, bool> defaultPathCompare = (s1, s2) => { return 0 == string.Compare(s1, s2, true); };
-        public IEnumerable<string> FilesToUninstall(IEnumerable<string> entries, Func<string, string, bool> compare = null)
+        public IEnumerable<string> FilesToUninstall(IEnumerable<string> files, Func<string, string, bool> compare = null)
         {
             if (null == compare) compare = defaultPathCompare;
-            return entries.Where(e => !Exists(product => compare(product.LocalPath, e)));
+            return files.Where(e => !Exists(product => compare(product.LocalPath, e)));
         }
         public (IEnumerable<ProductInfo> filesToUninstall, IEnumerable<ProductInfo> productsToInstall) Separate(Func<string, ProductInfo> findInstalledProduct)
         {
