@@ -10,4 +10,4 @@ Install Windows Installer MSI from S3
 
 
 
-I'm not supposed to merge to master easily, so making this file different from the one in develop hopefully prevent that.
+I'm not supposed to merge to master easily, so making this file different from the one in develop (and other branches derived from it) hopefully can prevent that, by requesting manual merge.
