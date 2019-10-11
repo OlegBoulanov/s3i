@@ -100,6 +100,7 @@ namespace s3i
                 else
                 {
                     Console.WriteLine($"Save {localInfoFile}");
+                    Directory.CreateDirectory(Path.GetDirectoryName(localInfoFile));
                     product.SaveToLocal(localInfoFile).Wait(2000);
                 }
                 //var res = commandLine.LogAndExecute($"Save info for {product.AbsoluteUri}",
