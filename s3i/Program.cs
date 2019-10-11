@@ -3,7 +3,6 @@ using System.Collections.Generic;
 using System.Diagnostics;
 using System.IO;
 using System.Linq;
-using System.Configuration;
 using System.Reflection;
 using System.Threading.Tasks;
 
@@ -68,14 +67,10 @@ namespace s3i
                     exitCode = await ProcessAndExecute(commandLine);
                     if (commandLine.Verbose)
                     {
-                        Console.WriteLine();
+                        //Console.WriteLine();
                         Console.WriteLine($"Elapsed: {clock.Elapsed}");
                     }
                 }
-            }
-            if (Debugger.IsAttached)
-            {
-                Console.Write("Press Enter..."); Console.ReadLine();
             }
             return exitCode;
         }
@@ -99,11 +94,6 @@ namespace s3i
                         Console.WriteLine($"  {p.Name}: {p.AbsoluteUri} => {p.LocalPath}");
                         foreach (var pp in p.Props) Console.WriteLine($"    {pp.Key} = {pp.Value}");
                     }
-                }
-                if (!Directory.Exists(commandLine.StagingFolder))
-                {
-                    if (commandLine.Verbose) Console.WriteLine($"Create {commandLine.StagingFolder}");
-                    Directory.CreateDirectory(commandLine.StagingFolder);
                 }
                 // installed products (cached installer files) we don't need anymore
                 remove = products.FindFilesToUninstall(Path.Combine(commandLine.StagingFolder, $"*{Installer.InstallerFileExtension}"));
@@ -138,26 +128,35 @@ namespace s3i
             catch (Exception x)
             {
                 Console.WriteLine($"? {x.Format(4)}");
-                // no need to proceed if don't know what to do
                 exitCode = -1;
             }
             // Ok, now we can proceed with changes:
             if (0 == exitCode)
             {
-                // 1) uninstall old...
+                // 1) Clean installation flushing existing history and ability to recover
+                if (commandLine.ClearStagingFolder)
+                {
+                    commandLine.DeleteStagingFolder();
+                }
+                // 2) Uninstall what's not needed anymore...
                 foreach (var f in remove)
                 {
                     var err = commandLine.Uninstall(f, true);
                     if (0 == exitCode && 0 != err) { exitCode = err; break; }
                 }
+                // 3) Uninstall whose to be changed
                 foreach (var f in uninstall)
                 {
                     var err = commandLine.Uninstall(f, false);
                     if (0 == exitCode && 0 != err) { exitCode = err; break; }
                 }
-                // 2) ...download/cache new...
-                await products.DownloadInstallers(s3, commandLine.StagingFolder);
-                // 3) install them!
+                // 4) Download/cache existing and new
+                if (true)
+                {
+                    var err = commandLine.DownloadProducts(products, s3, commandLine.Timeout);
+                    if (0 == exitCode && 0 != err) { exitCode = err; }
+                }
+                // 5) Install changed and new
                 foreach (var p in install)
                 {
                     var err = commandLine.Install(p);

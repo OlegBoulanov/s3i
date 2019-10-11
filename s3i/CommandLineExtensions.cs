@@ -6,6 +6,7 @@ using System.Text;
 using System.Threading.Tasks;
 
 using s3i_lib;
+using Amazon.S3.Util;
 
 namespace s3i
 {
@@ -30,9 +31,24 @@ namespace s3i
                 return onException(x);
             }
         }
-        public static T LogToConsoleAndExecute<T>(this CommandLine commandLine, string info, Func<T> func, Func<Exception, T> onException)
+        public static int DeleteStagingFolder(this CommandLine commandLine)
         {
-            return commandLine.LogAndExecute(info, func, onException, s => Console.WriteLine(s));
+            return commandLine.LogAndExecute($"Delete staging folder {commandLine.StagingFolder}",
+                () => { 
+                    if(Directory.Exists(commandLine.StagingFolder)) Directory.Delete(commandLine.StagingFolder, true); 
+                    return 0; 
+                },
+                x => x.HResult,
+                s => Console.WriteLine(s)
+                );
+        }
+        public static int DownloadProducts(this CommandLine commandLine, Products products, S3Helper s3, TimeSpan timeout)
+        {
+            return commandLine.LogAndExecute($"Download {products.Count} products",
+                () => { products.DownloadInstallers(s3, commandLine.StagingFolder).Wait(timeout); return 0; },
+                x => x.HResult,
+                s => Console.WriteLine(s)
+                );
         }
         public static int Uninstall(this CommandLine commandLine, string msiFilePath, bool deleteAllFiles)
         {
@@ -101,9 +117,24 @@ namespace s3i
 
         public static Outcome<bool, string> Validate(this CommandLine commandLine)
         {
-            if (string.IsNullOrWhiteSpace(commandLine.StagingFolder)) return Outcome<bool, string>.Failure("Staging folder is not specified, you may want to set TEMP or HOME environment variable");
+            // we must have staging folder
+            if (string.IsNullOrWhiteSpace(commandLine.StagingFolder)) return Outcome<bool, string>.Failure(false, "Staging folder is not specified, you may want to set TEMP or HOME environment variable");
             if (!commandLine.StagingFolder.EndsWith(Path.DirectorySeparatorChar)) commandLine.StagingFolder += Path.DirectorySeparatorChar;
-            return true;
+            // validate
+            var outcome = Outcome<bool, string>.Success(true);
+            foreach (var a in commandLine.Arguments)
+            {
+                try
+                {
+                    // this one throws... thank you, Amazon
+                    if (!AmazonS3Uri.TryParseAmazonS3Uri(a, out var uri)) { outcome.AddErrors($"Invalid AWS S3 Uri: {a}"); }
+                }
+                catch (Exception x)
+                {
+                    outcome.AddErrors($"{x.GetType().Name} {x.Message}: {a}");
+                } 
+            }
+            return outcome;
         }
     }
 }

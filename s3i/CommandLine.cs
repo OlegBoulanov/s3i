@@ -19,6 +19,9 @@ namespace s3i
         [CommandLine("Path to staging folder", "-s", "--stage")]
         public string StagingFolder { get; set; } = Environment.GetEnvironmentVariable("TEMP") ?? $"{Environment.GetEnvironmentVariable("HOME")}{Path.DirectorySeparatorChar}Temp";
 
+        [CommandLine("Clear staging folder at startup", "-c", "--clean")]
+        public bool ClearStagingFolder { get; set; } = false;
+
         [CommandLine("MsiExec command", "-m", "--msiexec")]
         public string MsiExecCommand { get; set; } = "msiexec.exe";
 

@@ -15,6 +15,23 @@ namespace s3i_lib
 {
     public class Products : List<ProductInfo>
     {
+        public class InvalidUriException : ApplicationException 
+        {
+            public InvalidUriException(string s, Exception x) : base($"Invalid AWS S3 URI: {s}", x) { }
+        }
+        public static AmazonS3Uri ParseS3Uri(string s)
+        {
+            try
+            {
+                // this shitty method actually throws !!!
+                if (!AmazonS3Uri.TryParseAmazonS3Uri(s, out var uri)) throw new InvalidUriException(s, null);
+                return uri;
+            }
+            catch(Exception x)
+            {
+                throw new InvalidUriException(s, x);
+            }
+        }
         public static async Task<Products> FromJson(Stream stream)
         {
             using(var reader = new StreamReader(stream))
@@ -46,26 +63,25 @@ namespace s3i_lib
             });
             return products;
         }
-        public static async Task<Products> ReadProducts(S3Helper s3, string configFileUri, string tempFilePath)
+        public static async Task<Products> ReadProducts(S3Helper s3, AmazonS3Uri uri, string tempFilePath)
         {
             var products = new Products();
-            var uri = new AmazonS3Uri(configFileUri);
             await s3.DownloadAsync(uri.Bucket, uri.Key, DateTime.MinValue, async (contentType, stream) =>
             {
-                switch (Path.GetExtension(configFileUri).ToLower())
+                switch (Path.GetExtension(uri.Key).ToLower())
                 {
                     case ".msi":
-                        products.Add(new ProductInfo { Name = configFileUri, AbsoluteUri = configFileUri });
+                        products.Add(new ProductInfo { Name = uri.ToString(), AbsoluteUri = uri.ToString() });
                         await Task.CompletedTask;
                         break;
                     case ".ini":
-                        products.AddRange(await Products.FromIni(stream, configFileUri, tempFilePath));
+                        products.AddRange(await Products.FromIni(stream, uri.ToString(), tempFilePath));
                         break;
                     case ".json":
                         products.AddRange(await Products.FromJson(stream));
                         break;
                     default:
-                        throw new FormatException($"Unsupported file extension in {configFileUri}");
+                        throw new FormatException($"Unsupported file extension in {uri.ToString()}");
                 }
             });
             return products;
@@ -75,10 +91,11 @@ namespace s3i_lib
             var products = new Products();
             var arrayOfProducts = await Task.WhenAll(
                 uris.Aggregate(new List<Task<Products>>(),
-                (tasks, uri) =>
+                (tasks, configFileUri) =>
                 {
                     tasks.Add(Task<Products>.Run(() =>
                     {
+                        var uri = ParseS3Uri(configFileUri);
                         return ReadProducts(s3, uri, tempFilePath);
                     }));
                     return tasks;
@@ -94,7 +111,7 @@ namespace s3i_lib
                 this.Aggregate(new List<Task<HttpStatusCode>>(),
                     (tasks, product) =>
                     {
-                        var uri = new AmazonS3Uri(product.AbsoluteUri);
+                        var uri = ParseS3Uri(product.AbsoluteUri);
                         product.LocalPath = product.MapToLocalPath(localPathBase);
                         Directory.CreateDirectory(Path.GetDirectoryName(product.LocalPath));
                         tasks.Add(s3.DownloadAsync(uri.Bucket, uri.Key, product.LocalPath));
