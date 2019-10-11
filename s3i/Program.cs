@@ -81,8 +81,8 @@ namespace s3i
             var s3 = new S3Helper(commandLine.ProfileName);
 
             Products products = null;
-            IEnumerable<string> remove = null, uninstall = null;
-            IEnumerable<ProductInfo> install = null;
+            IEnumerable<string> remove = null;
+            IEnumerable<ProductInfo> uninstall = null, install = null;
             try
             {
                 products = await Products.ReadProducts(s3, commandLine.Arguments.Select((uri, index) => { return uri; }), commandLine.StagingFolder);
@@ -109,14 +109,16 @@ namespace s3i
                 (uninstall, install) = products.Separate(localMsiFile =>
                 {
                     var localInfoFile = Path.ChangeExtension(localMsiFile, ProductInfo.LocalInfoFileExtension);
-                    return ProductInfo.FindInstalled(localInfoFile).Result;
+                    var installedProduct = ProductInfo.FindInstalled(localInfoFile).Result;
+                    if (string.IsNullOrEmpty(installedProduct.LocalPath)) installedProduct.LocalPath = localMsiFile;    // if was not serialized
+                    return installedProduct;
                 });
                 if (commandLine.Verbose)
                 {
                     if (0 < uninstall.Count())
                     {
                         Console.WriteLine($"Uninstall [{uninstall.Count()}]:");
-                        foreach (var f in uninstall) Console.WriteLine($"  {f}");
+                        foreach (var f in uninstall) Console.WriteLine($"  {f.AbsoluteUri}");
                     }
                     if (0 < install.Count())
                     {
@@ -147,13 +149,13 @@ namespace s3i
                 // 3) Uninstall whose to be changed
                 foreach (var f in uninstall)
                 {
-                    var err = commandLine.Uninstall(f, false);
+                    var err = commandLine.Uninstall(f.LocalPath, false);
                     if (0 == exitCode && 0 != err) { exitCode = err; break; }
                 }
                 // 4) Download/cache existing and new
                 if (true)
                 {
-                    var err = commandLine.DownloadProducts(products, s3, commandLine.Timeout);
+                    var err = commandLine.DownloadProducts(install, s3, commandLine.Timeout);
                     if (0 == exitCode && 0 != err) { exitCode = err; }
                 }
                 // 5) Install changed and new

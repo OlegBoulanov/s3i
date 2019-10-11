@@ -105,10 +105,10 @@ namespace s3i_lib
             //return arrayOfProducts.Aggregate(new Products(), (p, pp) => { p.AddRange(pp); return p; });
         }
 
-        public async Task DownloadInstallers(S3Helper s3, string localPathBase)
+        public static async Task DownloadInstallers(IEnumerable<ProductInfo> products, S3Helper s3, string localPathBase)
         {
             await Task.WhenAll(
-                this.Aggregate(new List<Task<HttpStatusCode>>(),
+                products.Aggregate(new List<Task<HttpStatusCode>>(),
                     (tasks, product) =>
                     {
                         var uri = ParseS3Uri(product.AbsoluteUri);
@@ -137,9 +137,9 @@ namespace s3i_lib
             if (null == compare) compare = defaultPathCompare;
             return entries.Where(e => !Exists(product => compare(product.LocalPath, e)));
         }
-        public (IEnumerable<string> filesToUninstall, IEnumerable<ProductInfo> productsToInstall) Separate(Func<string, ProductInfo> findInstalledProduct)
+        public (IEnumerable<ProductInfo> filesToUninstall, IEnumerable<ProductInfo> productsToInstall) Separate(Func<string, ProductInfo> findInstalledProduct)
         {
-            var uninstall = new List<string>();
+            var uninstall = new List<ProductInfo>();
             var install = new List<ProductInfo>();
             foreach(var product in this) 
             {
@@ -156,11 +156,11 @@ namespace s3i_lib
                         install.Add(product);
                         break;
                     case Installer.Action.Reinstall:
-                        uninstall.Add(product.LocalPath);
+                        uninstall.Add(installedProduct);
                         install.Add(product);
                         break;
                     case Installer.Action.Uninstall:
-                        uninstall.Add(product.LocalPath);
+                        uninstall.Add(installedProduct);
                         break;
                 }
             }

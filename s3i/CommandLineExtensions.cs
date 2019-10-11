@@ -42,10 +42,10 @@ namespace s3i
                 s => Console.WriteLine(s)
                 );
         }
-        public static int DownloadProducts(this CommandLine commandLine, Products products, S3Helper s3, TimeSpan timeout)
+        public static int DownloadProducts(this CommandLine commandLine, IEnumerable<ProductInfo> products, S3Helper s3, TimeSpan timeout)
         {
-            return commandLine.LogAndExecute($"Download {products.Count} products",
-                () => { products.DownloadInstallers(s3, commandLine.StagingFolder).Wait(timeout); return 0; },
+            return commandLine.LogAndExecute($"Download {products.Count()} product{products.Count().Plural()}:{products.Aggregate(new StringBuilder(), (sb, p) => { sb.AppendLine(); sb.Append($"  {p.AbsoluteUri}"); return sb; }, sb => sb.ToString())}",
+                () => { Products.DownloadInstallers(products, s3, commandLine.StagingFolder).Wait(timeout); return 0; },
                 x => x.HResult,
                 s => Console.WriteLine(s)
                 );

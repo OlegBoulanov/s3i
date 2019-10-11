@@ -13,7 +13,6 @@ namespace s3i_lib
     {
         public string Name { get; set; }
         public string AbsoluteUri { get; set; }
-        [JsonIgnore]
         public string LocalPath { get; set; }
         public ProductProps Props { get; protected set; } = new ProductProps();
         public string MapToLocalPath(string basePath)
