@@ -33,7 +33,7 @@ namespace s3i_lib
         public static string ReplaceAll(this string s, Regex rex, string replacement)
         {
             string next = s;
-            for (var prev = next; !prev.Equals(next = rex.Replace(prev, replacement, 1)); prev = next);
+            for (var prev = next; !prev.Equals(next = rex.Replace(prev, replacement, 1)); prev = next) ;
             return next;
         }
         public static string BuildRelativeUri(this string baseUri, string path)
@@ -57,7 +57,7 @@ namespace s3i_lib
             var subPath = $"{builder.Host}/{builder.Path.Substring(1)}";
             return Path.Combine(localPath, subPath).Replace('/', Path.DirectorySeparatorChar).Replace('\\', Path.DirectorySeparatorChar);
         }
-        public static string Quote(this string s, string quote, params char [] spaces)
+        public static string Quote(this string s, string quote, params char[] spaces)
         {
             if (string.IsNullOrEmpty(quote)) quote = "\"";
             if (0 == spaces.Length) spaces = new char[] { ' ', '\t' };
@@ -67,5 +67,10 @@ namespace s3i_lib
             }
             return s;
         }
+    }
+
+    public static class IntegerExtensions
+    { 
+        public static string Plural(this int n, string suffix = "s") { return 1 == n ? "" : suffix; }
     }
 }

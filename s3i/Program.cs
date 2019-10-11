@@ -3,7 +3,6 @@ using System.Collections.Generic;
 using System.Diagnostics;
 using System.IO;
 using System.Linq;
-using System.Configuration;
 using System.Reflection;
 using System.Threading.Tasks;
 
@@ -20,7 +19,6 @@ namespace s3i
         }
         static async Task<int> __Main(string[] args)
         {
-            var clock = System.Diagnostics.Stopwatch.StartNew();
             int exitCode = 0;
             var assembly = Assembly.GetExecutingAssembly();
             var exeFileName = Path.GetFileName(assembly.Location);
@@ -32,13 +30,12 @@ namespace s3i
                            + $"  {exeFileName} [<option> ...] <products> ..."
             };
             commandLine.Parse(args);
+            // decide if help needed
             if (commandLine.Arguments.Count < 1)
             {
                 // no command args provided, try to obtain from env var
-                var cmd2expand = $"%{commandLine.EnvironmentVariableName}%";
-                var defaultCommandLine = Environment.ExpandEnvironmentVariables(cmd2expand);
-                if (0 == string.Compare(cmd2expand, defaultCommandLine)) defaultCommandLine = string.Empty;
-                if(!string.IsNullOrEmpty(defaultCommandLine)) commandLine.HelpTail = $"Default command line ({cmd2expand}): {defaultCommandLine}";
+                var defaultCommandLine = Environment.GetEnvironmentVariable(commandLine.EnvironmentVariableName) ?? "";
+                if (!string.IsNullOrEmpty(defaultCommandLine)) commandLine.HelpTail = $"Default command line (%{commandLine.EnvironmentVariableName}%): {defaultCommandLine}";
                 // no args provided, try to use saved
                 if (commandLine.PrintHelp)
                 {
@@ -54,18 +51,26 @@ namespace s3i
                     }
                 }
             }
+            // validate and execute
             if (0 < commandLine.Arguments.Count)
             {
-                exitCode = await ProcessAndExecute(commandLine);
-            }
-            if (commandLine.Verbose)
-            {
-                Console.WriteLine();
-                Console.WriteLine($"Elapsed: {clock.Elapsed}");
-            }
-            if (Debugger.IsAttached)
-            {
-                Console.Write("Press Enter..."); Console.ReadLine();
+                var validateResult = commandLine.Validate();
+                if (!validateResult)
+                {
+                    Console.WriteLine($"? Command line validation failed{(0 < validateResult.Errors.Count ? ":" : ".")}");
+                    foreach (var e in validateResult.Errors) Console.WriteLine($"  {e}");
+                    exitCode = -1;
+                }
+                else
+                {
+                    var clock = System.Diagnostics.Stopwatch.StartNew();
+                    exitCode = await ProcessAndExecute(commandLine);
+                    if (commandLine.Verbose)
+                    {
+                        //Console.WriteLine();
+                        Console.WriteLine($"Elapsed: {clock.Elapsed}");
+                    }
+                }
             }
             return exitCode;
         }
@@ -76,11 +81,11 @@ namespace s3i
             var s3 = new S3Helper(commandLine.ProfileName);
 
             Products products = null;
-            IEnumerable<string> remove = null, uninstall = null;
-            IEnumerable<ProductInfo> install = null;
+            IEnumerable<string> remove = null;
+            IEnumerable<ProductInfo> uninstall = null, install = null;
             try
             {
-                products = await Products.ReadProducts(s3, commandLine.Arguments.Select((uri, index) => { return uri; }), commandLine.TempFolder);
+                products = await Products.ReadProducts(s3, commandLine.Arguments.Select((uri, index) => { return uri; }), commandLine.StagingFolder);
                 if (commandLine.Verbose)
                 {
                     Console.WriteLine($"Products [{products.Count}]:");
@@ -90,13 +95,8 @@ namespace s3i
                         foreach (var pp in p.Props) Console.WriteLine($"    {pp.Key} = {pp.Value}");
                     }
                 }
-                if (!Directory.Exists(commandLine.TempFolder))
-                {
-                    if (commandLine.Verbose) Console.WriteLine($"Create {commandLine.TempFolder}");
-                    Directory.CreateDirectory(commandLine.TempFolder);
-                }
                 // installed products (cached installer files) we don't need anymore
-                remove = products.FindFilesToUninstall(Path.Combine(commandLine.TempFolder, $"*{Installer.InstallerFileExtension}"));
+                remove = products.FindFilesToUninstall(Path.Combine(commandLine.StagingFolder, $"*{Installer.InstallerFileExtension}"));
                 if (commandLine.Verbose)
                 {
                     if (0 < remove.Count())
@@ -109,14 +109,16 @@ namespace s3i
                 (uninstall, install) = products.Separate(localMsiFile =>
                 {
                     var localInfoFile = Path.ChangeExtension(localMsiFile, ProductInfo.LocalInfoFileExtension);
-                    return ProductInfo.FindInstalled(localInfoFile).Result;
+                    var installedProduct = ProductInfo.FindInstalled(localInfoFile).Result;
+                    if (string.IsNullOrEmpty(installedProduct.LocalPath)) installedProduct.LocalPath = localMsiFile;    // if was not serialized
+                    return installedProduct;
                 });
                 if (commandLine.Verbose)
                 {
                     if (0 < uninstall.Count())
                     {
                         Console.WriteLine($"Uninstall [{uninstall.Count()}]:");
-                        foreach (var f in uninstall) Console.WriteLine($"  {f}");
+                        foreach (var f in uninstall) Console.WriteLine($"  {f.AbsoluteUri}");
                     }
                     if (0 < install.Count())
                     {
@@ -128,26 +130,35 @@ namespace s3i
             catch (Exception x)
             {
                 Console.WriteLine($"? {x.Format(4)}");
-                // no need to proceed if don't know what to do
                 exitCode = -1;
             }
             // Ok, now we can proceed with changes:
             if (0 == exitCode)
             {
-                // 1) uninstall old...
+                // 1) Clean installation flushing existing history and ability to recover
+                if (commandLine.ClearStagingFolder)
+                {
+                    commandLine.DeleteStagingFolder();
+                }
+                // 2) Uninstall what's not needed anymore...
                 foreach (var f in remove)
                 {
                     var err = commandLine.Uninstall(f, true);
                     if (0 == exitCode && 0 != err) { exitCode = err; break; }
                 }
+                // 3) Uninstall whose to be changed
                 foreach (var f in uninstall)
                 {
-                    var err = commandLine.Uninstall(f, false);
+                    var err = commandLine.Uninstall(f.LocalPath, false);
                     if (0 == exitCode && 0 != err) { exitCode = err; break; }
                 }
-                // 2) ...download/cache new...
-                await products.DownloadInstallers(s3, commandLine.TempFolder);
-                // 3) install them!
+                // 4) Download/cache existing and new
+                if (true)
+                {
+                    var err = commandLine.DownloadProducts(install, s3, commandLine.Timeout);
+                    if (0 == exitCode && 0 != err) { exitCode = err; }
+                }
+                // 5) Install changed and new
                 foreach (var p in install)
                 {
                     var err = commandLine.Install(p);
