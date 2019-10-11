@@ -32,13 +32,18 @@ namespace s3i
                            + $"  {exeFileName} [<option> ...] <products> ..."
             };
             commandLine.Parse(args);
+            // validate
+            if(string.IsNullOrWhiteSpace(commandLine.TempFolder))
+            {
+                commandLine.TempFolder = $"{Environment.GetEnvironmentVariable("HOME") ?? ""}{Path.DirectorySeparatorChar}Temp";
+            }
+            if(!commandLine.TempFolder.EndsWith(Path.DirectorySeparatorChar)) commandLine.TempFolder += Path.DirectorySeparatorChar;
+            // decide if help needed
             if (commandLine.Arguments.Count < 1)
             {
                 // no command args provided, try to obtain from env var
-                var cmd2expand = $"%{commandLine.EnvironmentVariableName}%";
-                var defaultCommandLine = Environment.ExpandEnvironmentVariables(cmd2expand);
-                if (0 == string.Compare(cmd2expand, defaultCommandLine)) defaultCommandLine = string.Empty;
-                if(!string.IsNullOrEmpty(defaultCommandLine)) commandLine.HelpTail = $"Default command line ({cmd2expand}): {defaultCommandLine}";
+                var defaultCommandLine = Environment.GetEnvironmentVariable(commandLine.EnvironmentVariableName) ?? "";
+                if(!string.IsNullOrEmpty(defaultCommandLine)) commandLine.HelpTail = $"Default command line (%{commandLine.EnvironmentVariableName}%): {defaultCommandLine}";
                 // no args provided, try to use saved
                 if (commandLine.PrintHelp)
                 {

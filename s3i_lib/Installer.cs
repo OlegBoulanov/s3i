@@ -1,14 +1,8 @@
 ﻿using System;
-using System.Collections.Concurrent;
-using System.Collections.Generic;
+using System.Runtime.InteropServices;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
-
-using System.Text.RegularExpressions;
-using System.IO;
-
-using Amazon.S3.Util;
 using System.Diagnostics;
 
 namespace s3i_lib
@@ -20,14 +14,22 @@ namespace s3i_lib
         public static string InstallerFileExtension { get; } = ".msi";
         public static int RunInstall(string commandLineArgs, TimeSpan timeout)
         {
-            using (var process = Process.Start(MsiExec, commandLineArgs))
+            if (RuntimeInformation.IsOSPlatform(OSPlatform.Windows))
             {
-                if (timeout.TotalMilliseconds <= 0) return 0;
-                if (false == process.WaitForExit((int)timeout.TotalMilliseconds) || 0 != process.ExitCode)
+                using (var process = Process.Start(MsiExec, commandLineArgs))
                 {
-                    Console.WriteLine($"{MsiExec} failed with {process.ExitCode}");
+                    if (timeout.TotalMilliseconds <= 0) return 0;
+                    if (false == process.WaitForExit((int)timeout.TotalMilliseconds) || 0 != process.ExitCode)
+                    {
+                        Console.WriteLine($"{MsiExec} failed with {process.ExitCode}");
+                    }
+                    return process.ExitCode;
                 }
-                return process.ExitCode;
+            }
+            else
+            {
+                Console.WriteLine($"(Windows) {MsiExec} {commandLineArgs}");
+                return 0;
             }
         }
         public static string FormatCommand(string msiFilePath, ProductProps props, string msiExecKeys, string extraArgs)
