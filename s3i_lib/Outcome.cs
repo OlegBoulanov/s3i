@@ -26,7 +26,7 @@ namespace s3i_lib
         public Outcome<R, E> AddErrors(IEnumerable<E> errors)
         {
             Failed = true;
-            if (null == errors) Errors = new List<E>();
+            if (null == Errors) Errors = new List<E>();
             Errors.AddRange(errors);
             return this;
         }
@@ -38,9 +38,11 @@ namespace s3i_lib
         #region Shortcuts
         public static implicit operator R(Outcome<R, E> outcome) { return outcome.Result; }
         public static implicit operator Outcome<R, E>(R result) { return new Outcome<R, E>(result); }
-        public static Outcome<R, E> Success(R result) { return new Outcome<R, E>(result); }
-        public static Outcome<R, E> Failure(params E[] errors) { return new Outcome<R, E>(default, errors); }
-        public static Outcome<R, E> Failure(IEnumerable<E> errors) { return new Outcome<R, E>(default, errors); }
+        public static Outcome<R, E> Success(R result = default(R)) { return new Outcome<R, E>(result); }
+        public static Outcome<R, E> Failure(params E[] errors) { return new Outcome<R, E>(default(R), errors); }
+        public static Outcome<R, E> Failure(IEnumerable<E> errors) { return new Outcome<R, E>(default(R), errors); }
+        public static Outcome<R, E> Failure(R result, params E[] errors) { return new Outcome<R, E>(result, errors); }
+        public static Outcome<R, E> Failure(R result, IEnumerable<E> errors) { return new Outcome<R, E>(result, errors); }
         #endregion
     }
 }
