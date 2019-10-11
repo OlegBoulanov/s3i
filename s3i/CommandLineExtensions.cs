@@ -22,7 +22,7 @@ namespace s3i
             }
             try
             {
-                return func(commandLine.DryRun);
+                return func(!commandLine.DryRun);
             }
             catch(Exception x)
             {
