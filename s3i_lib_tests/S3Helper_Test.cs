@@ -80,15 +80,15 @@ namespace s3i_lib_tests
                 uri.Bucket, uri.Key, DateTime.MinValue,
                 async (type, stream) => {
                     using (var reader = new StreamReader(stream)) {
-                        for (string s; null != (s = await reader.ReadLineAsync()); ) lines.Enqueue(s);
+                        for (string s; null != (s = await reader.ReadLineAsync());) lines.Enqueue(s);
                     }
                 });
-            foreach(var s in lines.Select((s, i) => $"{(i+1),3}: {s}")) Console.WriteLine(s);
+            foreach (var s in lines.Select((s, i) => $"{(i + 1),3}: {s}")) Console.WriteLine(s);
             Console.WriteLine($"Line count: {lines.Count}");
             Assert.AreEqual(testObjectLineCount, lines.Count);
         }
 
-       
+
         [Test]
         [Category("AWS")]
         public async Task ReadTwoIniFilesFromS3()
@@ -108,10 +108,31 @@ namespace s3i_lib_tests
                 var ms = clock.ElapsedMilliseconds;
                 if (100 < ms)
                 {
-                    Console.WriteLine($"{DateTime.Now:HH:mm:ss.fff} [{i:0000}] {clock.Elapsed:mm\\:ss\\.fff} {new string('*', (int)(ms/100))}");
+                    Console.WriteLine($"{DateTime.Now:HH:mm:ss.fff} [{i:0000}] {clock.Elapsed:mm\\:ss\\.fff} {new string('*', (int)(ms / 100))}");
                 }
                 Assert.AreEqual(2, prods.Count);
             }
+        }
+        public static bool TryParseAmazonS3Uri_Old(string uri, out AmazonS3Uri amazonS3Uri)
+        {
+            return AmazonS3Uri.TryParseAmazonS3Uri(new Uri(uri), out amazonS3Uri);
+        }
+        public static bool TryParseAmazonS3Uri(string s, out AmazonS3Uri amazonS3Uri)
+        {
+            try
+            {
+                return AmazonS3Uri.TryParseAmazonS3Uri(new Uri(s), out amazonS3Uri);
+            }
+            catch (UriFormatException)
+            {
+                amazonS3Uri = null;
+                return false;
+            }
+        }
+        [Test]
+        public void AwsS3UriParse_Fix()
+        {
+            TryParseAmazonS3Uri("blah-blah", out var uri);
         }
     }
 
