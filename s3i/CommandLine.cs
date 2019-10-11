@@ -26,7 +26,7 @@ namespace s3i
         public string MsiExecCommand { get; set; } = "msiexec.exe";
 
         [CommandLine("MsiExec extra args", "-a", "--msiargs")]
-        public string MsiExecArgs { get; set; }
+        public string MsiExecArgs { get; set; } = "/passive";
 
         [CommandLine("Installation timeout", "-t", "--timeout")]
         public TimeSpan Timeout { get; set; } = TimeSpan.FromMinutes(3);
