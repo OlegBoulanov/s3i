@@ -18,7 +18,7 @@ namespace s3i_lib
         }
         public bool IsKey(string s)
         {
-            return !string.IsNullOrWhiteSpace(Keys.Find(k => s == k.Split(' ', '\t')[0]));
+            return !string.IsNullOrWhiteSpace(Keys.Find(k => s == k.Split(' ', '\t').FirstOrDefault()));
         }
     }
 }
