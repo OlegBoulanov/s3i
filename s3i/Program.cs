@@ -21,11 +21,11 @@ namespace s3i
         {
             int exitCode = 0;
             var assembly = Assembly.GetExecutingAssembly();
-            var exeFileName = Path.GetFileName(assembly.Location);
+            var exeFileName = Path.GetFileNameWithoutExtension(assembly.Location);
             var version = FileVersionInfo.GetVersionInfo(assembly.Location);
             var commandLine = new CommandLine
             {
-                HelpHeader = $"{version.ProductName}: S3 download and install v{version.ProductVersion}{Environment.NewLine}"
+                HelpHeader = $"{exeFileName}: S3 download and install v{version.ProductVersion}{Environment.NewLine}"
                            + $" Usage:{Environment.NewLine}"
                            + $"  {exeFileName} [<option> ...] <products> ..."
             };

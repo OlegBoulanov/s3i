@@ -16,7 +16,7 @@ namespace s3i_lib_tests
 
         class TestCommandLine : CommandLineBase
         {
-            [CommandLine("user profile", "-p", "--profile")]
+            [CommandLine("user profile", "-p", "--profile <aws-profile-name>")]
             public string Profile { get; set; } = "default";
             [CommandLine("verbosity", "-v", "--verbose")]
             public bool Verbose { get; set; } = false;
@@ -38,5 +38,12 @@ namespace s3i_lib_tests
             Assert.AreEqual(2, cmd.Arguments.Count);
         }
 
+        [Test]
+        public void Help()
+        {
+            var cmd = new TestCommandLine();
+            var help = cmd.Help();
+            Console.WriteLine(help);
+        }
     }
 }

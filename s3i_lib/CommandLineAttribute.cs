@@ -16,5 +16,9 @@ namespace s3i_lib
             Help = help;
             Keys = new List<string>(keys);
         }
+        public bool IsKey(string s)
+        {
+            return !string.IsNullOrWhiteSpace(Keys.Find(k => s == k.Split(' ', '\t')[0]));
+        }
     }
 }

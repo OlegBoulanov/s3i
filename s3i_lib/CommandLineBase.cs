@@ -41,10 +41,9 @@ namespace s3i_lib
                 var propFound = false;
                 foreach (var prop in GetType().GetProperties())
                 {
-                    foreach (var attr in prop.GetCustomAttributes(true))
+                    foreach (CommandLineAttribute attr in prop.GetCustomAttributes(true))
                     {
-                        if (!(attr is CommandLineAttribute cla)) continue;
-                        if (!cla.Keys.Contains(a)) continue;
+                        if (!attr.IsKey(a)) continue;
                         if (typeof(bool) == prop.PropertyType) onFlag?.Invoke(prop);
                         else currentProp = prop;
                         propFound = true;
@@ -56,18 +55,28 @@ namespace s3i_lib
                 if (null == currentProp) onArgument?.Invoke(a);
             }
         }
-        public string Help()
+        public string FormatKeys(IEnumerable<string> keys)
+        {
+            return keys.Aggregate((a, k) => $"{(string.IsNullOrEmpty(a) ? " " : $"{a},")} {k}");
+        }
+        public string Help(int indent = 4)
         {
             var sb = new StringBuilder();
             sb.AppendLine(HelpHeader);
-            var count = 0;
+            int count = 0, keysLength = 0;
             foreach (var prop in GetType().GetProperties())
             {
-                foreach (var attr in prop.GetCustomAttributes(true))
+                var attributes = prop.GetCustomAttributes(true).Where(a => a is CommandLineAttribute);
+                if (0 == attributes.Count()) continue;    // because Max may throw
+                keysLength = Math.Max(keysLength, attributes.Max(a => FormatKeys(((CommandLineAttribute)a).Keys).Length));
+            }
+            foreach (var prop in GetType().GetProperties())
+            {
+                var attributes = prop.GetCustomAttributes(true).Where(a => a is CommandLineAttribute);
+                foreach (CommandLineAttribute attr in attributes)
                 {
-                    if (!(attr is CommandLineAttribute cla)) continue;
                     if (0 == count++) sb.AppendLine(" Options:");
-                    sb.AppendLine($"  {cla.Keys.Aggregate((a, k) => { return $"{(string.IsNullOrEmpty(a) ? " " : $"{a},")} {k}"; }),-20}  {cla.Help} [{prop.GetValue(this)}]");
+                    sb.AppendLine($"  {FormatKeys(attr.Keys).PadRight(keysLength + indent)}  {attr.Help} [{prop.GetValue(this)}]");
                 }
             }
             if (!string.IsNullOrEmpty(HelpTail)) sb.AppendLine(HelpTail);
