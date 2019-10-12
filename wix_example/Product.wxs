@@ -1,0 +1,40 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<Wix xmlns="http://schemas.microsoft.com/wix/2006/wi" xmlns:util="http://schemas.microsoft.com/wix/UtilExtension" xmlns:netfx="http://schemas.microsoft.com/wix/NetFxExtension">
+
+  <?define ProductName=wix_example?>
+  <?define Manufacturer=OlegB?>
+
+  <!-- change for a major upgrade -->
+  <?define ProductCode=*?>
+
+  <!-- NEVER CHANGE UpgradeCode - actually it is PRODUCT ID -->
+  <?define UpgradeCode={4318C0EF-48DC-4FF7-974A-D1D3F315FCD8}?>
+
+  <Product UpgradeCode="$(var.UpgradeCode)" Id="$(var.ProductCode)" Version="1.0.0" Name="$(var.ProductName)" Language="1033" Manufacturer="$(var.Manufacturer)">
+
+    <Package InstallerVersion="300" Compressed="yes" InstallScope="perMachine" />
+    <Media Id="1" Cabinet="$(var.ProductName).cab" EmbedCab="yes" />
+
+    <Directory Id="TARGETDIR" Name="SourceDir">
+      <Directory Id="ProgramFilesFolder">
+        <Directory Id="INSTALLDIR" Name="$(var.Manufacturer)">
+          <Directory Id="Product_Root" Name="$(var.ProductName)">
+          </Directory>
+        </Directory>
+      </Directory>
+    </Directory>
+
+    <DirectoryRef Id="Product_Root">
+      <Component Id="wix_example" Guid="{F61F6544-DBBF-472D-93D2-3714E0C1D4DB}">
+        <File Id="wix_example.wxs" Source="Product.wxs" KeyPath="yes"/>
+      </Component>
+    </DirectoryRef>
+
+    <Feature Id="ProductFeature" Title="s3i" Level="1">
+      <ComponentRef Id="wix_example" />
+    </Feature>
+
+    <MajorUpgrade DowngradeErrorMessage="A newer than [ProductVersion] version of [ProductName] is already installed." />
+  </Product>
+
+</Wix>
