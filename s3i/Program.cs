@@ -63,6 +63,7 @@ namespace s3i
                 }
                 else
                 {
+                    Installer.MsiExec = commandLine.MsiExecCommand;
                     var clock = System.Diagnostics.Stopwatch.StartNew();
                     exitCode = await ProcessAndExecute(commandLine);
                     if (commandLine.Verbose)
