@@ -5,12 +5,12 @@ using s3i_lib;
 
 namespace s3i_lib_tests
 {
-    [TestFixture]
-    [Category("Study")]
     public class MsiInfo_Test
     {
         [Test]
         [Category("Study")]
+        [Category("Manual")]
+        [Category("Windows")]
         public void GetVersion()
         {
             var msi = new MsiInfo();

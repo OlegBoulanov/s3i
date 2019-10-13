@@ -60,5 +60,13 @@ namespace s3i_lib_tests
             Assert.IsTrue(ProductVersion.TryParse("2.4.4.5", out var v_2_4_4_5) && v_2_3_4_5.CompareTo(v_2_4_4_5) < 0);
             Assert.IsTrue(ProductVersion.TryParse("3.3.4.5", out var v_3_3_4_5) && v_2_3_4_5.CompareTo(v_3_3_4_5) < 0);
         }
+
+        [Test]
+        public void GetVersion()
+        {
+            var v1 = System.Diagnostics.FileVersionInfo.GetVersionInfo(@"C:\ProgramData\Eliza\Temp\SipExplorer\SipExplorer.msi");
+            var v2 = System.Diagnostics.FileVersionInfo.GetVersionInfo(@"C:\Program Files (x86)\dotnet\host\fxr\3.0.0\hostfxr.dll");
+            //Assert.AreEqual(0, v2.FileMajorPart);
+        }
     }
 }
