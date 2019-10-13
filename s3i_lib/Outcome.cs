@@ -10,22 +10,16 @@ namespace s3i_lib
         #region Properties
         public R Result { get; set; }
         public List<E> Errors { get; protected set; }
-        public bool Failed { get { return null != Errors && 0 < Errors.Count; } }
+        public bool Failed { get { return null != Errors; } }
         public bool Succeeded { get { return !Failed; } }
         #endregion
         #region Constructors
-        public Outcome(R result, params E[] errors) : this(result, errors.ToList()) { }
-        public Outcome(R result, IEnumerable<E> errors)
-        {
-            Result = result;
-            Errors = 0 < errors.Count() ? new List<E>(errors) : null;
-        }
         #endregion
         #region Operations
         public Outcome<R, E> AddErrors(IEnumerable<E> errors)
         {
-            if (null == Errors) Errors = new List<E>();
-            Errors.AddRange(errors);
+            //(Errors ??= new List<E>()).AddRange(errors);
+            if(null != Errors) Errors = new List<E>(); Errors.AddRange(errors);
             return this;
         }
         public Outcome<R, E> AddErrors(params E[] errors)
@@ -35,12 +29,20 @@ namespace s3i_lib
         #endregion
         #region Shortcuts
         public static implicit operator R(Outcome<R, E> outcome) { return outcome.Result; }
-        public static implicit operator Outcome<R, E>(R result) { return new Outcome<R, E>(result); }
-        public static Outcome<R, E> Success(R result) { return new Outcome<R, E>(result); }
-        public static Outcome<R, E> Failure(params E[] errors) { return new Outcome<R, E>(default(R), errors); }
-        public static Outcome<R, E> Failure(IEnumerable<E> errors) { return new Outcome<R, E>(default(R), errors); }
-        public static Outcome<R, E> Failure(R result, params E[] errors) { return new Outcome<R, E>(result, errors); }
-        public static Outcome<R, E> Failure(R result, IEnumerable<E> errors) { return new Outcome<R, E>(result, errors); }
+        public static implicit operator Outcome<R, E>(R result) { return new Outcome<R, E> { Result = result }; }
+        public static Outcome<R, E> Success(R result) { return new Outcome<R, E> { Result = result }; }
+        public static Outcome<R, E> Failure(params E[] errors) { return Failure(default, errors); }
+        public static Outcome<R, E> Failure(IEnumerable<E> errors) { return Failure(default, errors); }
+        public static Outcome<R, E> Failure(R result, params E[] errors) { return new Outcome<R, E> { Result = result }.AddErrors(errors); }
+        public static Outcome<R, E> Failure(R result, IEnumerable<E> errors) { return new Outcome<R, E> { Result = result }.AddErrors(errors); }
+        #endregion
+        #region Composition
+        public Outcome<R, E> Merge(Outcome<R, E> other, Func<R, R, R> merge = null)
+        {
+            Result = null != merge ? merge(Result, other.Result) : other.Result;
+            if (other.Failed) AddErrors(other.Errors);
+            return this;
+        }
         #endregion
     }
 }
