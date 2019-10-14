@@ -10,8 +10,8 @@ namespace s3i_lib_tests
     public class MsiInfo_Test
     {
 
-        [Test]
-        [Category("Study")]
+        //[Test]
+        //[Category("Study")]
         public void GetVersion()
         {
             var testDirectoryName = Path.GetDirectoryName(TestContext.CurrentContext.TestDirectory);
