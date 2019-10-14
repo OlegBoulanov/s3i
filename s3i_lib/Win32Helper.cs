@@ -10,6 +10,7 @@ namespace s3i_lib
 {
     public class Win32Helper
     {
+        public static string ErrorMessage(uint code) { return ErrorMessage((int)code); }
         public static string ErrorMessage(int code)
         {
             var msg = new Win32Exception(code).Message;
