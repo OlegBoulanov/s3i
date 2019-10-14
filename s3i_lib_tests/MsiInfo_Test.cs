@@ -9,8 +9,6 @@ namespace s3i_lib_tests
     {
         [Test]
         [Category("Study")]
-        [Category("Manual")]
-        [Category("Windows")]
         public void GetVersion()
         {
             var msi = new MsiInfo(@"C:\ProgramData\Eliza\Temp\SipExplorer\SipExplorer.msi");
