@@ -10,72 +10,39 @@ namespace s3i_lib
     public class MsiInfo : IDisposable
     {
         //
-        // Adopted from here: https://social.msdn.microsoft.com/Forums/windows/en-US/678f0c0e-eed3-4b13-a420-ee94802d8330/reading-msi-file-properties?forum=winformssetup
+        // Loosely adopted from here: https://social.msdn.microsoft.com/Forums/windows/en-US/678f0c0e-eed3-4b13-a420-ee94802d8330/reading-msi-file-properties?forum=winformssetup
         //
-        /*
-        public static void GetMsiInfo(string msiFilePath)
+
+        IntPtr hMsi = IntPtr.Zero;
+        IntPtr hSummary = IntPtr.Zero;
+
+        public enum StringPropertyType { 
+            Title = 2, 
+            Subject = 3, 
+            Author = 4, 
+            Keywords = 5, 
+            Comments = 6, 
+            Template = 7, 
+            LastSavedBy = 8, 
+            RevisionNumber = 9 
+        };
+
+        public uint ErrorCode { get; protected set; }
+        public static implicit operator bool(MsiInfo info) { return IntPtr.Zero != info.hMsi && IntPtr.Zero != info.hSummary; }
+        public MsiInfo(string msiFilePath)
         {
-            IntPtr hMsi = IntPtr.Zero, hSum = IntPtr.Zero;
-            IntPtr MSIDBOPEN_READONLY = (IntPtr)0;
-            const uint ERROR_MORE_DATA = 234;
-            const uint PID_TEMPLATE = 7;
-
-            uint ret = NativeMethods.MsiOpenDatabase(msiFilePath, MSIDBOPEN_READONLY, out hMsi);
-            if (ret == 0)
-            {
-                ret = NativeMethods.MsiGetSummaryInformation(hMsi, string.Empty, 0, out hSum);
-
-                if (ret == 0)
-                {
-                    uint uiData = 0;
-                    int iValue = 0;
-                    Comtypes.FILETIME ftValue;
-                    IntPtr strEmpty = Marshal.StringToHGlobalUni(string.Empty);
-                    uint uicch = 0;
-
-                    if (NativeMethods.MsiSummaryInfoGetProperty(hSum, PID_TEMPLATE, out uiData, out iValue, out ftValue, strEmpty, ref uicch) == ERROR_MORE_DATA)
-                    {
-                        uicch = uicch + 1;
-
-                        IntPtr strBuffer = Marshal.AllocHGlobal((int)uicch * 2);
-
-                        ret = NativeMethods.MsiSummaryInfoGetProperty(hSum, PID_TEMPLATE, out uiData, out iValue, out ftValue, strBuffer, ref uicch);
-
-                        if (ret == 0)
-                        {
-                            string strProperty = Marshal.PtrToStringUni(strBuffer);
-                            Console.WriteLine("Property is {0}", strProperty);
-                        }
-
-                        Marshal.FreeHGlobal(strBuffer);
-                    }
-
-                    Marshal.FreeHGlobal(strEmpty);
-                }
-
-                NativeMethods.MsiCloseHandle(hSum);
-            }
-
-            NativeMethods.MsiCloseHandle(hMsi);
+            Open(msiFilePath);
         }
-        */
-        /// <summary>
-        /// Msi installer property access
-        /// </summary>
-        /// 
-
-        protected IntPtr hMsi = IntPtr.Zero;
-        protected IntPtr hSummary = IntPtr.Zero;
 
         public uint Open(string msiFilePath)
         {
             IntPtr MSIDBOPEN_READONLY = (IntPtr)0;
-            uint ret = NativeMethods.MsiOpenDatabase(msiFilePath, MSIDBOPEN_READONLY, out hMsi);
-            if (ret == 0)
+            ErrorCode = NativeMethods.MsiOpenDatabase(msiFilePath, MSIDBOPEN_READONLY, out hMsi);
+            if (ErrorCode == 0)
             {
-                ret = NativeMethods.MsiGetSummaryInformation(hMsi, string.Empty, 0, out hSummary);
+                ErrorCode = NativeMethods.MsiGetSummaryInformation(hMsi, string.Empty, 0, out hSummary);
             }
-            return ret;
+            return ErrorCode;
         }
 
         public void Close()
@@ -83,20 +50,18 @@ namespace s3i_lib
             IDisposable_FreeUnmanagedResources();
         }
 
-        public string GetProperty(uint uiProperty, string defaultValue = null)
+
+        public string GetStringProperty(StringPropertyType propertType, string defaultValue)
         {
-            uint uiData;
-            int iValue;
-            Comtypes.FILETIME ftValue;
             IntPtr strEmpty = Marshal.StringToHGlobalUni(string.Empty);
             uint uicch = 0;
             const uint ERROR_MORE_DATA = 234;
             string propertyValue = defaultValue;
-            if (NativeMethods.MsiSummaryInfoGetProperty(hSummary, uiProperty, out uiData, out iValue, out ftValue, strEmpty, ref uicch) == ERROR_MORE_DATA)
+            if (NativeMethods.MsiSummaryInfoGetProperty(hSummary, (uint)propertType, out uint _, out _, out _, strEmpty, ref uicch) == ERROR_MORE_DATA)
             {
                 IntPtr strBuffer = Marshal.AllocHGlobal((int)uicch++ * 2);
-                uint ret = NativeMethods.MsiSummaryInfoGetProperty(hSummary, uiProperty, out uiData, out iValue, out ftValue, strBuffer, ref uicch);
-                if (ret == 0) propertyValue = Marshal.PtrToStringUni(strBuffer);
+                ErrorCode = NativeMethods.MsiSummaryInfoGetProperty(hSummary, (uint)propertType, out _, out _, out _, strBuffer, ref uicch);
+                if (ErrorCode == 0) propertyValue = Marshal.PtrToStringUni(strBuffer);
                 Marshal.FreeHGlobal(strBuffer);
             }
             Marshal.FreeHGlobal(strEmpty);
