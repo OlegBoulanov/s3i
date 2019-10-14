@@ -3,16 +3,21 @@ using NUnit.Framework;
 
 using s3i_lib;
 
+using System.IO;
+
 namespace s3i_lib_tests
 {
-    [TestFixture]
-    [Category("Study")]
     public class MsiInfo_Test
     {
-        [Test]
+
+        [Test, Category("Study")]
         public void GetVersion()
         {
-            var msi = new MsiInfo(@"C:\ProgramData\Eliza\Temp\SipExplorer\SipExplorer.msi");
+            var testDirectoryName = Path.GetDirectoryName(TestContext.CurrentContext.TestDirectory);
+            var configurationName = Path.GetFileName(testDirectoryName);
+            var projectDirectory = Path.GetDirectoryName(Path.GetDirectoryName(testDirectoryName));
+            var msiPath = $"{Path.GetDirectoryName(projectDirectory)}{Path.DirectorySeparatorChar}s3i_setup{Path.DirectorySeparatorChar}bin{Path.DirectorySeparatorChar}{configurationName}{Path.DirectorySeparatorChar}s3i.msi";
+            var msi = new MsiInfo(msiPath);
             if (msi)
             {
                 foreach(var p in (MsiInfo.StringPropertyType[]) Enum.GetValues(typeof(MsiInfo.StringPropertyType)))
@@ -23,8 +28,8 @@ namespace s3i_lib_tests
             Assert.IsTrue(msi);
             Console.WriteLine(Win32Helper.ErrorMessage(msi.ErrorCode));
             Assert.AreEqual(0, msi.ErrorCode);
-            Assert.AreEqual("Eliza SipExplorer 12.6.64.0", msi.GetStringProperty(MsiInfo.StringPropertyType.Subject, null));
-            var v1 = System.Diagnostics.FileVersionInfo.GetVersionInfo(@"C:\ProgramData\Eliza\Temp\SipExplorer\SipExplorer.msi");
+            Assert.AreEqual("s3i", msi.GetStringProperty(MsiInfo.StringPropertyType.Subject, null));
+            var v1 = System.Diagnostics.FileVersionInfo.GetVersionInfo(msiPath);
             var v2 = System.Diagnostics.FileVersionInfo.GetVersionInfo(@"C:\Program Files (x86)\dotnet\host\fxr\3.0.0\hostfxr.dll");
             //Assert.AreEqual(0, v2.FileMajorPart);
         }

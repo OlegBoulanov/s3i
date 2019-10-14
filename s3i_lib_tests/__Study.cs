@@ -7,7 +7,7 @@ using System.Threading.Tasks;
 
 namespace s3i_lib__Study
 {
-    [TestFixture]
+
     [Category("Study")]
     public class __WhatTypeIsAsyncLambda__
     {
@@ -22,7 +22,6 @@ namespace s3i_lib__Study
         const int millisecondsToWait = 1000;
 
         [Test]
-        //[Category("Study")]
         public async Task Test_SyncAction()
         {
             var watch = Stopwatch.StartNew();
@@ -31,7 +30,6 @@ namespace s3i_lib__Study
         }
 
         [Test]
-        //[Category("Study")]
         public async Task Test_AsyncFunc()
         {
             var watch = Stopwatch.StartNew();
@@ -40,7 +38,6 @@ namespace s3i_lib__Study
         }
 
         [Test]
-        //[Category("Study")]
         public async Task Test_AsyncAction()
         {
             var watch = Stopwatch.StartNew();

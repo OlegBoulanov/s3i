@@ -23,7 +23,6 @@ using s3i_lib;
 
 namespace s3i_lib_tests
 {
-    [TestFixture]
     public class S3Helper_Test
     {
         const string testProfileName = "test.s3i";
