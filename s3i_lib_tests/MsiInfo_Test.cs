@@ -6,10 +6,10 @@ using s3i_lib;
 namespace s3i_lib_tests
 {
     [TestFixture]
+    [Category("Study")]
     public class MsiInfo_Test
     {
         [Test]
-        [Category("Study")]
         public void GetVersion()
         {
             var msi = new MsiInfo(@"C:\ProgramData\Eliza\Temp\SipExplorer\SipExplorer.msi");
