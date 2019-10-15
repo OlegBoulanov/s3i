@@ -32,7 +32,7 @@ namespace s3i_lib_tests
             Console.WriteLine($"profile0={cmd.Profile}");
             Assert.AreEqual("default", cmd.Profile);
 
-            cmd.Parse("-p", "xp", "argument", "--verbose", "arg2", "-t", "00:01:23");
+            cmd.Parse(new List<string> { "-p", "xp", "argument", "--verbose", "arg2", "-t", "00:01:23" });
             Console.WriteLine($"profile2={cmd.Profile}, verbose={cmd.Verbose}, timeout={cmd.Timeout}");
             Assert.AreEqual("xp", cmd.Profile);
             Assert.AreEqual(2, cmd.Arguments.Count);

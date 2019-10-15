@@ -13,7 +13,7 @@ namespace s3i_lib
         public List<string> Arguments { get; protected set; }
         public string HelpHeader { get; set; }
         public string HelpTail { get; set; }
-        public void Parse(params string[] args)
+        public void Parse(IEnumerable<string> args)
         {
             Arguments = new List<string>();
             Parse(
@@ -25,7 +25,7 @@ namespace s3i_lib
                 }, 
                 args);
         }
-        public void Parse(Action<string> onArgument, Action<PropertyInfo> onFlag, Action<PropertyInfo, string> onOption, string[] args)
+        public void Parse(Action<string> onArgument, Action<PropertyInfo> onFlag, Action<PropertyInfo, string> onOption, IEnumerable<string> args)
         {
             Arguments = new List<string>();
             PropertyInfo currentProp = null;

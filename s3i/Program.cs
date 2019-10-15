@@ -42,7 +42,7 @@ namespace s3i
                            + $" Usage:{Environment.NewLine}"
                            + $"  {exeFileName} [<option> ...] <products> ..."
             };
-            commandLine.Parse(args);
+            commandLine.Parse(args.Select(a => Environment.ExpandEnvironmentVariables(a)));
             // decide if help needed
             if (commandLine.Arguments.Count < 1)
             {
