@@ -105,7 +105,7 @@ namespace s3i
             remove = products.FindFilesToUninstall(Path.Combine(commandLine.StagingFolder, $"*{Installer.InstallerFileExtension}"));
             if (commandLine.Verbose)
             {
-                if (0 < remove.Count())
+                if (remove.Any())
                 {
                     Console.WriteLine($"Remove [{remove.Count()}]:");
                     foreach (var f in remove) Console.WriteLine($"  {f}");
@@ -123,19 +123,19 @@ namespace s3i
                 {
                     var localInfoFile = Path.ChangeExtension(localMsiFile, ProductInfo.LocalInfoFileExtension);
                     var installedProduct = ProductInfo.FindInstalled(localInfoFile).Result;
-                        // some backward compatibility in case if was not serialized
-                        if (null != installedProduct && string.IsNullOrEmpty(installedProduct.LocalPath)) installedProduct.LocalPath = localMsiFile;
+                    // some backward compatibility in case if was not serialized
+                    if (string.IsNullOrEmpty(installedProduct?.LocalPath)) installedProduct.LocalPath = localMsiFile;
                     return installedProduct;
                 });
             }
             if (commandLine.Verbose)
             {
-                if (0 < uninstall.Count())
+                if (uninstall.Any())
                 {
                     Console.WriteLine($"Uninstall [{uninstall.Count()}]:");
                     foreach (var f in uninstall) Console.WriteLine($"  {f.AbsoluteUri}");
                 }
-                if (0 < install.Count())
+                if (install.Any())
                 {
                     Console.WriteLine($"Install [{install.Count()}]:");
                     foreach (var f in install) Console.WriteLine($"  {f.AbsoluteUri}");
@@ -157,21 +157,19 @@ namespace s3i
                     if (0 == exitCode && 0 != err) { exitCode = err; break; }
                 }
                 // 3) Download/cache existing and new
-                if (true)
+                if (install.Any())
                 {
                     var err = commandLine.DownloadProducts(install, s3, commandLine.Timeout);
                     if (0 == exitCode && 0 != err) { exitCode = err; }
-                }
-                // 4) Install changed and new
-                foreach (var p in install)
-                {
-                    var err = commandLine.Install(p);
-                    if (0 == exitCode && 0 != err) { exitCode = err; break; }
+                    // 4) Install changed and new
+                    foreach (var p in install)
+                    {
+                        err = commandLine.Install(p);
+                        if (0 == exitCode && 0 != err) { exitCode = err; break; }
+                    }
                 }
             }
-
             return exitCode;
         }
-
     }
 }
