@@ -32,8 +32,8 @@ namespace s3i_lib
             if (0 < versionIsNewer) return Installer.Action.Install;
             // else (if less or props changed) reinstall
             if (versionIsNewer < 0 || !Props.Equals(installedProduct.Props)) return Installer.Action.Reinstall;
-            // else (if same and no props changed) do nothing
-            return Installer.Action.NoAction;
+            // else (if same and no props changed) run anyway - won't do any harm
+            return Installer.Action.Install;
         }
         #region Json Serialization
         public string ToJson()

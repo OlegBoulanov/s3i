@@ -126,12 +126,12 @@ namespace s3i
             {
                 (uninstall, install) = products.Separate(localMsiFile =>
                 {
-                var localInfoFile = Path.ChangeExtension(localMsiFile, ProductInfo.LocalInfoFileExtension);
-                var installedProduct = ProductInfo.FindInstalled(localInfoFile).Result;
+                    var localInfoFile = Path.ChangeExtension(localMsiFile, ProductInfo.LocalInfoFileExtension);
+                    var installedProduct = ProductInfo.FindInstalled(localInfoFile).Result;
                     // some backward compatibility in case if was not serialized
                     if (null != installedProduct)
                     {
-                        if(string.IsNullOrEmpty(installedProduct.LocalPath)) installedProduct.LocalPath = localMsiFile;
+                        if (string.IsNullOrEmpty(installedProduct.LocalPath)) installedProduct.LocalPath = localMsiFile;
                     }
                     return installedProduct;
                 });
