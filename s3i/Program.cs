@@ -15,9 +15,9 @@ namespace s3i
         static int Main(string[] args)
         {
             // to allow compilation on c# 7.0 (mono)
-            return __Main(args).Result;
+            return AsyncMain(args).Result;
         }
-        static async Task<int> __Main(string[] args)
+        static async Task<int> AsyncMain(string[] args)
         {
             int exitCode = 0;
             var assembly = Assembly.GetExecutingAssembly();

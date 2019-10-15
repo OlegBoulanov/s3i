@@ -16,11 +16,11 @@ namespace s3i_lib_tests
 
         class TestCommandLine : CommandLineBase
         {
-            [CommandLine("user profile", "-p", "--profile <aws-profile-name>")]
+            [CommandLineKey("user profile", "-p", "--profile <aws-profile-name>")]
             public string Profile { get; set; } = "default";
-            [CommandLine("verbosity", "-v", "--verbose")]
+            [CommandLineKey("verbosity", "-v", "--verbose")]
             public bool Verbose { get; set; } = false;
-            [CommandLine("timeout", "-t", "--timeout")]
+            [CommandLineKey("timeout", "-t", "--timeout")]
             public TimeSpan Timeout { get; set; }
             public string ExtraField { get; set; }
         };

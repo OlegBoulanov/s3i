@@ -41,7 +41,7 @@ namespace s3i_lib
                 var propFound = false;
                 foreach (var prop in GetType().GetProperties())
                 {
-                    foreach (CommandLineAttribute attr in prop.GetCustomAttributes(true))
+                    foreach (CommandLineKeyAttribute attr in prop.GetCustomAttributes(true))
                     {
                         if (!attr.IsKey(a)) continue;
                         if (typeof(bool) == prop.PropertyType) onFlag?.Invoke(prop);
@@ -55,7 +55,7 @@ namespace s3i_lib
                 if (null == currentProp) onArgument?.Invoke(a);
             }
         }
-        public string FormatKeys(IEnumerable<string> keys)
+        public static string FormatKeys(IEnumerable<string> keys)
         {
             return keys.Aggregate((a, k) => $"{(string.IsNullOrEmpty(a) ? " " : $"{a},")} {k}");
         }
@@ -66,14 +66,14 @@ namespace s3i_lib
             int count = 0, keysLength = 0;
             foreach (var prop in GetType().GetProperties())
             {
-                var attributes = prop.GetCustomAttributes(true).Where(a => a is CommandLineAttribute);
+                var attributes = prop.GetCustomAttributes(true).Where(a => a is CommandLineKeyAttribute);
                 if (0 == attributes.Count()) continue;    // because Max may throw
-                keysLength = Math.Max(keysLength, attributes.Max(a => FormatKeys(((CommandLineAttribute)a).Keys).Length));
+                keysLength = Math.Max(keysLength, attributes.Max(a => FormatKeys(((CommandLineKeyAttribute)a).Keys).Length));
             }
             foreach (var prop in GetType().GetProperties())
             {
-                var attributes = prop.GetCustomAttributes(true).Where(a => a is CommandLineAttribute);
-                foreach (CommandLineAttribute attr in attributes)
+                var attributes = prop.GetCustomAttributes(true).Where(a => a is CommandLineKeyAttribute);
+                foreach (CommandLineKeyAttribute attr in attributes)
                 {
                     if (0 == count++) sb.AppendLine(" Options:");
                     sb.AppendLine($"  {FormatKeys(attr.Keys).PadRight(keysLength + indent)}  {attr.Help} [{prop.GetValue(this)}]");

@@ -24,8 +24,7 @@ namespace s3i_lib
         }
         public async Task<AmazonS3Client> GetClientAsync(string bucketName)
         {
-            string regionName;
-            if (!bucket2region.TryGetValue(bucketName, out regionName))
+            if (!bucket2region.TryGetValue(bucketName, out string regionName))
             {
                 var bucketLocationResponse = await Client.GetBucketLocationAsync(bucketName);
                 switch (bucketLocationResponse.HttpStatusCode)

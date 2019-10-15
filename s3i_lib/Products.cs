@@ -15,9 +15,11 @@ namespace s3i_lib
 {
     public class Products : List<ProductInfo>
     {
-        public class InvalidUriException : ApplicationException 
+        internal class InvalidUriException : ApplicationException 
         {
             public InvalidUriException(string s, Exception x) : base($"Invalid AWS S3 URI: {s}", x) { }
+            public InvalidUriException() : base($"Invalid AWS S3 URI") { }
+            public InvalidUriException(string message) : base(message) { }
         }
         public static AmazonS3Uri ParseS3Uri(string s)
         {
@@ -39,7 +41,7 @@ namespace s3i_lib
                 return JsonConvert.DeserializeObject<Products>(await reader.ReadToEndAsync());
             }
         }
-        static readonly string sectionProducts = "$products$";
+        const string sectionProducts = "$products$";
         public static async Task<Products> FromIni(Stream stream, string baseUri, string tempFilePath)
         {
             var products = new Products();
