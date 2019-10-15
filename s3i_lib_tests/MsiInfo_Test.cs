@@ -18,15 +18,15 @@ namespace s3i_lib_tests
             var configurationName = Path.GetFileName(testDirectoryName);
             var projectDirectory = Path.GetDirectoryName(Path.GetDirectoryName(testDirectoryName));
             var msiPath = $"{Path.GetDirectoryName(projectDirectory)}{Path.DirectorySeparatorChar}s3i_setup{Path.DirectorySeparatorChar}bin{Path.DirectorySeparatorChar}{configurationName}{Path.DirectorySeparatorChar}s3i.msi";
-            var msi = new MsiInfo(msiPath);
-            if (msi)
+            using var msi = new MsiInfo(msiPath);
+            if (msi.IsOpen)
             {
                 foreach(var p in (MsiInfo.StringPropertyType[]) Enum.GetValues(typeof(MsiInfo.StringPropertyType)))
                 {
                     Console.WriteLine($"{p}: {msi.GetStringProperty(p, null)}");
                 }
             }
-            Assert.IsTrue(msi);
+            Assert.IsTrue(msi.IsOpen);
             Console.WriteLine(Win32Helper.ErrorMessage(msi.ErrorCode));
             Assert.AreEqual(0, msi.ErrorCode);
             Assert.AreEqual("s3i", msi.GetStringProperty(MsiInfo.StringPropertyType.Subject, null));

@@ -17,24 +17,19 @@ namespace s3i_lib
         IntPtr hSummary = IntPtr.Zero;
 
         public enum StringPropertyType { 
-            Title = 2, 
-            Subject = 3, 
-            Author = 4, 
-            Keywords = 5, 
-            Comments = 6, 
-            Template = 7, 
+            Title = 2,          // Installation Database
+            Subject = 3,        // Product 12.6.64.0
+            Author = 4,         // OlegB
+            Keywords = 5,       // Installer
+            Comments = 6,       // This installer database contains the logic and data required to install Product 12.6.64.0.
+            Template = 7,       // Intel;1033
             LastSavedBy = 8, 
-            RevisionNumber = 9 
+            RevisionNumber = 9  // {1FC64C1A-145D-4E13-896E-A8E92E7C00D3}
         };
 
         public uint ErrorCode { get; protected set; }
-        public static implicit operator bool(MsiInfo info) { return IntPtr.Zero != info.hMsi && IntPtr.Zero != info.hSummary; }
+        public bool IsOpen { get { return IntPtr.Zero != hMsi && IntPtr.Zero != hSummary; } }
         public MsiInfo(string msiFilePath)
-        {
-            Open(msiFilePath);
-        }
-
-        public uint Open(string msiFilePath)
         {
             IntPtr MSIDBOPEN_READONLY = (IntPtr)0;
             ErrorCode = NativeMethods.MsiOpenDatabase(msiFilePath, MSIDBOPEN_READONLY, out hMsi);
@@ -42,39 +37,34 @@ namespace s3i_lib
             {
                 ErrorCode = NativeMethods.MsiGetSummaryInformation(hMsi, string.Empty, 0, out hSummary);
             }
-            return ErrorCode;
         }
-
-        public void Close()
-        {
-            IDisposable_FreeUnmanagedResources();
-        }
-
-
+        
         public string GetStringProperty(StringPropertyType propertType, string defaultValue)
         {
-            IntPtr strEmpty = Marshal.StringToHGlobalUni(string.Empty);
-            uint uicch = 0;
-            const uint ERROR_MORE_DATA = 234;
             string propertyValue = defaultValue;
-            if (NativeMethods.MsiSummaryInfoGetProperty(hSummary, (uint)propertType, out uint _, out _, out _, strEmpty, ref uicch) == ERROR_MORE_DATA)
+            if (IsOpen)
             {
-                IntPtr strBuffer = Marshal.AllocHGlobal((int)uicch++ * 2);
-                ErrorCode = NativeMethods.MsiSummaryInfoGetProperty(hSummary, (uint)propertType, out _, out _, out _, strBuffer, ref uicch);
-                if (ErrorCode == 0) propertyValue = Marshal.PtrToStringUni(strBuffer);
-                Marshal.FreeHGlobal(strBuffer);
+                IntPtr strEmpty = Marshal.StringToHGlobalUni(string.Empty);
+                uint uicch = 0;
+                if (NativeMethods.MsiSummaryInfoGetProperty(hSummary, (uint)propertType, out uint _, out _, out _, strEmpty, ref uicch) == 234) // ERROR_MORE_DATA
+                {
+                    IntPtr strBuffer = Marshal.AllocHGlobal((int)uicch++ * 2);
+                    ErrorCode = NativeMethods.MsiSummaryInfoGetProperty(hSummary, (uint)propertType, out _, out _, out _, strBuffer, ref uicch);
+                    if (ErrorCode == 0) propertyValue = Marshal.PtrToStringUni(strBuffer);
+                    Marshal.FreeHGlobal(strBuffer);
+                }
+                Marshal.FreeHGlobal(strEmpty);
             }
-            Marshal.FreeHGlobal(strEmpty);
             return propertyValue;
         }
 
+        #region IDisposable Support
         void IDisposable_FreeUnmanagedResources()
         {
             if (IntPtr.Zero != hSummary) { NativeMethods.MsiCloseHandle(hSummary); hSummary = IntPtr.Zero; }
             if (IntPtr.Zero != hMsi) { NativeMethods.MsiCloseHandle(hMsi); hMsi = IntPtr.Zero; }
         }
 
-        #region IDisposable Support
         private bool disposedValue = false; // To detect redundant calls
         protected virtual void Dispose(bool disposing)
         {
