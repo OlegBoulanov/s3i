@@ -14,8 +14,21 @@ namespace s3i
     {
         static int Main(string[] args)
         {
-            // to allow compilation on c# 7.0 (mono)
-            return AsyncMain(args).Result;
+            try
+            {
+                // to allow compilation on c# 7.0 (mono)
+                return AsyncMain(args).Result;
+            }
+            catch (AggregateException x)
+            {
+                Console.WriteLine($"? {(x.InnerException??x).Format(4)}");
+                return -1;
+            }
+            catch (ApplicationException x)
+            {
+                Console.WriteLine($"? {x.Format(4)}");
+                return -1;
+            }
         }
         static async Task<int> AsyncMain(string[] args)
         {
@@ -65,15 +78,7 @@ namespace s3i
                 {
                     Installer.MsiExec = commandLine.MsiExecCommand;
                     var clock = System.Diagnostics.Stopwatch.StartNew();
-                    try
-                    {
-                        exitCode = await ProcessAndExecute(commandLine);
-                    }
-                    catch(Exception x)
-                    {
-                        Console.WriteLine($"? {x.Format(4)}");
-                        exitCode = -1;
-                    }
+                    exitCode = await ProcessAndExecute(commandLine);
                     if (commandLine.Verbose)
                     {
                         //Console.WriteLine();
