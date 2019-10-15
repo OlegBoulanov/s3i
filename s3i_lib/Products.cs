@@ -100,7 +100,7 @@ namespace s3i_lib
                     }));
                     return tasks;
                 }));
-            products.AddRange(arrayOfProducts.SelectMany(x => x));
+            if(null != arrayOfProducts) products.AddRange(arrayOfProducts.SelectMany(x => x));
             return products;
             //return arrayOfProducts.Aggregate(new Products(), (p, pp) => { p.AddRange(pp); return p; });
         }

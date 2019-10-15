@@ -34,6 +34,10 @@ namespace s3i_lib
                 Credentials = credentials;
                 Clients = new AmazonS3ClientMap(credentials, client);
             }
+            else
+            {
+                throw new ApplicationException($"Can't get [{profileName}] credentials");
+            }
         }
         public async Task<HttpStatusCode> DownloadAsync(string bucket, string key, DateTime modifiedSinceDateUtc, Func<string, Stream, Task> processStream)
         {
