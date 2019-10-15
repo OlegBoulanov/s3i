@@ -147,7 +147,7 @@ namespace s3i
                 // 1) Uninstall what's not needed anymore...
                 foreach (var f in remove)
                 {
-                    var err = commandLine.Uninstall(f, true);
+                    var err = commandLine.Uninstall(f, !commandLine.DryRun);
                     if (0 == exitCode && 0 != err) { exitCode = err; break; }
                 }
                 // 2) Uninstall whose to be changed
