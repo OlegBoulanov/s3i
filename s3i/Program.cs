@@ -168,12 +168,14 @@ namespace s3i
                 if (install.Any())
                 {
                     var err = commandLine.DownloadProducts(install, s3, commandLine.Timeout);
-                    if (0 == exitCode && 0 != err) { exitCode = err; }
-                    // 4) Install changed and new
-                    foreach (var p in install)
+                    if (0 == err)
                     {
-                        err = commandLine.Install(p);
-                        if (0 == exitCode && 0 != err) { exitCode = err; break; }
+                        // 4) Install changed and new
+                        foreach (var p in install)
+                        {
+                            err = commandLine.Install(p);
+                            if (0 == exitCode && 0 != err) { exitCode = err; break; }
+                        }
                     }
                 }
             }
