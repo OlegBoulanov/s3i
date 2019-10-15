@@ -3,11 +3,11 @@ Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio Version 16
 VisualStudioVersion = 16.0.28803.352
 MinimumVisualStudioVersion = 10.0.40219.1
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "s3i", "s3i\s3i.csproj", "{649316E5-F497-4DAC-A71E-16AD55C44C57}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "s3i", "s3i\s3i.csproj", "{649316E5-F497-4DAC-A71E-16AD55C44C57}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "s3i_lib", "s3i_lib\s3i_lib.csproj", "{9CE9228B-2DEC-485D-B67E-C8880DFE9DF7}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "s3i_lib", "s3i_lib\s3i_lib.csproj", "{9CE9228B-2DEC-485D-B67E-C8880DFE9DF7}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "s3i_lib_tests", "s3i_lib_tests\s3i_lib_tests.csproj", "{2BEA5018-2F50-4FF6-9970-7C590C058382}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "s3i_lib_tests", "s3i_lib_tests\s3i_lib_tests.csproj", "{2BEA5018-2F50-4FF6-9970-7C590C058382}"
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution Items", "{26BA2AE3-05FD-45B2-B99B-B283F3D784D0}"
 	ProjectSection(SolutionItems) = preProject
@@ -18,6 +18,8 @@ EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "s3i_service", "s3i_service\s3i_service.csproj", "{8EF1416C-B82B-4164-B22E-CBC2EA01431D}"
 EndProject
 Project("{930C7802-8A8C-48F9-8165-68863BCCD9DD}") = "s3i_setup", "s3i_setup\s3i_setup.wixproj", "{CC606C19-C85F-4C7E-9F28-FFD2D13F3DB0}"
+EndProject
+Project("{930C7802-8A8C-48F9-8165-68863BCCD9DD}") = "wix_example", "wix_example\wix_example.wixproj", "{FC1547BC-7B64-4135-A4B3-02C2AF648CA1}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -67,6 +69,14 @@ Global
 		{CC606C19-C85F-4C7E-9F28-FFD2D13F3DB0}.Release|Any CPU.Build.0 = Release|x86
 		{CC606C19-C85F-4C7E-9F28-FFD2D13F3DB0}.Release|x86.ActiveCfg = Release|x86
 		{CC606C19-C85F-4C7E-9F28-FFD2D13F3DB0}.Release|x86.Build.0 = Release|x86
+		{FC1547BC-7B64-4135-A4B3-02C2AF648CA1}.Debug|Any CPU.ActiveCfg = Debug|x86
+		{FC1547BC-7B64-4135-A4B3-02C2AF648CA1}.Debug|Any CPU.Build.0 = Debug|x86
+		{FC1547BC-7B64-4135-A4B3-02C2AF648CA1}.Debug|x86.ActiveCfg = Debug|x86
+		{FC1547BC-7B64-4135-A4B3-02C2AF648CA1}.Debug|x86.Build.0 = Debug|x86
+		{FC1547BC-7B64-4135-A4B3-02C2AF648CA1}.Release|Any CPU.ActiveCfg = Release|x86
+		{FC1547BC-7B64-4135-A4B3-02C2AF648CA1}.Release|Any CPU.Build.0 = Release|x86
+		{FC1547BC-7B64-4135-A4B3-02C2AF648CA1}.Release|x86.ActiveCfg = Release|x86
+		{FC1547BC-7B64-4135-A4B3-02C2AF648CA1}.Release|x86.Build.0 = Release|x86
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

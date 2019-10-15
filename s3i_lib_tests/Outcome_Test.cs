@@ -11,6 +11,12 @@ namespace s3i_lib_tests
         [Test]
         public void Outcome()
         {
+            Assert.IsTrue(Outcome<bool, string>.Success(true).Succeeded);
+            Assert.IsTrue(Outcome<bool, string>.Success(false).Succeeded);
+            Assert.IsTrue(Outcome<bool, string>.Failure(true).Failed);
+            Assert.IsTrue(Outcome<bool, string>.Failure(false).Failed);
+            Assert.IsTrue(Outcome<int, string>.Success(1).Succeeded);
+            Assert.IsTrue(Outcome<int, string>.Failure(1).Failed);
             var failed1 = Outcome<string, string>.Failure("no", "could", "not", "do");
             Assert.IsTrue(failed1.Failed);
             var failed2 = Outcome<string, string>.Failure("RESULT").AddErrors(new List<string> { "could", "not", "do" }).AddErrors("one", "two").AddErrors();

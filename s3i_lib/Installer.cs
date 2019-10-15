@@ -7,16 +7,17 @@ using System.Diagnostics;
 
 namespace s3i_lib
 {
-    public class Installer
+    public static class Installer
     {
         public enum Action { NoAction, Install, Reinstall, Uninstall };
-        public static string MsiExec { get; } = "msiexec.exe";
-        public static string InstallerFileExtension { get; } = ".msi";
+        public static string MsiExec { get; set;  } = "msiexec.exe";
+        public static string InstallerFileExtension { get; set; } = ".msi";
         public static int RunInstall(string commandLineArgs, bool dryrun, TimeSpan timeout)
         {
             if (RuntimeInformation.IsOSPlatform(OSPlatform.Windows) && !dryrun)
             {
-                using (var process = Process.Start(MsiExec, commandLineArgs))
+                var args = $"/c {MsiExec.Quote(null)} {commandLineArgs}";
+                using (var process = Process.Start("cmd.exe", args))
                 {
                     if (timeout.TotalMilliseconds <= 0) return 0;
                     if (false == process.WaitForExit((int)timeout.TotalMilliseconds) || 0 != process.ExitCode)

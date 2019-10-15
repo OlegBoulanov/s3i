@@ -60,5 +60,6 @@ namespace s3i_lib_tests
             Assert.IsTrue(ProductVersion.TryParse("2.4.4.5", out var v_2_4_4_5) && v_2_3_4_5.CompareTo(v_2_4_4_5) < 0);
             Assert.IsTrue(ProductVersion.TryParse("3.3.4.5", out var v_3_3_4_5) && v_2_3_4_5.CompareTo(v_3_3_4_5) < 0);
         }
+
     }
 }

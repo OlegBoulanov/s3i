@@ -7,14 +7,18 @@ using System.Threading.Tasks;
 namespace s3i_lib
 {
     [AttributeUsage(AttributeTargets.Property, AllowMultiple=false)]
-    public class CommandLineAttribute : Attribute
+    public sealed class CommandLineKeyAttribute : Attribute
     {
         public string Help { get; set; }
         public List<string> Keys { get; set; }
-        public CommandLineAttribute(string help, params string[] keys)
+        public CommandLineKeyAttribute(string help, params string[] keys)
         {
             Help = help;
             Keys = new List<string>(keys);
+        }
+        public bool IsKey(string s)
+        {
+            return !string.IsNullOrWhiteSpace(Keys.Find(k => s == k.Split(' ', '\t').FirstOrDefault()));
         }
     }
 }

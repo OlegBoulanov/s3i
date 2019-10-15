@@ -27,12 +27,14 @@ namespace s3i_lib
         }
         public S3Helper(string profileName, AmazonS3Client client)
         {
-            var chain = new CredentialProfileStoreChain();
-            AWSCredentials credentials = null;
-            if (chain.TryGetAWSCredentials(profileName, out credentials))
+            if (new CredentialProfileStoreChain().TryGetAWSCredentials(profileName, out AWSCredentials credentials))
             {
                 Credentials = credentials;
                 Clients = new AmazonS3ClientMap(credentials, client);
+            }
+            else
+            {
+                throw new ApplicationException($"Can't get [{profileName}] credentials");
             }
         }
         public async Task<HttpStatusCode> DownloadAsync(string bucket, string key, DateTime modifiedSinceDateUtc, Func<string, Stream, Task> processStream)

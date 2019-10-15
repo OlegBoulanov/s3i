@@ -7,7 +7,7 @@ using System.Threading.Tasks;
 
 namespace s3i_lib__Study
 {
-    [TestFixture]
+
     [Category("Study")]
     public class __WhatTypeIsAsyncLambda__
     {
