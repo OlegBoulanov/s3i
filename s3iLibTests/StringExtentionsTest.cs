@@ -9,7 +9,7 @@ using s3iLib;
 namespace s3iLibTests
 {
     
-    public class StringExtentions_Test
+    public class StringExtentionsTest
     {
         readonly char x = Path.DirectorySeparatorChar;
 

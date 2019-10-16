@@ -6,7 +6,7 @@ using s3iLib;
 namespace s3iLibTests
 {
     
-    public class ProductVersion_Test
+    public class ProductVersionTest
     {
         void CanParse(string s)
         {

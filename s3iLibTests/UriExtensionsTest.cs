@@ -6,7 +6,7 @@ using s3iLib;
 namespace s3iLibTests
 {
     
-    public class UriExtensions_Test
+    public class UriExtensionsTest
     {
         [Test]
         public void Compare()

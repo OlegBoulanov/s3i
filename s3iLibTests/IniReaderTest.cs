@@ -11,7 +11,7 @@ using s3iLib;
 namespace s3iLibTests
 {
     
-    public class IniReader_Test
+    public class IniReaderTest
     {
         [Test]
         public async Task ReadIniFromMemoryStream()

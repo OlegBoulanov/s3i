@@ -6,7 +6,7 @@ using s3iLib;
 namespace s3iLibTests
 {
     
-    public class Installer_Test
+    public class InstallerTest
     {
         [Test]
         public void FormatInstallerCommandFromProductInfo()

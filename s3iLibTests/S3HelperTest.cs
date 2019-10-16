@@ -23,7 +23,7 @@ using s3iLib;
 
 namespace s3iLibTests
 {
-    public class S3Helper_Test
+    public class S3HelperTest
     {
         const string testProfileName = "test.s3i";
         const string testBucketName = "test.s3i";

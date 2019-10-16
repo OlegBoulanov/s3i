@@ -11,7 +11,7 @@ using s3iLib;
 namespace s3iLibTests
 {
     
-    public class CommandLine_Test
+    public class CommandLineTest
     {
 
         class TestCommandLine : CommandLineBase

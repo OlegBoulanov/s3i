@@ -6,7 +6,7 @@ using s3iLib;
 namespace s3iLibTests
 {
     
-    public class ProductInfo_Test
+    public class ProductInfoTest
     {
         [Test]
         public void Compare()

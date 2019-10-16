@@ -13,7 +13,7 @@ using System.Reflection;
 namespace s3iLibTests
 {
     
-    public class Products_Test
+    public class ProductsTest
     {
         static string testConfig = @"[$Products$]
 
