@@ -17,7 +17,7 @@ namespace s3iLibTests
             var testDirectoryName = Path.GetDirectoryName(TestContext.CurrentContext.TestDirectory);
             var configurationName = Path.GetFileName(testDirectoryName);
             var projectDirectory = Path.GetDirectoryName(Path.GetDirectoryName(testDirectoryName));
-            var msiPath = $"{Path.GetDirectoryName(projectDirectory)}{Path.DirectorySeparatorChar}s3i_setup{Path.DirectorySeparatorChar}bin{Path.DirectorySeparatorChar}{configurationName}{Path.DirectorySeparatorChar}s3i.msi";
+            var msiPath = $"{Path.GetDirectoryName(projectDirectory)}{Path.DirectorySeparatorChar}s3iSetup{Path.DirectorySeparatorChar}bin{Path.DirectorySeparatorChar}{configurationName}{Path.DirectorySeparatorChar}s3i.msi";
             using var msi = new MsiInfo(msiPath);
             if (msi.IsOpen)
             {
