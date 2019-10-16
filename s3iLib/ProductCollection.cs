@@ -1,5 +1,5 @@
 ﻿using System;
-using System.Collections.Concurrent;
+using System.Globalization;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -13,38 +13,34 @@ using Amazon.S3.Util;
 
 namespace s3iLib
 {
-    public class Products : List<ProductInfo>
+    public class ProductCollection : List<ProductInfo>
     {
-        internal class InvalidUriException : ApplicationException 
-        {
-            public InvalidUriException(string s, Exception x) : base($"Invalid AWS S3 URI: {s}", x) { }
-            public InvalidUriException() : base($"Invalid AWS S3 URI") { }
-            public InvalidUriException(string message) : base(message) { }
-        }
+
         public static AmazonS3Uri ParseS3Uri(string s)
         {
             try
             {
-                // this shitty method actually throws !!!
-                if (!AmazonS3Uri.TryParseAmazonS3Uri(s, out var uri)) throw new InvalidUriException(s, null);
-                return uri;
+                var uri = new Uri(s);
+                // this shitty method may actually throw, so does TryParseAmazonS3Uri(string): https://github.com/aws/aws-sdk-net/issues/1426
+                if (!AmazonS3Uri.TryParseAmazonS3Uri(uri, out var s3uri)) throw new InvalidUriException(s, null);
+                return s3uri;
             }
             catch(Exception x)
             {
                 throw new InvalidUriException(s, x);
             }
         }
-        public static async Task<Products> FromJson(Stream stream)
+        public static async Task<ProductCollection> FromJson(Stream stream)
         {
             using(var reader = new StreamReader(stream))
             {
-                return JsonConvert.DeserializeObject<Products>(await reader.ReadToEndAsync());
+                return JsonConvert.DeserializeObject<ProductCollection>(await reader.ReadToEndAsync().ConfigureAwait(false));
             }
         }
         const string sectionProducts = "$products$";
-        public static async Task<Products> FromIni(Stream stream, string baseUri, string tempFilePath)
+        public static async Task<ProductCollection> FromIni(Stream stream, string baseUri, string tempFilePath)
         {
-            var products = new Products();
+            var products = new ProductCollection();
             await IniReader.Read(stream, (sectionName, keyName, keyValue) =>
             {
                 if (sectionProducts.Equals(sectionName, StringComparison.InvariantCultureIgnoreCase))
@@ -53,11 +49,11 @@ namespace s3iLib
                 }
                 else
                 {
-                    var product = products.FirstOrDefault((p) => { return sectionName.Equals(p.Name); });
+                    var product = products.FirstOrDefault((p) => { return sectionName.Equals(p.Name, StringComparison.InvariantCulture); });
                     if(default(ProductInfo) != product) product.Props.Add(keyName, keyValue);
                 }
                 //await Task.CompletedTask;
-            });
+            }).ConfigureAwait(false);
             products.ForEach((p) =>
             {
                 p.AbsoluteUri = p.AbsoluteUri.RebaseUri(baseUri);
@@ -65,43 +61,43 @@ namespace s3iLib
             });
             return products;
         }
-        public static async Task<Products> ReadProducts(S3Helper s3, AmazonS3Uri uri, string tempFilePath)
+        public static async Task<ProductCollection> ReadProducts(S3Helper s3, AmazonS3Uri uri, string tempFilePath)
         {
-            var products = new Products();
+            var products = new ProductCollection();
             await s3.DownloadAsync(uri.Bucket, uri.Key, DateTime.MinValue, async (contentType, stream) =>
             {
-                switch (Path.GetExtension(uri.Key).ToLower())
-                {
-                    case ".msi":
-                        products.Add(new ProductInfo { Name = uri.ToString(), AbsoluteUri = uri.ToString() });
-                        await Task.CompletedTask;
-                        break;
-                    case ".ini":
-                        products.AddRange(await Products.FromIni(stream, uri.ToString(), tempFilePath));
-                        break;
-                    case ".json":
-                        products.AddRange(await Products.FromJson(stream));
-                        break;
-                    default:
-                        throw new FormatException($"Unsupported file extension in {uri.ToString()}");
-                }
-            });
+                  switch (Path.GetExtension(uri.Key).ToLowerInvariant())
+                  {
+                      case ".msi":
+                          products.Add(new ProductInfo { Name = uri.ToString(), AbsoluteUri = uri.ToString() });
+                          await Task.CompletedTask;
+                          break;
+                      case ".ini":
+                          products.AddRange(await ProductCollection.FromIni(stream, uri.ToString(), tempFilePath));
+                          break;
+                      case ".json":
+                          products.AddRange(await ProductCollection.FromJson(stream));
+                          break;
+                      default:
+                          throw new FormatException($"Unsupported file extension in {uri.ToString()}");
+                  }
+              }).ConfigureAwait(false);
             return products;
         }
-        public static async Task<Products> ReadProducts(S3Helper s3, IEnumerable<string> uris, string tempFilePath)
+        public static async Task<ProductCollection> ReadProducts(S3Helper s3, IEnumerable<string> uris, string tempFilePath)
         {
-            var products = new Products();
+            var products = new ProductCollection();
             var arrayOfProducts = await Task.WhenAll(
-                uris.Aggregate(new List<Task<Products>>(),
+                uris.Aggregate(new List<Task<ProductCollection>>(),
                 (tasks, configFileUri) =>
                 {
-                    tasks.Add(Task<Products>.Run(() =>
+                    tasks.Add(Task<ProductCollection>.Run(() =>
                     {
                         var uri = ParseS3Uri(configFileUri);
                         return ReadProducts(s3, uri, tempFilePath);
                     }));
                     return tasks;
-                }));
+                })).ConfigureAwait(false);
             if(null != arrayOfProducts) products.AddRange(arrayOfProducts.SelectMany(x => x));
             return products;
             //return arrayOfProducts.Aggregate(new Products(), (p, pp) => { p.AddRange(pp); return p; });
@@ -120,7 +116,7 @@ namespace s3iLib
                         return tasks;
                     }
                 )
-            );
+            ).ConfigureAwait(false);
         }
         /// <summary>
         /// Finds locally cached installer files which need to be uninstalled completely because they are no longer in the products
@@ -134,10 +130,9 @@ namespace s3iLib
             var files = Directory.Exists(root) ? Directory.EnumerateFiles(root, mask, SearchOption.AllDirectories) : new List<string>();
             return FilesToUninstall(files.Select(s => Path.Combine(root, s)));
         }
-        public static Func<string, string, bool> defaultPathCompare = (s1, s2) => { return 0 == string.Compare(s1, s2, true); };
         public IEnumerable<string> FilesToUninstall(IEnumerable<string> files, Func<string, string, bool> compare = null)
         {
-            if (null == compare) compare = defaultPathCompare;
+            if (null == compare) compare = (s1, s2) => { return 0 == string.Compare(s1, s2, StringComparison.CurrentCultureIgnoreCase); };
             return files.Where(e => !Exists(product => compare(product.LocalPath, e)));
         }
         public (IEnumerable<ProductInfo> filesToUninstall, IEnumerable<ProductInfo> productsToInstall) Separate(Func<string, ProductInfo> findInstalledProduct)
