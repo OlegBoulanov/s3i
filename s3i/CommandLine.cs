@@ -1,7 +1,7 @@
 ﻿using System;
 using System.IO;
 
-using s3i_lib;
+using s3iLib;
 
 namespace s3i
 {

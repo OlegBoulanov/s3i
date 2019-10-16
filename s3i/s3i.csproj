@@ -20,7 +20,7 @@
   </ItemGroup>
   
   <ItemGroup>
-    <ProjectReference Include="..\s3i_lib\s3i_lib.csproj" />
+    <ProjectReference Include="..\s3iLib\s3iLib.csproj" />
   </ItemGroup>
   
 </Project>

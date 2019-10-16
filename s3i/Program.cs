@@ -6,7 +6,7 @@ using System.Linq;
 using System.Reflection;
 using System.Threading.Tasks;
 
-using s3i_lib;
+using s3iLib;
 
 namespace s3i
 {

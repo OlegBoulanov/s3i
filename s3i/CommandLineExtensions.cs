@@ -5,7 +5,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-using s3i_lib;
+using s3iLib;
 using Amazon.S3.Util;
 
 namespace s3i
