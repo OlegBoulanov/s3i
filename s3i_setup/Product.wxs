@@ -3,7 +3,7 @@
 
   <?define ProductName=s3i?>
   <?define ProductVersion=!(bind.FileVersion.s3i.exe)?>
-  <?define Manufacturer=UslessExtras?>
+  <?define Manufacturer=UselessExtras?>
 
   <!-- change for a major upgrade -->
   <?define ProductCode=*?>
@@ -57,7 +57,7 @@
         <File Id="s3i.runtimeconfig.json" Name="s3i.runtimeconfig.json" Vital="yes"/>
         <File Id="s3i.runtimeconfig.dev.json" Name="s3i.runtimeconfig.dev.json" Vital="yes"/>
         <File Id="s3i_lib.dll" Name="s3i_lib.dll" Vital="yes"/>
-        <Environment Id="path" Name="PATH" Value="[Product_Root]" Action="set" System="yes" Part="last" Permanent="no"/>
+        <Environment Id="path" Name="PATH" Value="[Product_Root]" Action="set" System="yes" Part="last" Permanent="no" />
       </Component>
       <Component Id="s3i_service" Guid="{B0238396-CF59-471E-8793-2A407D45E411}">
         <File Id="s3i_service.exe" Name="$(var.s3i_service_exe)" Source="$(var.s3i_service.TargetDir)$(var.s3i_service_exe)" Vital="yes"/>
