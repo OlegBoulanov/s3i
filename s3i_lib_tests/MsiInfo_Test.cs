@@ -10,8 +10,8 @@ namespace s3i_lib_tests
     public class MsiInfo_Test : PlatformSpecificTestBase
     {
         [Test]
+        [WindowsOnly]
         [Category("Study")]
-        [Category("WindowsOnly")]
         public void GetVersion()
         {
             var testDirectoryName = Path.GetDirectoryName(TestContext.CurrentContext.TestDirectory);

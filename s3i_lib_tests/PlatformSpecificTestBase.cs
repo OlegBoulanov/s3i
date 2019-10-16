@@ -4,27 +4,40 @@ using NUnit.Framework;
 using System.Linq;
 using System.Runtime.InteropServices;
 
+[AttributeUsage(AttributeTargets.Method, AllowMultiple = false)]
+public abstract class PlatformSpecificAttributeBase : CategoryAttribute { }
+
+public sealed class WindowsOnlyAttribute : PlatformSpecificAttributeBase { }
+public sealed class LinuxOnlyAttribute : PlatformSpecificAttributeBase { }
+public sealed class OSXOnlyAttribute : PlatformSpecificAttributeBase { }
+public sealed class FreeBSDAttribute : PlatformSpecificAttributeBase { }
+
 public class PlatformSpecificTestBase
 {
+    // prepare instances for string comparison
+    static readonly WindowsOnlyAttribute WindowsOnly = new WindowsOnlyAttribute();
+    static readonly LinuxOnlyAttribute LinuxOnly = new LinuxOnlyAttribute();
+    static readonly OSXOnlyAttribute OSXOnly = new OSXOnlyAttribute();
+    static readonly FreeBSDAttribute FreeBSDOnly = new FreeBSDAttribute();
     [SetUp]
     public void Init()
     {
         var testCategories = TestContext.CurrentContext.Test.Properties["Category"];
-        if (testCategories.Contains("WindowsOnly") && !RuntimeInformation.IsOSPlatform(OSPlatform.Windows))
+        if (testCategories.Any(c => WindowsOnly.Name.Equals(c)) && !RuntimeInformation.IsOSPlatform(OSPlatform.Windows))
         {
-            Assert.Inconclusive($"-- Can run this test on Windows only");
+            Assert.Ignore($"Windows only");
         }
-        if (testCategories.Contains("LinuxOnly") && !RuntimeInformation.IsOSPlatform(OSPlatform.Linux))
+        if (testCategories.Any(c => LinuxOnly.Name.Equals(c)) && !RuntimeInformation.IsOSPlatform(OSPlatform.Linux))
         {
-            Assert.Inconclusive($"-- Can run this test on Linux only");
+            Assert.Ignore($"Linux only");
         }
-        if (testCategories.Contains("OSXOnly") && !RuntimeInformation.IsOSPlatform(OSPlatform.OSX))
+        if (testCategories.Any(c => OSXOnly.Name.Equals(c)) && !RuntimeInformation.IsOSPlatform(OSPlatform.OSX))
         {
-            Assert.Inconclusive($"-- Can run this test on OSX only");
+            Assert.Ignore($"OSX only");
         }
-        if (testCategories.Contains("FreeBSDOnly") && !RuntimeInformation.IsOSPlatform(OSPlatform.FreeBSD))
+        if (testCategories.Any(c => FreeBSDOnly.Name.Equals(c)) && !RuntimeInformation.IsOSPlatform(OSPlatform.FreeBSD))
         {
-            Assert.Inconclusive($"-- Can run this test on FreeBSD only");
+            Assert.Ignore($"FreeBSD only");
         }
     }
 }
