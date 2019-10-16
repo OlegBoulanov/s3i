@@ -13,9 +13,9 @@ using System.Reflection;
 namespace s3iLibTests
 {
     
-    public class ProductsTest
+    public class ProductCollectionTest
     {
-        static string testConfig = @"[$Products$]
+        const string testConfig = @"[$Products$]
 
 ProductOne = https://xxx.s3.amazonaws.com/Test/Windows10/Distrib/ProductOne/12.6.16/ProductOne.msi
 SecondProduct    = ../../../Distrib/SecondProduct/9.4.188/SecondProduct.msi
@@ -39,7 +39,8 @@ SecondProduct    = ../../../Distrib/SecondProduct/9.4.188/SecondProduct.msi
         [Test]
         public async Task TestTwoProductProps()
         {
-            var products = await Products.FromIni(new MemoryStream(Encoding.ASCII.GetBytes(testConfig)), "https://xxx.s3.amazonaws.com/Test/Windows10", "C:\\Temp\\");
+            using var stream = new MemoryStream(Encoding.ASCII.GetBytes(testConfig));
+            var products = await ProductCollection.FromIni(stream, "https://xxx.s3.amazonaws.com/Test/Windows10", "C:\\Temp\\").ConfigureAwait(false); 
             Assert.AreEqual(2, products.Count);
             Assert.AreEqual("ProductOne", products[0].Name);
             Assert.AreEqual("SecondProduct", products[1].Name);
@@ -54,7 +55,7 @@ SecondProduct    = ../../../Distrib/SecondProduct/9.4.188/SecondProduct.msi
             Assert.AreEqual("00:15:00 1000 20000000 00:01:00", products[1].Props["SYNC"]);
         }
 
-        static string manyProducts = @"[$Products$]
+        const string manyProducts = @"[$Products$]
 One = https://xxx.s3.amazonaws.com/Test/Windows10/Distrib/ProductOne/12.6.16/ProductOne.msi
 Two    = ../../Distrib/SecondProduct/9.4.188/SecondProduct.msi
 Three    = https://xxx.s3.amazonaws.com/Test/Windows10/Distrib//SecondProduct/9.4.188/SecondProduct.msi
@@ -62,7 +63,8 @@ Three    = https://xxx.s3.amazonaws.com/Test/Windows10/Distrib//SecondProduct/9.
         [Test]
         public async Task TestDownloadPaths()
         {
-            var products = await Products.FromIni(new MemoryStream(Encoding.ASCII.GetBytes(manyProducts)), "https://xxx.s3.amazonaws.com/Test/Windows10/Config/OneInstance/config.ini", "C:\\Temp\\");
+            using var stream = new MemoryStream(Encoding.ASCII.GetBytes(manyProducts));
+            var products = await ProductCollection.FromIni(stream, "https://xxx.s3.amazonaws.com/Test/Windows10/Config/OneInstance/config.ini", "C:\\Temp\\").ConfigureAwait(false);
             var files = from p in products select new { product = p, local = p.AbsoluteUri.MapToLocalPath("c:/Temp/")  };
             Assert.AreEqual(3, products.Count);
             Assert.AreEqual(3, files.Count());
@@ -70,32 +72,34 @@ Three    = https://xxx.s3.amazonaws.com/Test/Windows10/Distrib//SecondProduct/9.
             Assert.AreEqual($"c:{x}Temp{x}xxx.s3.amazonaws.com{x}Test{x}Windows10{x}Distrib{x}ProductOne{x}12.6.16{x}ProductOne.msi", files.First().local);
         }
 
-        static string products1 = "[$products$]\nOne=https://x.amazonaws.com/one/config.ini\nTwo=https://x.amazonaws.com/one/config.ini\n[One]p11=1\np12=2\n[Two]\np21=11\np22=12\n";
-        static string products2 = "[$products$]\nOne=https://x.amazonaws.com/one/config.ini\nTwo=https://x.amazonaws.com/one/config.ini\n[One]p11=1\np12=2\n[Two]\np21=11\np22=12\n";
-        static string products3 = "[$products$]\nOne=https://x.amazonaws.com/one/config.ini\nTwo=https://x.amazonaws.com/one/config.ini\n[One]p11=1\np12=2\n[Two]\np21=11\np22=12\n";
+        const string products1 = "[$products$]\nOne=https://x.amazonaws.com/one/config.ini\nTwo=https://x.amazonaws.com/one/config.ini\n[One]p11=1\np12=2\n[Two]\np21=11\np22=12\n";
+        const string products2 = "[$products$]\nOne=https://x.amazonaws.com/one/config.ini\nTwo=https://x.amazonaws.com/one/config.ini\n[One]p11=1\np12=2\n[Two]\np21=11\np22=12\n";
+        const string products3 = "[$products$]\nOne=https://x.amazonaws.com/one/config.ini\nTwo=https://x.amazonaws.com/one/config.ini\n[One]p11=1\np12=2\n[Two]\np21=11\np22=12\n";
 
         [Test]
         public async Task TestDiff()
         {
             var baseUri = "https://mecompany.s3.amazonaws.com/something/config.ini";
             var temp = "C:\\Temp\\";
-            var p1 = await Products.FromIni(new MemoryStream(Encoding.ASCII.GetBytes(products1)), baseUri, temp);
-            var p2 = await Products.FromIni(new MemoryStream(Encoding.ASCII.GetBytes(products2)), baseUri, temp);
-            var p3 = await Products.FromIni(new MemoryStream(Encoding.ASCII.GetBytes(products3)), baseUri, temp);
-
+            using var stream1 = new MemoryStream(Encoding.ASCII.GetBytes(products1));
+            using var stream2 = new MemoryStream(Encoding.ASCII.GetBytes(products2));
+            using var stream3 = new MemoryStream(Encoding.ASCII.GetBytes(products3));
+            var p1 = await ProductCollection.FromIni(stream1, baseUri, temp).ConfigureAwait(false);
+            var p2 = await ProductCollection.FromIni(stream2, baseUri, temp).ConfigureAwait(false);
+            var p3 = await ProductCollection.FromIni(stream3, baseUri, temp).ConfigureAwait(false);
         }
 
         [Test]
         public void ProductsToUninstall()
         {
             var tempFilePath = "X:\\temp\\";
-            var products = new Products();
+            var products = new ProductCollection();
             products.AddRange(new List<string> {
                 "https://download/from/here/p1.msi",
                 "https://download/from/here/p2.msi",
                 "https://download/from/there/p3.msi",
                 "https://download/from/somewhere/p4.msi",
-            }.Aggregate(new Products(), (ps, s) =>
+            }.Aggregate(new ProductCollection(), (ps, s) =>
             {
                 ps.Add(new ProductInfo { Name = Path.GetFileNameWithoutExtension(s), AbsoluteUri = s, LocalPath = s.MapToLocalPath(tempFilePath) }); return ps;
             }));
@@ -136,7 +140,7 @@ Three    = https://xxx.s3.amazonaws.com/Test/Windows10/Distrib//SecondProduct/9.
                 { "Prod03\\p3.msi", "https://download/there/Prod03/12.5.8/p3.msi" },
                 { "ProdXX\\px.msi", "https://download/there/ProdXX/1.2.5.8+uninstall/px.msi" },
             };
-            var products = new Products { 
+            var products = new ProductCollection { 
                 new ProductInfo { Name = "Prod01", AbsoluteUri = "https://download/here/Prod01/9.4.8+upgrade/p1.msi", LocalPath = "Prod01\\p1.msi", },
                 new ProductInfo { Name = "Prod02", AbsoluteUri = "https://download/here/Prod02/3.3.5+keep/p2.msi", LocalPath = "Prod02\\p2.msi", },
                 new ProductInfo { Name = "Prod03", AbsoluteUri = "https://download/there/Prod03/12.5.4+downgrade/p3.msi", LocalPath = "Prod03\\p3.msi", },
