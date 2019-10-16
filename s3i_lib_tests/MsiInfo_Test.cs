@@ -7,11 +7,11 @@ using System.IO;
 
 namespace s3i_lib_tests
 {
-    public class MsiInfo_Test
+    public class MsiInfo_Test : PlatformSpecificTestBase
     {
-
         [Test]
         [Category("Study")]
+        [Category("WindowsOnly")]
         public void GetVersion()
         {
             var testDirectoryName = Path.GetDirectoryName(TestContext.CurrentContext.TestDirectory);
