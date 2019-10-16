@@ -28,15 +28,15 @@ Character Count	    PID_CHARCOUNT	16	VT_I4
 Creating Application	PID_APPNAME	18	VT_LPSTR
 Security	        PID_SECURITY	19	VT_I4
 */
-    public static class NativeMethods
+    internal static class NativeMethods
     {
         [DllImport("msi.dll", CharSet = CharSet.Unicode)]
-        public static extern uint MsiOpenDatabase(string szDatabasePath, IntPtr szPersist, out IntPtr msiHandle);
+        internal static extern uint MsiOpenDatabase(string szDatabasePath, IntPtr szPersist, out IntPtr msiHandle);
         [DllImport("msi.dll", CharSet = CharSet.Unicode)]
-        public static extern uint MsiGetSummaryInformation(IntPtr msiHandle, string szDatabasePath, uint uiUpdateCount, out IntPtr SummaryInfoHandle);
+        internal static extern uint MsiGetSummaryInformation(IntPtr msiHandle, string szDatabasePath, uint uiUpdateCount, out IntPtr SummaryInfoHandle);
         [DllImport("msi.dll", CharSet = CharSet.Unicode)]
-        public static extern uint MsiSummaryInfoGetProperty(IntPtr msiHandle, uint uiProperty, out uint uiDataType, out int iValue, out Comtypes.FILETIME ftValue, IntPtr szBuffer, ref uint cchBuf);
+        internal static extern uint MsiSummaryInfoGetProperty(IntPtr msiHandle, uint uiProperty, out uint uiDataType, out int iValue, out Comtypes.FILETIME ftValue, IntPtr szBuffer, ref uint cchBuf);
         [DllImport("msi.dll")]
-        public static extern uint MsiCloseHandle(IntPtr msiHandle);
+        internal static extern uint MsiCloseHandle(IntPtr msiHandle);
     }
 }
