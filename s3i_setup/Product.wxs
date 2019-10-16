@@ -1,5 +1,4 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<!--Wix xmlns="http://wixtoolset.org/schemas/v4/wxs"-->
 <Wix xmlns="http://schemas.microsoft.com/wix/2006/wi" xmlns:util="http://schemas.microsoft.com/wix/UtilExtension" xmlns:netfx="http://schemas.microsoft.com/wix/NetFxExtension">
 
   <?define ProductName=s3i?>
@@ -8,7 +7,6 @@
 
   <!-- change for a major upgrade -->
   <?define ProductCode=*?>
-
   <!-- NEVER CHANGE UpgradeCode - actually it is PRODUCT ID -->
   <?define UpgradeCode={e34c5e85-21ad-4a6c-b4ef-be5925074846}?>
 
@@ -88,7 +86,4 @@
 
     <MajorUpgrade DowngradeErrorMessage="A newer than [ProductVersion] version of [ProductName] is already installed." />
   </Product>
- 
-  
-
 </Wix>
