@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 
 namespace s3iLib
 {
-    public class ProductProps : Dictionary<string, string>
+    public class ProductPropertiesDictionary : Dictionary<string, string>
     {
         public override string ToString()
         {
@@ -18,9 +18,8 @@ namespace s3iLib
         }
         public override bool Equals(object obj)
         {
-            if (!(obj is ProductProps)) return false;
-            var pi = (ProductProps)obj;
-            return Count == pi.Count && this.All(kv => pi.ContainsKey(kv.Key) && pi[kv.Key].Equals(kv.Value));
+            var pi = obj as ProductPropertiesDictionary;
+            return Count == pi?.Count && this.All(kv => pi.ContainsKey(kv.Key) && pi[kv.Key].Equals(kv.Value, StringComparison.InvariantCulture));
         }
     }
 }
