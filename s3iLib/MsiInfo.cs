@@ -61,8 +61,8 @@ namespace s3iLib
         #region IDisposable Support
         void IDisposable_FreeUnmanagedResources()
         {
-            if (IntPtr.Zero != hSummary) { NativeMethods.MsiCloseHandle(hSummary); hSummary = IntPtr.Zero; }
-            if (IntPtr.Zero != hMsi) { NativeMethods.MsiCloseHandle(hMsi); hMsi = IntPtr.Zero; }
+            if (IntPtr.Zero != hSummary && 0 == NativeMethods.MsiCloseHandle(hSummary)) hSummary = IntPtr.Zero; 
+            if (IntPtr.Zero != hMsi && 0 == NativeMethods.MsiCloseHandle(hMsi)) hMsi = IntPtr.Zero; 
         }
 
         private bool disposedValue = false; // To detect redundant calls
