@@ -9,14 +9,14 @@ using System.Text.RegularExpressions;
 
 namespace s3iLib
 {
-    public class IniReader
+    public static class IniReader
     {
         static readonly Regex rexSectionName = new Regex(@"^\s*\[([^\]]+)\]\s*$", RegexOptions.Compiled);
         public static async Task Read(Stream stream, Action<string, string, string> onNewKeyValue)
         {
             using (var reader = new StreamReader(stream))
             {
-                for (string sectionName = null, line; null != (line = await reader.ReadLineAsync());)
+                for (string sectionName = null, line; null != (line = await reader.ReadLineAsync().ConfigureAwait(false));)
                 {
                     line = line.Split(';')[0];
                     var m = rexSectionName.Match(line);
