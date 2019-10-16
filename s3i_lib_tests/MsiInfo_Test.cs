@@ -7,10 +7,10 @@ using System.IO;
 
 namespace s3i_lib_tests
 {
-    public class MsiInfo_Test
+    public class MsiInfo_Test : PlatformSpecificTestBase
     {
-
         [Test]
+        [WindowsOnly]
         [Category("Study")]
         public void GetVersion()
         {
