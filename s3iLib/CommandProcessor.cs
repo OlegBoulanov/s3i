@@ -6,16 +6,16 @@ namespace s3iLib
 {
     public class CommandProcessor<T>
     {
-        public Outcome<R, E> Execute<R, E>(Func<Outcome<R, E>> function, Func<Exception, Outcome<R, E>> exception = null)
+        public Outcome<TR, TE> Execute<TR, TE>(Func<Outcome<TR, TE>> function, Func<Exception, Outcome<TR, TE>> exception = null)
         {
-            Outcome<R, E> outcome = null;
+            Outcome<TR, TE> outcome = null;
             try
             {
-                outcome = function();
+                outcome = function?.Invoke();
             }
             catch (Exception x)
             {
-                outcome = exception?.Invoke(x) ?? Outcome<R, E>.Failure();
+                outcome = exception?.Invoke(x) ?? Outcome<TR, TE>.Failure();
             }
             return outcome;
         }

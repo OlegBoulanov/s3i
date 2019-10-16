@@ -36,9 +36,7 @@ namespace s3iLibTests
         AmazonS3Client GetClient(RegionEndpoint region = null)
         {
             AmazonS3Client s3 = null;
-            var chain = new CredentialProfileStoreChain();
-            AWSCredentials credentials = null;
-            if (chain.TryGetAWSCredentials(testProfileName, out credentials))
+            if (new CredentialProfileStoreChain().TryGetAWSCredentials(testProfileName, out AWSCredentials credentials))
             {
                 s3 = new AmazonS3Client(credentials, region ?? RegionEndpoint.USEast1);
             }
@@ -49,9 +47,9 @@ namespace s3iLibTests
         [Category("AWS")]
         public async Task GetTestObject()
         {
-            var s3 = GetClient(RegionEndpoint.USEast2);
+            using var s3 = GetClient(RegionEndpoint.USEast2);
             Assert.IsNotNull(s3);
-            var response = await s3.GetObjectAsync(new GetObjectRequest { BucketName = testBucketName, Key = testKey });
+            using var response = await s3.GetObjectAsync(new GetObjectRequest { BucketName = testBucketName, Key = testKey }).ConfigureAwait(false);
             Assert.AreEqual(HttpStatusCode.OK, response.HttpStatusCode);
         }
 
@@ -59,9 +57,9 @@ namespace s3iLibTests
         [Category("AWS")]
         public async Task GetTestBucketLocation()
         {
-            var s3 = GetClient(RegionEndpoint.USEast1);
+            using var s3 = GetClient(RegionEndpoint.USEast1);
             Assert.IsNotNull(s3);
-            var response = await s3.GetBucketLocationAsync(new GetBucketLocationRequest { BucketName = testBucketName });
+            var response = await s3.GetBucketLocationAsync(new GetBucketLocationRequest { BucketName = testBucketName }).ConfigureAwait(false);
             Assert.AreEqual(HttpStatusCode.OK, response.HttpStatusCode);
             Assert.AreEqual(S3Region.USE2, response.Location);
         }
@@ -78,10 +76,9 @@ namespace s3iLibTests
             await s3.DownloadAsync(
                 uri.Bucket, uri.Key, DateTime.MinValue,
                 async (type, stream) => {
-                    using (var reader = new StreamReader(stream)) {
-                        for (string s; null != (s = await reader.ReadLineAsync());) lines.Enqueue(s);
-                    }
-                });
+                    using var reader = new StreamReader(stream);
+                    for (string s; null != (s = await reader.ReadLineAsync().ConfigureAwait(false));) lines.Enqueue(s);
+                }).ConfigureAwait(false);
             foreach (var s in lines.Select((s, i) => $"{(i + 1),3}: {s}")) Console.WriteLine(s);
             Console.WriteLine($"Line count: {lines.Count}");
             Assert.AreEqual(testObjectLineCount, lines.Count);
@@ -98,12 +95,12 @@ namespace s3iLibTests
             var maxAttempts = 3;// 3000;
             for (var i = 0; i < maxAttempts; i++) {
                 var clock = System.Diagnostics.Stopwatch.StartNew();
-                var prods = await Products.ReadProducts(s3,
+                var prods = await ProductCollection.ReadProducts(s3,
                     new List<string> {
                         testIniS3Uri,
                         testIniS3Uri,
                     },
-                    "D:/Temp/");
+                    "D:/Temp/").ConfigureAwait(false);
                 var ms = clock.ElapsedMilliseconds;
                 if (100 < ms)
                 {
@@ -111,27 +108,6 @@ namespace s3iLibTests
                 }
                 Assert.AreEqual(2, prods.Count);
             }
-        }
-        public static bool TryParseAmazonS3Uri_Old(string uri, out AmazonS3Uri amazonS3Uri)
-        {
-            return AmazonS3Uri.TryParseAmazonS3Uri(new Uri(uri), out amazonS3Uri);
-        }
-        public static bool TryParseAmazonS3Uri(string s, out AmazonS3Uri amazonS3Uri)
-        {
-            try
-            {
-                return AmazonS3Uri.TryParseAmazonS3Uri(new Uri(s), out amazonS3Uri);
-            }
-            catch (UriFormatException)
-            {
-                amazonS3Uri = null;
-                return false;
-            }
-        }
-        [Test]
-        public void AwsS3UriParse_Fix()
-        {
-            TryParseAmazonS3Uri("blah-blah", out var uri);
         }
     }
 

@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.ComponentModel;
+using System.Globalization;
 using System.Linq;
 using System.Reflection;
 using System.Text;
@@ -10,12 +11,12 @@ namespace s3iLib
 {
     public abstract class CommandLineBase
     {
-        public List<string> Arguments { get; protected set; }
+        public List<string> Arguments { get; } = new List<string>();
         public string HelpHeader { get; set; }
         public string HelpTail { get; set; }
         public void Parse(IEnumerable<string> args)
         {
-            Arguments = new List<string>();
+            Arguments.Clear();
             Parse(
                 (s) => { Arguments.Add(s); },
                 (p) => { SetProperty(p.Name, true); },
@@ -27,7 +28,7 @@ namespace s3iLib
         }
         public void Parse(Action<string> onArgument, Action<PropertyInfo> onFlag, Action<PropertyInfo, string> onOption, IEnumerable<string> args)
         {
-            Arguments = new List<string>();
+            Arguments.Clear();
             PropertyInfo currentProp = null;
             foreach (var a in args)
             {
@@ -84,7 +85,7 @@ namespace s3iLib
         }
         void SetProperty(string name, object value)
         {
-            GetType().InvokeMember(name, BindingFlags.Instance | BindingFlags.Public | BindingFlags.SetProperty, Type.DefaultBinder, this, new Object[] { value });
+            _ = GetType().InvokeMember(name, BindingFlags.Instance | BindingFlags.Public | BindingFlags.SetProperty, Type.DefaultBinder, this, new object[] { value }, CultureInfo.CurrentCulture);
         }
         void SetProperty(PropertyInfo prop, object value, object defaultValue)
         {

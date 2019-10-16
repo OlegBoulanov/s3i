@@ -17,7 +17,8 @@ namespace s3iLib
         {
             var sb = new StringBuilder();
             if (x is AmazonS3Exception ax) sb.AppendLine($"{ax.GetType().Name}: {ax.ErrorType}, {ax.ErrorCode}, {ax.Message}");
-            else sb.AppendLine($"{x.GetType().Name}: {x.Message}");
+            else if (null != x) sb.AppendLine($"{x.GetType().Name}: {x.Message}");
+            else sb.AppendLine($"(null) exception: (null)");
             if (0 < indent)
             {
                 var spaceCount = indent;

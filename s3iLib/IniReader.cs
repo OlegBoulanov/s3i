@@ -16,7 +16,7 @@ namespace s3iLib
         {
             using (var reader = new StreamReader(stream))
             {
-                for (string sectionName = null, line; null != (line = await reader.ReadLineAsync().ConfigureAwait(false));)
+                for (string sectionName = null, line; null != (line = await reader.ReadLineAsync());)
                 {
                     line = line.Split(';')[0];
                     var m = rexSectionName.Match(line);

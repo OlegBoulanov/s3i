@@ -36,11 +36,11 @@ namespace s3iLib
         }
         public int CompareTo(ProductVersion other)
         {
-            var major = Major.CompareTo(other.Major);
+            var major = Major.CompareTo(other?.Major);
             if (0 != major) return major;
-            var minor = Minor.CompareTo(other.Minor);
+            var minor = Minor.CompareTo(other?.Minor);
             if (0 != minor) return minor;
-            var build = Build.CompareTo(other.Build);
+            var build = Build.CompareTo(other?.Build);
             if (0 != build) return build;
             //Windows Installer ignores Patch
             return 0;

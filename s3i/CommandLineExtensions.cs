@@ -14,7 +14,7 @@ namespace s3i
     {
         static string DryRunHeader { get; } = "(DryRun)";
         static string ExecuteHeader { get; } = "(Execute)";
-        public static T LogAndExecute<T>(this CommandLine commandLine, string info, Func<bool, T> func, Func<Exception, T> onException, Action<string> log)
+        internal static T LogAndExecute<T>(this CommandLine commandLine, string info, Func<bool, T> func, Func<Exception, T> onException, Action<string> log)
         {
             if (commandLine.Verbose)
             {
@@ -30,7 +30,7 @@ namespace s3i
                 return onException(x);
             }
         }
-        public static int DeleteStagingFolder(this CommandLine commandLine)
+        internal static int DeleteStagingFolder(this CommandLine commandLine)
         {
             return commandLine.LogAndExecute($"Delete staging folder {commandLine.StagingFolder}",
                 (run) => { 
@@ -41,15 +41,15 @@ namespace s3i
                 s => Console.WriteLine(s)
                 );
         }
-        public static int DownloadProducts(this CommandLine commandLine, IEnumerable<ProductInfo> products, S3Helper s3, TimeSpan timeout)
+        internal static int DownloadProducts(this CommandLine commandLine, IEnumerable<ProductInfo> products, S3Helper s3, TimeSpan timeout)
         {
             return commandLine.LogAndExecute($"Download {products.Count()} product{products.Count().Plural()}:{products.Aggregate(new StringBuilder(), (sb, p) => { sb.AppendLine(); sb.Append($"  {p.AbsoluteUri}"); return sb; }, sb => sb.ToString())}",
-                (run) => { if(run) Products.DownloadInstallers(products, s3, commandLine.StagingFolder).Wait(timeout); return 0; },
+                (run) => { if(run) ProductCollection.DownloadInstallers(products, s3, commandLine.StagingFolder).Wait(timeout); return 0; },
                 x => x.HResult,
                 s => Console.WriteLine(s)
                 );
         }
-        public static int Uninstall(this CommandLine commandLine, string msiFilePath, bool deleteAllFiles)
+        internal static int Uninstall(this CommandLine commandLine, string msiFilePath, bool deleteAllFiles)
         {
             var retCode = commandLine.LogAndExecute($"Uninstall {msiFilePath}",
                 (run) => run ? Installer.Uninstall(msiFilePath, commandLine.MsiExecArgs, commandLine.DryRun, commandLine.Timeout) : 0,
@@ -78,7 +78,7 @@ namespace s3i
             return retCode;
         }
 
-        public static int Install(this CommandLine commandLine, ProductInfo product)
+        internal static int Install(this CommandLine commandLine, ProductInfo product)
         {
             var retCode = commandLine.LogAndExecute($"Install {product.LocalPath}",
                 (run) => run ? Installer.Install(product.LocalPath, product.Props, commandLine.MsiExecArgs, commandLine.DryRun, commandLine.Timeout) : 0,
@@ -115,8 +115,9 @@ namespace s3i
             return retCode;
         }
 
-        public static Outcome<bool, string> Validate(this CommandLine commandLine)
+        internal static Outcome<bool, string> Validate(this CommandLine commandLine)
         {
+            if (null == commandLine) throw new NullReferenceException(nameof(commandLine));
             // we must have staging folder
             if (string.IsNullOrWhiteSpace(commandLine.StagingFolder)) return Outcome<bool, string>.Failure(false, "Staging folder is not specified, you may want to set TEMP or HOME environment variable");
             if (!commandLine.StagingFolder.EndsWith(Path.DirectorySeparatorChar)) commandLine.StagingFolder += Path.DirectorySeparatorChar;
@@ -127,7 +128,8 @@ namespace s3i
                 try
                 {
                     // this one throws... thank you, Amazon
-                    if (!AmazonS3Uri.TryParseAmazonS3Uri(a, out var uri)) { outcome.AddErrors($"Invalid AWS S3 Uri: {a}"); }
+                    var uri = new Uri(a);
+                    if (!AmazonS3Uri.TryParseAmazonS3Uri(uri, out var s3uri)) { outcome.AddErrors($"Invalid AWS S3 Uri: {a}"); }
                 }
                 catch (Exception x)
                 {

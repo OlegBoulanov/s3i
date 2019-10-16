@@ -8,7 +8,7 @@ using s3iLib;
 namespace s3iLibTests
 {
 
-    public class ExceptionExtemsions_Test
+    public class ExceptionExtemsionsTest
     {
         [Test]
         public void ErrorMessage()

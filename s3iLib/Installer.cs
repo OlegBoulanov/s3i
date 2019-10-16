@@ -33,16 +33,16 @@ namespace s3iLib
                 return 0;
             }
         }
-        public static string FormatCommand(string msiFilePath, ProductProps props, string prefix, string suffix)
+        public static string FormatCommand(string msiFilePath, ProductPropertiesDictionary props, string prefix, string suffix)
         {
             StringBuilder sb = new StringBuilder($"{prefix} {msiFilePath.Quote("\"")}");
             // begin with list of quoted if necessary props
             if(null != props) sb.Append(props.Aggregate("", (s, a) => { s = $"{s} {a.Key}={a.Value.Quote("\"")}"; return s; }));
             // now append extra args, so they may override props and set more msiexec options
-            if (!string.IsNullOrEmpty(suffix)) sb.AppendFormat(" {0}", suffix);
+            if (!string.IsNullOrEmpty(suffix)) sb.Append($" {suffix}");
             return sb.ToString();
         }
-        public static int Install(string msiFilePath, ProductProps props, string extraArgs, bool dryrun, TimeSpan timeout)
+        public static int Install(string msiFilePath, ProductPropertiesDictionary props, string extraArgs, bool dryrun, TimeSpan timeout)
         {
             return RunInstall(FormatCommand(msiFilePath, props, " /i ", extraArgs), dryrun, timeout);
         }

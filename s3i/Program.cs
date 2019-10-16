@@ -78,7 +78,7 @@ namespace s3i
                 {
                     Installer.MsiExec = commandLine.MsiExecCommand;
                     var clock = System.Diagnostics.Stopwatch.StartNew();
-                    exitCode = await ProcessAndExecute(commandLine);
+                    exitCode = await ProcessAndExecute(commandLine).ConfigureAwait(false);
                     if (commandLine.Verbose)
                     {
                         //Console.WriteLine();
@@ -96,7 +96,7 @@ namespace s3i
             IEnumerable<string> remove = new List<string>();
             IEnumerable<ProductInfo> uninstall = new List<ProductInfo>(), install = null;
             var s3 = new S3Helper(commandLine.ProfileName);
-            var products = await Products.ReadProducts(s3, commandLine.Arguments.Select((uri, index) => { return uri; }), commandLine.StagingFolder);
+            var products = await ProductCollection.ReadProducts(s3, commandLine.Arguments.Select((uri, index) => { return uri; }), commandLine.StagingFolder).ConfigureAwait(false);
             if (commandLine.Verbose)
             {
                 Console.WriteLine($"Products [{products.Count}]:");

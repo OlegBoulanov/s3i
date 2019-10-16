@@ -14,7 +14,7 @@ namespace s3iLib
         public string Name { get; set; }
         public string AbsoluteUri { get; set; }
         public string LocalPath { get; set; }
-        public ProductProps Props { get; protected set; } = new ProductProps();
+        public ProductPropertiesDictionary Props { get; } = new ProductPropertiesDictionary();
         public string MapToLocalPath(string basePath)
         {
             return MapToLocalPath(basePath, Name, Path.GetFileName(AbsoluteUri));
