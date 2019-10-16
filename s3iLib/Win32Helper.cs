@@ -8,15 +8,12 @@ using System.Threading.Tasks;
 
 namespace s3iLib
 {
-    public class Win32Helper
+    public static class Win32Helper
     {
         public static string ErrorMessage(uint code) { return ErrorMessage((int)code); }
         public static string ErrorMessage(int code)
         {
-            var msg = new Win32Exception(code).Message;
-            // NetStandard: adds a dot in the end
-            // NetFramework: does not
-            return msg.EndsWith(".") ? msg.Substring(0, msg.Length - 1) : msg;
+            return new Win32Exception(code).Message;
         }
         public static string ErrorMessage()
         {
