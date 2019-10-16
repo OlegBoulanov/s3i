@@ -5,12 +5,12 @@ using System.Linq;
 using System.Runtime.InteropServices;
 
 [AttributeUsage(AttributeTargets.Method, AllowMultiple = false)]
-public abstract class PlatformSpecificAttributeBase : CategoryAttribute { }
+public abstract class PlatformSpecificAttribute : CategoryAttribute { }
 
-public sealed class WindowsOnlyAttribute : PlatformSpecificAttributeBase { }
-public sealed class LinuxOnlyAttribute : PlatformSpecificAttributeBase { }
-public sealed class OSXOnlyAttribute : PlatformSpecificAttributeBase { }
-public sealed class FreeBSDAttribute : PlatformSpecificAttributeBase { }
+public sealed class WindowsOnlyAttribute : PlatformSpecificAttribute { }
+public sealed class LinuxOnlyAttribute : PlatformSpecificAttribute { }
+public sealed class OSXOnlyAttribute : PlatformSpecificAttribute { }
+public sealed class FreeBSDAttribute : PlatformSpecificAttribute { }
 
 public class PlatformSpecificTestBase
 {
@@ -25,19 +25,19 @@ public class PlatformSpecificTestBase
         var testCategories = TestContext.CurrentContext.Test.Properties["Category"];
         if (testCategories.Any(c => WindowsOnly.Name.Equals(c)) && !RuntimeInformation.IsOSPlatform(OSPlatform.Windows))
         {
-            Assert.Ignore($"Windows only");
+            Assert.Ignore(WindowsOnly.Name);
         }
         if (testCategories.Any(c => LinuxOnly.Name.Equals(c)) && !RuntimeInformation.IsOSPlatform(OSPlatform.Linux))
         {
-            Assert.Ignore($"Linux only");
+            Assert.Ignore(LinuxOnly.Name);
         }
         if (testCategories.Any(c => OSXOnly.Name.Equals(c)) && !RuntimeInformation.IsOSPlatform(OSPlatform.OSX))
         {
-            Assert.Ignore($"OSX only");
+            Assert.Ignore(OSXOnly.Name);
         }
         if (testCategories.Any(c => FreeBSDOnly.Name.Equals(c)) && !RuntimeInformation.IsOSPlatform(OSPlatform.FreeBSD))
         {
-            Assert.Ignore($"FreeBSD only");
+            Assert.Ignore(FreeBSDOnly.Name);
         }
     }
 }
