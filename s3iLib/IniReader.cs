@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Diagnostics.Contracts;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -16,7 +17,7 @@ namespace s3iLib
         {
             using (var reader = new StreamReader(stream))
             {
-                for (string sectionName = null, line; null != (line = await reader.ReadLineAsync());)
+                for (string sectionName = null, line; null != (line = await reader.ReadLineAsync().ConfigureAwait(false));)
                 {
                     line = line.Split(';')[0];
                     var m = rexSectionName.Match(line);
