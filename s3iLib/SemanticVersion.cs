@@ -1,4 +1,6 @@
 ﻿using System;
+using System.Diagnostics.Contracts;
+using System.Globalization;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -51,6 +53,7 @@ namespace s3iLib
         /// <returns>-1, if this precedes other, +1 if other precedes this, or 0 if no precedence could be determined</returns>
         public int CompareTo(SemanticVersion other)
         {
+            Contract.Requires(null != other);
             var major = Major.CompareTo(other.Major);
             if (0 != major) return major;
             var minor = Minor.CompareTo(other.Minor);
@@ -64,7 +67,7 @@ namespace s3iLib
             {
                 return !thisPrereleaseEmpty ? -1 : otherPrereleaseEmpty ? 0 : +1;
             }
-            var prerelease = Prerelease.CompareTo(other.Prerelease);
+            var prerelease = string.Compare(Prerelease, other.Prerelease, StringComparison.CurrentCulture);
             if (0 != prerelease) return prerelease;
             // we do not compare metadata, per standard
             return 0;
@@ -81,17 +84,41 @@ namespace s3iLib
         /// <returns>SemanticVersion</returns>
         public static SemanticVersion From(ProductVersion productVersion)
         {
+            Contract.Requires(null != productVersion);
             // product version patch to be ignored in semver compare, so we push it to metadata, keeping prerelease empty
-            return new SemanticVersion { Major = productVersion.Major, Minor = productVersion.Minor, Patch = productVersion.Build, Prerelease = null, Metadata = productVersion.Patch.ToString(), };
+            return new SemanticVersion { Major = productVersion.Major, Minor = productVersion.Minor, Patch = productVersion.Build, Prerelease = null, Metadata = productVersion.Patch.ToString(CultureInfo.CurrentCulture), };
         }           
         static char[] pathSeparatorChars = new char[] { '/', '\\' };
         public static SemanticVersion From(string path, string separators = null)
         {
+            Contract.Requires(null != path);
             return path.Split(separators?.ToCharArray() ?? pathSeparatorChars, StringSplitOptions.RemoveEmptyEntries).Aggregate((SemanticVersion)null, (a, s) => { return SemanticVersion.TryParse(s, out var v) ? v : a; });
         }
         public static SemanticVersion From(Uri uri)
         {
+            Contract.Requires(null != uri);
             return From(uri.AbsolutePath);
+        }
+        public bool Equals(SemanticVersion other)
+        {
+            Contract.Requires(null != other);
+            return 0 == CompareTo(other);
+        }
+        public static bool operator <(SemanticVersion thisVersion, SemanticVersion otherVersion) { Contract.Requires(null != thisVersion); return thisVersion.CompareTo(otherVersion) < 0; }
+        public static bool operator >(SemanticVersion thisVersion, SemanticVersion otherVersion) { Contract.Requires(null != thisVersion); return 0 < thisVersion.CompareTo(otherVersion); }
+        public static bool operator <=(SemanticVersion thisVersion, SemanticVersion otherVersion) { Contract.Requires(null != thisVersion); return thisVersion.CompareTo(otherVersion) <= 0; }
+        public static bool operator >=(SemanticVersion thisVersion, SemanticVersion otherVersion) { Contract.Requires(null != thisVersion); return 0 <= thisVersion.CompareTo(otherVersion); }
+        public static bool operator ==(SemanticVersion thisVersion, SemanticVersion otherVersion) { Contract.Requires(null != thisVersion); return 0 == thisVersion.CompareTo(otherVersion); }
+        public static bool operator != (SemanticVersion thisVersion, SemanticVersion otherVersion) { Contract.Requires(null != thisVersion); return 0 != thisVersion.CompareTo(otherVersion); }
+        public override bool Equals(object obj)
+        {
+            Contract.Requires(null != obj);
+            var otherVersion = obj as SemanticVersion;
+            return null == otherVersion ? false : Equals(otherVersion);
+        }
+        public override int GetHashCode()
+        {
+            return ToString().GetHashCode();
         }
         public override string ToString()
         {
