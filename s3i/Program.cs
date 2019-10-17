@@ -96,13 +96,14 @@ namespace s3i
             IEnumerable<string> remove = new List<string>();
             IEnumerable<ProductInfo> uninstall = new List<ProductInfo>(), install = null;
             var s3 = new S3Helper(commandLine.ProfileName);
-            var products = await ProductCollection.ReadProducts(s3, commandLine.Arguments.Select((uri, index) => { return uri; }), commandLine.StagingFolder).ConfigureAwait(false);
+            var products = await ProductCollection.ReadProducts(s3, commandLine.Arguments.Select((uri, index) => { return new Uri(uri); })).ConfigureAwait(false);
+            products.MapToLocal(commandLine.StagingFolder);
             if (commandLine.Verbose)
             {
                 Console.WriteLine($"Products [{products.Count}]:");
                 foreach (var p in products)
                 {
-                    Console.WriteLine($"  {p.Name}: {p.AbsoluteUri} => {p.LocalPath}");
+                    Console.WriteLine($"  {p.Name}: {p.Uri} => {p.LocalPath}");
                     foreach (var pp in p.Props) Console.WriteLine($"    {pp.Key} = {pp.Value}");
                 }
             }
@@ -141,12 +142,12 @@ namespace s3i
                 if (uninstall.Any())
                 {
                     Console.WriteLine($"Uninstall [{uninstall.Count()}]:");
-                    foreach (var f in uninstall) Console.WriteLine($"  {f.AbsoluteUri}");
+                    foreach (var f in uninstall) Console.WriteLine($"  {f.Uri}");
                 }
                 if (install.Any())
                 {
                     Console.WriteLine($"Install [{install.Count()}]:");
-                    foreach (var f in install) Console.WriteLine($"  {f.AbsoluteUri}");
+                    foreach (var f in install) Console.WriteLine($"  {f.Uri}");
                 }
             }
             // Ok, now we can proceed with changes:

@@ -12,12 +12,12 @@ namespace s3iLib
     public class ProductInfo
     {
         public string Name { get; set; }
-        public string AbsoluteUri { get; set; }
+        public Uri Uri { get; set; }
         public string LocalPath { get; set; }
         public ProductPropertiesDictionary Props { get; } = new ProductPropertiesDictionary();
         public string MapToLocalPath(string basePath)
         {
-            return MapToLocalPath(basePath, Name, Path.GetFileName(AbsoluteUri));
+            return MapToLocalPath(basePath, Name, Path.GetFileName(Uri.AbsolutePath));
         }
         public static string MapToLocalPath(string basePath, string productName, string fileName)
         {
@@ -27,8 +27,8 @@ namespace s3iLib
         {
             if(null == installedProduct) return Installer.Action.Install;
             // use absolute uri to compare versions
-            var thisVersion = SemanticVersion.From(AbsoluteUri);
-            var installedVersion = SemanticVersion.From(installedProduct.AbsoluteUri);
+            var thisVersion = SemanticVersion.From(Uri);
+            var installedVersion = SemanticVersion.From(installedProduct.Uri);
             var versionIsNewer = thisVersion.CompareTo(installedVersion);
             // if new is greater, install
             if (0 < versionIsNewer) return Installer.Action.Install;
@@ -78,7 +78,7 @@ namespace s3iLib
         #endregion
         public override string ToString()
         {
-            return $"{Name}: {AbsoluteUri}";
+            return $"{Name}: {Uri}";
         }
     }
 }

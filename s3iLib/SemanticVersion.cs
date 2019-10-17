@@ -92,7 +92,7 @@ namespace s3iLib
         public static SemanticVersion From(string path, string separators = null)
         {
             Contract.Requires(null != path);
-            return path.Split(separators?.ToCharArray() ?? pathSeparatorChars, StringSplitOptions.RemoveEmptyEntries).Aggregate((SemanticVersion)null, (a, s) => { return SemanticVersion.TryParse(s, out var v) ? v : a; });
+            return path.Split(separators?.ToCharArray() ?? pathSeparatorChars, StringSplitOptions.RemoveEmptyEntries).Aggregate(None, (a, s) => { return SemanticVersion.TryParse(s, out var v) ? v : a; });
         }
         public static SemanticVersion From(Uri uri)
         {
@@ -114,7 +114,7 @@ namespace s3iLib
         {
             Contract.Requires(null != obj);
             var otherVersion = obj as SemanticVersion;
-            return null == otherVersion ? false : Equals(otherVersion);
+            return default == otherVersion ? false : Equals(otherVersion);
         }
         public override int GetHashCode()
         {
@@ -124,5 +124,6 @@ namespace s3iLib
         {
             return $"{Major}.{Minor}.{Patch}{(string.IsNullOrEmpty(Prerelease) ? "" : $"-{Prerelease}")}{(string.IsNullOrEmpty(Metadata) ? "" : $"+{Metadata}")}";
         }
+        public static readonly SemanticVersion None = new SemanticVersion();
     }
 }

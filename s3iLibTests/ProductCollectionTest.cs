@@ -40,11 +40,12 @@ SecondProduct    = ../../../Distrib/SecondProduct/9.4.188/SecondProduct.msi
         public async Task TestTwoProductProps()
         {
             using var stream = new MemoryStream(Encoding.ASCII.GetBytes(testConfig));
-            var products = await ProductCollection.FromIni(stream, "https://xxx.s3.amazonaws.com/Test/Windows10", "C:\\Temp\\").ConfigureAwait(false); 
+            var products = await ProductCollection.FromIni(stream).ConfigureAwait(false); 
+            products.MapToLocal("C:\\Temp\\");
             Assert.AreEqual(2, products.Count);
             Assert.AreEqual("ProductOne", products[0].Name);
             Assert.AreEqual("SecondProduct", products[1].Name);
-            Assert.AreEqual("https://xxx.s3.amazonaws.com/Test/Windows10/Distrib/ProductOne/12.6.16/ProductOne.msi", products[0].AbsoluteUri);
+            Assert.AreEqual("https://xxx.s3.amazonaws.com/Test/Windows10/Distrib/ProductOne/12.6.16/ProductOne.msi", products[0].Uri);
             Assert.AreEqual(2, products[0].Props.Count);
             Assert.AreEqual("https://s3.amazonaws.com/config.company.com/Engineering/ESR/", products[0].Props["CONFIG_ROOT"]);
             Assert.AreEqual("https://s3.amazonaws.com/logs.company.com/{0:yyyy}/{0:MM}/{0:dd}/{1}/{0:yyMMdd_HH}{3:00}.log", products[0].Props["ROLLING_LOG"]);
@@ -64,8 +65,9 @@ Three    = https://xxx.s3.amazonaws.com/Test/Windows10/Distrib//SecondProduct/9.
         public async Task TestDownloadPaths()
         {
             using var stream = new MemoryStream(Encoding.ASCII.GetBytes(manyProducts));
-            var products = await ProductCollection.FromIni(stream, "https://xxx.s3.amazonaws.com/Test/Windows10/Config/OneInstance/config.ini", "C:\\Temp\\").ConfigureAwait(false);
-            var files = from p in products select new { product = p, local = p.AbsoluteUri.MapToLocalPath("c:/Temp/")  };
+            var products = await ProductCollection.FromIni(stream).ConfigureAwait(false);
+            products.MapToLocal("C:\\Temp\\");
+            var files = from p in products select new { product = p, local = p.LocalPath };
             Assert.AreEqual(3, products.Count);
             Assert.AreEqual(3, files.Count());
             var x = Path.DirectorySeparatorChar;
@@ -79,14 +81,13 @@ Three    = https://xxx.s3.amazonaws.com/Test/Windows10/Distrib//SecondProduct/9.
         [Test]
         public async Task TestDiff()
         {
-            var baseUri = "https://mecompany.s3.amazonaws.com/something/config.ini";
-            var temp = "C:\\Temp\\";
+            var baseUri = new Uri("https://mecompany.s3.amazonaws.com/something/config.ini");
             using var stream1 = new MemoryStream(Encoding.ASCII.GetBytes(products1));
             using var stream2 = new MemoryStream(Encoding.ASCII.GetBytes(products2));
             using var stream3 = new MemoryStream(Encoding.ASCII.GetBytes(products3));
-            var p1 = await ProductCollection.FromIni(stream1, baseUri, temp).ConfigureAwait(false);
-            var p2 = await ProductCollection.FromIni(stream2, baseUri, temp).ConfigureAwait(false);
-            var p3 = await ProductCollection.FromIni(stream3, baseUri, temp).ConfigureAwait(false);
+            var p1 = await ProductCollection.FromIni(stream1).ConfigureAwait(false);
+            var p2 = await ProductCollection.FromIni(stream2).ConfigureAwait(false);
+            var p3 = await ProductCollection.FromIni(stream3).ConfigureAwait(false);
         }
 
         [Test]
@@ -101,7 +102,7 @@ Three    = https://xxx.s3.amazonaws.com/Test/Windows10/Distrib//SecondProduct/9.
                 "https://download/from/somewhere/p4.msi",
             }.Aggregate(new ProductCollection(), (ps, s) =>
             {
-                ps.Add(new ProductInfo { Name = Path.GetFileNameWithoutExtension(s), AbsoluteUri = s, LocalPath = s.MapToLocalPath(tempFilePath) }); return ps;
+                ps.Add(new ProductInfo { Name = Path.GetFileNameWithoutExtension(s), Uri = new Uri(s), LocalPath = new Uri(s).MapToLocalPath(tempFilePath) }); return ps;
             }));
             Assert.That(products.Count, Is.EqualTo(4));
             var existing = new List<string> {
@@ -141,16 +142,16 @@ Three    = https://xxx.s3.amazonaws.com/Test/Windows10/Distrib//SecondProduct/9.
                 { "ProdXX\\px.msi", "https://download/there/ProdXX/1.2.5.8+uninstall/px.msi" },
             };
             var products = new ProductCollection { 
-                new ProductInfo { Name = "Prod01", AbsoluteUri = "https://download/here/Prod01/9.4.8+upgrade/p1.msi", LocalPath = "Prod01\\p1.msi", },
-                new ProductInfo { Name = "Prod02", AbsoluteUri = "https://download/here/Prod02/3.3.5+keep/p2.msi", LocalPath = "Prod02\\p2.msi", },
-                new ProductInfo { Name = "Prod03", AbsoluteUri = "https://download/there/Prod03/12.5.4+downgrade/p3.msi", LocalPath = "Prod03\\p3.msi", },
-                new ProductInfo { Name = "Prod04", AbsoluteUri = "https://download/from/Prod04/1.2.3+install/p4.msi", LocalPath = "Prod04\\p4.msi", },
+                new ProductInfo { Name = "Prod01", Uri = new Uri("https://download/here/Prod01/9.4.8+upgrade/p1.msi"), LocalPath = "Prod01\\p1.msi", },
+                new ProductInfo { Name = "Prod02", Uri = new Uri("https://download/here/Prod02/3.3.5+keep/p2.msi"), LocalPath = "Prod02\\p2.msi", },
+                new ProductInfo { Name = "Prod03", Uri = new Uri("https://download/there/Prod03/12.5.4+downgrade/p3.msi"), LocalPath = "Prod03\\p3.msi", },
+                new ProductInfo { Name = "Prod04", Uri = new Uri("https://download/from/Prod04/1.2.3+install/p4.msi"), LocalPath = "Prod04\\p4.msi", },
             };
             var remove = products.FilesToUninstall(installed.Keys);
             var (uninstall, install) = products.Separate(localPath =>
             {
                 var uri = installed.ContainsKey(localPath) ? installed[localPath] : null;
-                return new ProductInfo { AbsoluteUri = uri, };
+                return null != uri ? new ProductInfo { Uri = new Uri(uri), } : null;
             });
             //Console.WriteLine($"Remove:");
             //foreach (var r in remove) Console.WriteLine($"  {r}"); 
@@ -161,12 +162,12 @@ Three    = https://xxx.s3.amazonaws.com/Test/Windows10/Distrib//SecondProduct/9.
             Assert.That(remove.Count(), Is.EqualTo(1));
             Assert.That(remove.ElementAt(0), Is.EqualTo("ProdXX\\px.msi"));
             Assert.That(uninstall.Count(), Is.EqualTo(1));
-            Assert.That(uninstall.ElementAt(0).AbsoluteUri, Is.EqualTo("https://download/there/Prod03/12.5.8/p3.msi"));
+            Assert.That(uninstall.ElementAt(0).Uri.ToString(), Is.EqualTo("https://download/there/Prod03/12.5.8/p3.msi"));
             Assert.That(install.Count(), Is.EqualTo(4));
-            Assert.That(install.ElementAt(0).AbsoluteUri, Is.EqualTo("https://download/here/Prod01/9.4.8+upgrade/p1.msi"));
-            Assert.That(install.ElementAt(1).AbsoluteUri, Is.EqualTo("https://download/here/Prod02/3.3.5+keep/p2.msi"));
-            Assert.That(install.ElementAt(2).AbsoluteUri, Is.EqualTo("https://download/there/Prod03/12.5.4+downgrade/p3.msi"));
-            Assert.That(install.ElementAt(3).AbsoluteUri, Is.EqualTo("https://download/from/Prod04/1.2.3+install/p4.msi"));
+            Assert.That(install.ElementAt(0).Uri.ToString(), Is.EqualTo("https://download/here/Prod01/9.4.8+upgrade/p1.msi"));
+            Assert.That(install.ElementAt(1).Uri.ToString(), Is.EqualTo("https://download/here/Prod02/3.3.5+keep/p2.msi"));
+            Assert.That(install.ElementAt(2).Uri.ToString(), Is.EqualTo("https://download/there/Prod03/12.5.4+downgrade/p3.msi"));
+            Assert.That(install.ElementAt(3).Uri.ToString(), Is.EqualTo("https://download/from/Prod04/1.2.3+install/p4.msi"));
         }
     }
 

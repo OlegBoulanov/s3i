@@ -31,6 +31,19 @@ namespace s3iLib
                 throw new InvalidUriException(s, x);
             }
         }
+        public static AmazonS3Uri ParseS3Uri(Uri uri)
+        {
+            try
+            {
+                // this shitty method may actually throw, so does TryParseAmazonS3Uri(string): https://github.com/aws/aws-sdk-net/issues/1426
+                if (!AmazonS3Uri.TryParseAmazonS3Uri(uri, out var s3uri)) throw new InvalidUriException(uri, null);
+                return s3uri;
+            }
+            catch (Exception x)
+            {
+                throw new InvalidUriException(uri, x);
+            }
+        }
         public static async Task<ProductCollection> FromJson(Stream stream)
         {
             using(var reader = new StreamReader(stream))
@@ -38,24 +51,29 @@ namespace s3iLib
                 return JsonConvert.DeserializeObject<ProductCollection>(await reader.ReadToEndAsync().ConfigureAwait(false));
             }
         }
+        public ProductCollection MapToLocal(string tempFilePath)
+        {
+            ForEach(p =>
+            {
+                if(string.IsNullOrWhiteSpace(p.LocalPath)) {
+                    var uri = p.Uri;
+                    p.LocalPath = Path.Combine(tempFilePath, $"{uri.Host}{Path.DirectorySeparatorChar}{uri.AbsolutePath}");
+                }
+            });
+            return this;
+        }
         const string sectionProducts = "$products$";
-        public static async Task<ProductCollection> FromIni(Stream stream, string baseUri, string tempFilePath)
+        public static async Task<ProductCollection> FromIni(Stream stream)
         {
-            return await FromIni(stream, new AmazonS3Uri(baseUri), tempFilePath).ConfigureAwait(false);
-        }
-        public static async Task<ProductCollection> FromIni(Stream stream, Uri baseUri, string tempFilePath)
-        {
-            return await FromIni(stream, new AmazonS3Uri(baseUri), tempFilePath).ConfigureAwait(false);
-        }
-        public static async Task<ProductCollection> FromIni(Stream stream, AmazonS3Uri baseUri, string tempFilePath)
-        {
-            Contract.Requires(null != baseUri);
             var products = new ProductCollection();
             await IniReader.Read(stream, (sectionName, keyName, keyValue) =>
             {
                 if (sectionProducts.Equals(sectionName, StringComparison.InvariantCultureIgnoreCase))
                 {
-                    products.Add(new ProductInfo { Name = keyName, AbsoluteUri = keyValue });
+                    products.Add(new ProductInfo { 
+                        Name = keyName, 
+                        Uri = new Uri(keyValue) 
+                        });
                 }
                 else
                 {
@@ -64,28 +82,24 @@ namespace s3iLib
                 }
                 //await Task.CompletedTask;
             }).ConfigureAwait(false);
-            products.ForEach((p) =>
-            {
-                p.AbsoluteUri = p.AbsoluteUri.RebaseUri(baseUri.ToString());
-                p.LocalPath = p.MapToLocalPath(tempFilePath);
-            });
             return products;
         }
-        public static async Task<ProductCollection> ReadProducts(S3Helper s3, AmazonS3Uri uri, string tempFilePath)
+        public static async Task<ProductCollection> ReadProducts(S3Helper s3, Uri uri)
         {
             Contract.Requires(null != s3);
             Contract.Requires(null != uri);
             var products = new ProductCollection();
-            await s3.DownloadAsync(uri.Bucket, uri.Key, DateTime.MinValue, async (contentType, stream) =>
+            var s3uri = new AmazonS3Uri(uri);
+            await s3.DownloadAsync(s3uri.Bucket, s3uri.Key, DateTime.MinValue, async (contentType, stream) =>
             {
-                  switch (Path.GetExtension(uri.Key).ToUpperInvariant())
+                  switch (Path.GetExtension(s3uri.Key).ToUpperInvariant())
                   {
                       case ".MSI":
-                          products.Add(new ProductInfo { Name = uri.ToString(), AbsoluteUri = uri.ToString() });
+                          products.Add(new ProductInfo { Name = uri.ToString(), Uri = uri });
                           await Task.CompletedTask.ConfigureAwait(false);
                           break;
                       case ".INI":
-                          products.AddRange(await ProductCollection.FromIni(stream, uri, tempFilePath).ConfigureAwait(false));
+                          products.AddRange(await ProductCollection.FromIni(stream).ConfigureAwait(false));
                           break;
                       case ".JSON":
                           products.AddRange(await ProductCollection.FromJson(stream).ConfigureAwait(false));
@@ -96,7 +110,7 @@ namespace s3iLib
               }).ConfigureAwait(false);
             return products;
         }
-        public static async Task<ProductCollection> ReadProducts(S3Helper s3, IEnumerable<string> uris, string tempFilePath)
+        public static async Task<ProductCollection> ReadProducts(S3Helper s3, IEnumerable<Uri> uris)
         {
             var products = new ProductCollection();
             var arrayOfProducts = await Task.WhenAll(
@@ -105,8 +119,7 @@ namespace s3iLib
                 {
                     tasks.Add(Task<ProductCollection>.Run(() =>
                     {
-                        var uri = ParseS3Uri(configFileUri);
-                        return ReadProducts(s3, uri, tempFilePath);
+                        return ReadProducts(s3, configFileUri);
                     }));
                     return tasks;
                 })).ConfigureAwait(false);
@@ -121,7 +134,7 @@ namespace s3iLib
                 products.Aggregate(new List<Task<HttpStatusCode>>(),
                     (tasks, product) =>
                     {
-                        var uri = ParseS3Uri(product.AbsoluteUri);
+                        var uri = ParseS3Uri(product.Uri);
                         product.LocalPath = product.MapToLocalPath(localPathBase);
                         Directory.CreateDirectory(Path.GetDirectoryName(product.LocalPath));
                         tasks.Add(s3.DownloadAsync(uri.Bucket, uri.Key, product.LocalPath));
@@ -153,7 +166,7 @@ namespace s3iLib
             var install = new List<ProductInfo>();
             foreach(var product in this) 
             {
-                var installedProduct = findInstalledProduct(product.LocalPath);
+                var installedProduct = findInstalledProduct?.Invoke(product.LocalPath);
                 if (null == installedProduct)
                 {
                     install.Add(product);

@@ -96,11 +96,10 @@ namespace s3iLibTests
             for (var i = 0; i < maxAttempts; i++) {
                 var clock = System.Diagnostics.Stopwatch.StartNew();
                 var prods = await ProductCollection.ReadProducts(s3,
-                    new List<string> {
-                        testIniS3Uri,
-                        testIniS3Uri,
-                    },
-                    "D:/Temp/").ConfigureAwait(false);
+                    new List<Uri> {
+                        new Uri(testIniS3Uri),
+                        new Uri(testIniS3Uri),
+                    }).ConfigureAwait(false);
                 var ms = clock.ElapsedMilliseconds;
                 if (100 < ms)
                 {

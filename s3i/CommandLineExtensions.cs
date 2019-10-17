@@ -43,7 +43,7 @@ namespace s3i
         }
         internal static int DownloadProducts(this CommandLine commandLine, IEnumerable<ProductInfo> products, S3Helper s3, TimeSpan timeout)
         {
-            return commandLine.LogAndExecute($"Download {products.Count()} product{products.Count().Plural()}:{products.Aggregate(new StringBuilder(), (sb, p) => { sb.AppendLine(); sb.Append($"  {p.AbsoluteUri}"); return sb; }, sb => sb.ToString())}",
+            return commandLine.LogAndExecute($"Download {products.Count()} product{products.Count().Plural()}:{products.Aggregate(new StringBuilder(), (sb, p) => { sb.AppendLine(); sb.Append($"  {p.Uri}"); return sb; }, sb => sb.ToString())}",
                 (run) => { if(run) ProductCollection.DownloadInstallers(products, s3, commandLine.StagingFolder).Wait(timeout); return 0; },
                 x => x.HResult,
                 s => Console.WriteLine(s)
