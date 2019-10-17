@@ -16,6 +16,19 @@
             }
         },
         {
+            "label": "clean",
+            "type": "shell",
+            "command": "dotnet",
+            "args": [
+                "clean",
+                "${workspaceFolder}"
+            ],
+            "problemMatcher": "$msCompile",
+            "group": {
+                "kind": "build",
+                "isDefault": true
+            }
+        },        {
             "label": "test",
             "type": "shell",
             "command": "dotnet",
