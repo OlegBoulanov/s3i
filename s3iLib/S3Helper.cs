@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
+using System.Diagnostics.Contracts;
 using System.Threading.Tasks;
 
 using System.IO;
@@ -39,19 +40,25 @@ namespace s3iLib
         }
         public async Task<HttpStatusCode> DownloadAsync(string bucket, string key, DateTime modifiedSinceDateUtc, Func<string, Stream, Task> processStream)
         {
+            Contract.Requires(null != bucket);
+            Contract.Requires(null != key);
+            Contract.Requires(null != processStream);
             var request = new GetObjectRequest { BucketName = bucket, Key = key, ModifiedSinceDateUtc = modifiedSinceDateUtc };
-            var regionClient = await Clients.GetClientAsync(bucket);
-            using (var response = await (regionClient.GetObjectAsync(request)))
+            var regionClient = await Clients.GetClientAsync(bucket).ConfigureAwait(false);
+            using (var response = await regionClient.GetObjectAsync(request).ConfigureAwait(false))
             {
                 using (var responseStream = response.ResponseStream)
                 {
-                    await processStream?.Invoke(response.Headers["Content-Type"], responseStream);
+                    await processStream.Invoke(response.Headers["Content-Type"], responseStream).ConfigureAwait(false);
                 }
                 return response.HttpStatusCode;
             }
         }
         public async Task<HttpStatusCode> DownloadAsync(string bucket, string key, string localFilePath)
         {
+            Contract.Requires(null != bucket);
+            Contract.Requires(null != key);
+            Contract.Requires(null != localFilePath);
             var lastWriteTimeUtc = File.GetLastWriteTimeUtc(localFilePath);
             try
             {
@@ -60,9 +67,9 @@ namespace s3iLib
                     {
                         using (var file = File.Create(localFilePath))
                         {
-                            await stream.CopyToAsync(file);
+                            await stream.CopyToAsync(file).ConfigureAwait(false);
                         }
-                    });
+                    }).ConfigureAwait(false);
             }
             catch (AmazonS3Exception x)
             {
