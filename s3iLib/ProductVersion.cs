@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Diagnostics.Contracts;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -36,14 +37,35 @@ namespace s3iLib
         }
         public int CompareTo(ProductVersion other)
         {
-            var major = Major.CompareTo(other?.Major);
+            Contract.Requires(null != other);
+            var major = Major.CompareTo(other.Major);
             if (0 != major) return major;
-            var minor = Minor.CompareTo(other?.Minor);
+            var minor = Minor.CompareTo(other.Minor);
             if (0 != minor) return minor;
-            var build = Build.CompareTo(other?.Build);
+            var build = Build.CompareTo(other.Build);
             if (0 != build) return build;
             //Windows Installer ignores Patch
             return 0;
+        }
+        public bool Equals(ProductVersion other)
+        {
+            return 0 == CompareTo(other);
+        }
+        public static bool operator <(ProductVersion thisVersion, ProductVersion otherVersion) { Contract.Requires(null != thisVersion); return thisVersion.CompareTo(otherVersion) < 0; }
+        public static bool operator >(ProductVersion thisVersion, ProductVersion otherVersion) { Contract.Requires(null != thisVersion); return 0 < thisVersion.CompareTo(otherVersion); }
+        public static bool operator <=(ProductVersion thisVersion, ProductVersion otherVersion) { Contract.Requires(null != thisVersion); return thisVersion.CompareTo(otherVersion) <= 0; }
+        public static bool operator >=(ProductVersion thisVersion, ProductVersion otherVersion) { Contract.Requires(null != thisVersion); return 0 <= thisVersion.CompareTo(otherVersion); }
+        public static bool operator ==(ProductVersion thisVersion, ProductVersion otherVersion) { Contract.Requires(null != thisVersion); return 0 == thisVersion.CompareTo(otherVersion); }
+        public static bool operator !=(ProductVersion thisVersion, ProductVersion otherVersion) { Contract.Requires(null != thisVersion); return 0 != thisVersion.CompareTo(otherVersion); }
+        public override int GetHashCode()
+        {
+            return ToString().GetHashCode();
+        }
+        public override bool Equals(object obj)
+        {
+            Contract.Requires(obj != null);
+            var other = obj as ProductVersion;
+            return null == other ? false : Equals(other);
         }
         public override string ToString()
         {
