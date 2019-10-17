@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Diagnostics.Contracts;
 using System.Collections.Generic;
 using System.Text;
 
@@ -15,6 +16,7 @@ namespace s3iLib
         }
         public static string Format(this Exception x, int indent)
         {
+            Contract.Requires(null != x);
             var sb = new StringBuilder();
             if (x is AmazonS3Exception ax) sb.AppendLine($"{ax.GetType().Name}: {ax.ErrorType}, {ax.ErrorCode}, {ax.Message}");
             else if (null != x) sb.AppendLine($"{x.GetType().Name}: {x.Message}");

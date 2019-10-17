@@ -27,7 +27,9 @@ namespace s3iLib
         {
             if(null == installedProduct) return Installer.Action.Install;
             // use absolute uri to compare versions
-            var versionIsNewer = AbsoluteUri.CompareTo(installedProduct.AbsoluteUri);
+            var thisVersion = SemanticVersion.From(AbsoluteUri);
+            var installedVersion = SemanticVersion.From(installedProduct.AbsoluteUri);
+            var versionIsNewer = thisVersion.CompareTo(installedVersion);
             // if new is greater, install
             if (0 < versionIsNewer) return Installer.Action.Install;
             // else (if less or props changed) reinstall
@@ -44,14 +46,14 @@ namespace s3iLib
         {
             using (var writer = new StreamWriter(stream))
             {
-                await writer.WriteAsync(ToJson());
+                await writer.WriteAsync(ToJson()).ConfigureAwait(false);
             }
         }
         public static async Task<ProductInfo> FromJson(Stream stream)
         {
             using (var reader = new StreamReader(stream))
             {
-                return JsonConvert.DeserializeObject<ProductInfo>(await reader.ReadToEndAsync());
+                return JsonConvert.DeserializeObject<ProductInfo>(await reader.ReadToEndAsync().ConfigureAwait(false));
             }
         }
         public static string LocalInfoFileExtension { get; } = ".json";
@@ -59,7 +61,7 @@ namespace s3iLib
         {
             using (var fs = new FileStream(path, FileMode.Create))
             {
-                await ToJson(fs);
+                await ToJson(fs).ConfigureAwait(false);
             }
         }
         public static async Task<ProductInfo> FindInstalled(string path)
@@ -68,7 +70,7 @@ namespace s3iLib
             {
                 using (var fs = new FileStream(path, FileMode.Open))
                 {
-                    return await FromJson(fs);
+                    return await FromJson(fs).ConfigureAwait(false);
                 }
             }
             return null;

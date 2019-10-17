@@ -9,7 +9,10 @@
                 "build",
                 "${workspaceFolder}/s3i/"
             ],
-            "problemMatcher": "$msCompile",
+            "problemMatcher": {
+                "base": "$msCompile",
+                "fileLocation":"absolute"
+            },
             "group": {
                 "kind": "build",
                 "isDefault": true
@@ -23,18 +26,18 @@
                 "clean",
                 "${workspaceFolder}"
             ],
-            "problemMatcher": "$msCompile",
-            "group": {
-                "kind": "build",
-                "isDefault": true
-            }
-        },        {
+            "problemMatcher": "$msCompile"
+        },
+        {
             "label": "test",
             "type": "shell",
             "command": "dotnet",
             "args": [
                 "test",
                 "${workspaceFolder}/s3iLibTests/s3iLibTests.csproj"
+            ],
+            "dependsOn":[ 
+                "build" 
             ],
             "problemMatcher": "$msCompile"
         }

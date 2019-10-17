@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Diagnostics.Contracts;
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.Globalization;
@@ -28,6 +29,7 @@ namespace s3iLib
         }
         public void Parse(Action<string> onArgument, Action<PropertyInfo> onFlag, Action<PropertyInfo, string> onOption, IEnumerable<string> args)
         {
+            Contract.Requires(null != args);
             Arguments.Clear();
             PropertyInfo currentProp = null;
             foreach (var a in args)

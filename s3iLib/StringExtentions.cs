@@ -1,8 +1,9 @@
 ﻿using System;
+using System.Diagnostics.Contracts;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
-using System.Threading.Tasks;
+using System.Globalization;
 
 using System.IO;
 using System.Text.RegularExpressions;
@@ -18,7 +19,7 @@ namespace s3iLib
             return !String.IsNullOrWhiteSpace(path)
                 && path.IndexOfAny(System.IO.Path.GetInvalidPathChars().ToArray()) == -1
                 && Path.IsPathRooted(path)
-                && !Path.GetPathRoot(path).Equals(Path.DirectorySeparatorChar.ToString(), StringComparison.Ordinal);
+                && !Path.GetPathRoot(path).Equals(Path.DirectorySeparatorChar.ToString(CultureInfo.CurrentCulture), StringComparison.CurrentCulture);
         }
     }
 
@@ -32,8 +33,11 @@ namespace s3iLib
         }
         public static string ReplaceAll(this string s, Regex rex, string replacement)
         {
+            Contract.Requires(null != s);
+            Contract.Requires(null != rex);
+            Contract.Requires(null != replacement);
             string next = s;
-            for (var prev = next; !prev.Equals(next = rex.Replace(prev, replacement, 1)); prev = next) ;
+            for (var prev = next; !prev.Equals(next = rex.Replace(prev, replacement, 1), StringComparison.CurrentCulture); prev = next) ;
             return next;
         }
         public static string BuildRelativeUri(this string baseUri, string path)
@@ -59,6 +63,8 @@ namespace s3iLib
         }
         public static string Quote(this string s, string quote, params char[] spaces)
         {
+            Contract.Requires(null != s);
+            Contract.Requires(null != spaces);
             if (string.IsNullOrEmpty(quote)) quote = "\"";
             if (0 == spaces.Length) spaces = new char[] { ' ', '\t' };
             if (string.IsNullOrEmpty(s) || 0 <= s.IndexOfAny(spaces))
