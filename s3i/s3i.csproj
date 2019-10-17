@@ -11,13 +11,14 @@
   </PropertyGroup>
 
   <PropertyGroup>
-    <GenerateAssemblyInfo>false</GenerateAssemblyInfo>
+    <GenerateAssemblyInfo>true</GenerateAssemblyInfo>
     <Version>2.1.0.0</Version>
     <AssemblyVersion>2.1.0.0</AssemblyVersion>
     <FileVersion>2.1.0.0</FileVersion>
     <Company>Useless Extras</Company>
     <Product>s3i</Product>
     <PackageId>s3i</PackageId>
+    <NeutralLanguage>en</NeutralLanguage>
     <Authors>Oleg Boulanov</Authors>
     <PackageProjectUrl>http://github.com/OlegBoulanov/s3i</PackageProjectUrl>
     <RepositoryUrl>http://github.com/OlegBoulanov/s3i</RepositoryUrl>
