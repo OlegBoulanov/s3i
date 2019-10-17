@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Diagnostics.Contracts;
 using System.Globalization;
 using System.Collections.Generic;
 using System.Linq;
@@ -40,6 +41,15 @@ namespace s3iLib
         const string sectionProducts = "$products$";
         public static async Task<ProductCollection> FromIni(Stream stream, string baseUri, string tempFilePath)
         {
+            return await FromIni(stream, new AmazonS3Uri(baseUri), tempFilePath).ConfigureAwait(false);
+        }
+        public static async Task<ProductCollection> FromIni(Stream stream, Uri baseUri, string tempFilePath)
+        {
+            return await FromIni(stream, new AmazonS3Uri(baseUri), tempFilePath).ConfigureAwait(false);
+        }
+        public static async Task<ProductCollection> FromIni(Stream stream, AmazonS3Uri baseUri, string tempFilePath)
+        {
+            Contract.Requires(null != baseUri);
             var products = new ProductCollection();
             await IniReader.Read(stream, (sectionName, keyName, keyValue) =>
             {
@@ -56,27 +66,29 @@ namespace s3iLib
             }).ConfigureAwait(false);
             products.ForEach((p) =>
             {
-                p.AbsoluteUri = p.AbsoluteUri.RebaseUri(baseUri);
+                p.AbsoluteUri = p.AbsoluteUri.RebaseUri(baseUri.ToString());
                 p.LocalPath = p.MapToLocalPath(tempFilePath);
             });
             return products;
         }
         public static async Task<ProductCollection> ReadProducts(S3Helper s3, AmazonS3Uri uri, string tempFilePath)
         {
+            Contract.Requires(null != s3);
+            Contract.Requires(null != uri);
             var products = new ProductCollection();
             await s3.DownloadAsync(uri.Bucket, uri.Key, DateTime.MinValue, async (contentType, stream) =>
             {
-                  switch (Path.GetExtension(uri.Key).ToLowerInvariant())
+                  switch (Path.GetExtension(uri.Key).ToUpperInvariant())
                   {
-                      case ".msi":
+                      case ".MSI":
                           products.Add(new ProductInfo { Name = uri.ToString(), AbsoluteUri = uri.ToString() });
-                          await Task.CompletedTask;
+                          await Task.CompletedTask.ConfigureAwait(false);
                           break;
-                      case ".ini":
-                          products.AddRange(await ProductCollection.FromIni(stream, uri.ToString(), tempFilePath));
+                      case ".INI":
+                          products.AddRange(await ProductCollection.FromIni(stream, uri, tempFilePath).ConfigureAwait(false));
                           break;
-                      case ".json":
-                          products.AddRange(await ProductCollection.FromJson(stream));
+                      case ".JSON":
+                          products.AddRange(await ProductCollection.FromJson(stream).ConfigureAwait(false));
                           break;
                       default:
                           throw new FormatException($"Unsupported file extension in {uri.ToString()}");
