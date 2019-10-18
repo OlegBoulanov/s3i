@@ -44,7 +44,7 @@ namespace s3iLib
             Contract.Requires(null != replacement);
             string next = s;
             // single regex replacement may produce next string for replacement, thus the loop
-            for (var prev = next; !prev.Equals(next = rex.Replace(prev, replacement, 1), StringComparison.CurrentCulture); prev = next) ;
+            for (var prev = next; null != prev && !prev.Equals(next = rex.Replace(prev, replacement, 1), StringComparison.CurrentCulture); prev = next) ;
             return next;
         }
         public static Uri BuildRelativeUri(this Uri baseUri, string path)
