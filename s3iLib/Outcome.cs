@@ -15,12 +15,16 @@ namespace s3iLib
         public bool Succeeded { get { return !Failed; } }
         #endregion
         #region Constructors
+        public Outcome(TR result)
+        {
+            Result = result;
+        }
         #endregion
         #region Operations
         public Outcome<TR, TE> AddErrors(IEnumerable<TE> errors)
         {
             //(Errors ??= new List<E>()).AddRange(errors);
-            if(null == Errors) Errors = new List<TE>(); Errors.AddRange(errors);
+            if (null == Errors) Errors = new List<TE>(); Errors.AddRange(errors);
             return this;
         }
         public Outcome<TR, TE> AddErrors(params TE[] errors)
@@ -29,13 +33,11 @@ namespace s3iLib
         }
         #endregion
         #region Shortcuts
-        public static implicit operator TR(Outcome<TR, TE> outcome) { return outcome.Result; }
-        public static implicit operator Outcome<TR, TE>(TR result) { return new Outcome<TR, TE> { Result = result }; }
-        public static Outcome<TR, TE> Success(TR result) { return new Outcome<TR, TE> { Result = result }; }
+        public static Outcome<TR, TE> Success(TR result) { return new Outcome<TR, TE>(result); }
         public static Outcome<TR, TE> Failure(params TE[] errors) { return Failure(default, errors); }
         public static Outcome<TR, TE> Failure(IEnumerable<TE> errors) { return Failure(default, errors); }
-        public static Outcome<TR, TE> Failure(TR result, params TE[] errors) { return new Outcome<TR, TE> { Result = result }.AddErrors(errors); }
-        public static Outcome<TR, TE> Failure(TR result, IEnumerable<TE> errors) { return new Outcome<TR, TE> { Result = result }.AddErrors(errors); }
+        public static Outcome<TR, TE> Failure(TR result, params TE[] errors) { return new Outcome<TR, TE>(result).AddErrors(errors); }
+        public static Outcome<TR, TE> Failure(TR result, IEnumerable<TE> errors) { return new Outcome<TR, TE> (result).AddErrors(errors); }
         #endregion
         #region Composition
         public Outcome<TR, TE> Merge(Outcome<TR, TE> other, Func<TR, TR, TR> merge = null)

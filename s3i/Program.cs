@@ -69,7 +69,7 @@ namespace s3i
             if (0 < commandLine.Arguments.Count)
             {
                 var validateResult = commandLine.Validate();
-                if (!validateResult)
+                if (!validateResult.Result)
                 {
                     Console.WriteLine($"? Command line validation failed{(0 < validateResult.Errors.Count ? ":" : ".")}");
                     foreach (var e in validateResult.Errors) Console.WriteLine($"  {e}");
