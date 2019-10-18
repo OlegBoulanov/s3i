@@ -5,7 +5,7 @@ using s3iLib;
 
 namespace s3iLibTests
 {
-    public class Win32HelperTest : PlatformSpecificTestBase
+    public class Win32HelperTest : PlatformDependentTestBase
     {
         [Test]
         [LinuxOnly]

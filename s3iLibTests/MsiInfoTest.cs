@@ -7,7 +7,7 @@ using System.IO;
 
 namespace s3iLibTests
 {
-    public class MsiInfoTest : PlatformSpecificTestBase
+    public class MsiInfoTest : PlatformDependentTestBase
     {
         [Test]
         [WindowsOnly]

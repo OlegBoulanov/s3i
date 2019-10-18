@@ -33,37 +33,6 @@ namespace s3iLibTests
         const string testIniS3Uri = "https://s3.us-east-2.amazonaws.com/test.s3i/config/Site01/Group01/Product.ini";
         const int testObjectLineCount = 49;
 
-        AmazonS3Client GetClient(RegionEndpoint region = null)
-        {
-            AmazonS3Client s3 = null;
-            if (new CredentialProfileStoreChain().TryGetAWSCredentials(testProfileName, out AWSCredentials credentials))
-            {
-                s3 = new AmazonS3Client(credentials, region ?? RegionEndpoint.USEast1);
-            }
-            return s3;
-        }
-
-        [Test]
-        [Category("AWS")]
-        public async Task GetTestObject()
-        {
-            using var s3 = GetClient(RegionEndpoint.USEast2);
-            Assert.IsNotNull(s3);
-            using var response = await s3.GetObjectAsync(new GetObjectRequest { BucketName = testBucketName, Key = testKey }).ConfigureAwait(false);
-            Assert.AreEqual(HttpStatusCode.OK, response.HttpStatusCode);
-        }
-
-        [Test]
-        [Category("AWS")]
-        public async Task GetTestBucketLocation()
-        {
-            using var s3 = GetClient(RegionEndpoint.USEast1);
-            Assert.IsNotNull(s3);
-            var response = await s3.GetBucketLocationAsync(new GetBucketLocationRequest { BucketName = testBucketName }).ConfigureAwait(false);
-            Assert.AreEqual(HttpStatusCode.OK, response.HttpStatusCode);
-            Assert.AreEqual(S3Region.USE2, response.Location);
-        }
-
         [Test]
         [Category("AWS")]
         public async Task S3Download()
@@ -107,6 +76,17 @@ namespace s3iLibTests
                 }
                 Assert.AreEqual(2, prods.Count);
             }
+        }
+
+        [Test]
+        [Conditional(()=>true)]
+        public void TrueConditional()
+        {
+        }
+        [Test]
+        [Conditional(()=>false)]
+        public void FalseConditional()
+        {
         }
     }
 

@@ -12,7 +12,7 @@ public sealed class LinuxOnlyAttribute : PlatformSpecificAttribute { }
 public sealed class OSXOnlyAttribute : PlatformSpecificAttribute { }
 public sealed class FreeBSDAttribute : PlatformSpecificAttribute { }
 
-public class PlatformSpecificTestBase
+public class PlatformDependentTestBase
 {
     // prepare instances for string comparison
     static readonly WindowsOnlyAttribute WindowsOnly = new WindowsOnlyAttribute();
