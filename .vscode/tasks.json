@@ -29,7 +29,11 @@
                 "clean", "build"
             ],
             "dependsOrder": "sequence",
-            "problemMatcher":"$msCompile"
+            "problemMatcher":"$msCompile",
+            "presentation": {
+                "panel": "new",
+                "clear": true
+            }
         },
         {
             "label": "clean",
