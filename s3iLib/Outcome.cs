@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Diagnostics.Contracts;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -39,6 +40,7 @@ namespace s3iLib
         #region Composition
         public Outcome<TR, TE> Merge(Outcome<TR, TE> other, Func<TR, TR, TR> merge = null)
         {
+            Contract.Requires(null != other);
             Result = null != merge ? merge(Result, other.Result) : other.Result;
             if (other.Failed) AddErrors(other.Errors);
             return this;
