@@ -18,7 +18,7 @@ namespace s3iLibTests
             Assert.AreEqual(
                 "{\n"
                 + "  \"Name\": \"TestProduct\",\n"
-                + "  \"AbsoluteUri\": \"https://s3.something.com/install-me/me-me-me.msi\",\n"
+                + "  \"Uri\": \"https://s3.something.com/install-me/me-me-me.msi\",\n"
                 + "  \"LocalPath\": null,\n"
                 + "  \"Props\": {\n"
                 + "    \"prop1\": \"value1\",\n"

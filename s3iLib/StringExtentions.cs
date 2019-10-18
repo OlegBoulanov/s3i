@@ -25,19 +25,25 @@ namespace s3iLib
 
     public static class StringExtentions
     {
-        public static readonly Regex rexDotSegments = new Regex(@"[^\\/]+[\\/]\.\.[\\/]", RegexOptions.Compiled);
+        public static readonly Regex rexDotSegments = new Regex(@"[^\\/]+[\\/]+\.\.[\\/]+", RegexOptions.Compiled);
         public static readonly Regex rexSlashes = new Regex(@"[\\/]+", RegexOptions.Compiled);
         public static string RemoveDotSegments(this string s)
         {
             Contract.Requires(null != s);
-            return s.ReplaceAll(rexDotSegments, "");
+            return s.Replace(rexDotSegments, "");
         }
-        public static string ReplaceAll(this string s, Regex rex, string replacement)
+        public static string UnifySlashes(this string s, char separator = '\0')
+        {
+            Contract.Requires(null != s);
+            return rexSlashes.Replace(s, $"{('\0' != separator ? separator : Path.DirectorySeparatorChar)}");
+        }
+        public static string Replace(this string s, Regex rex, string replacement)
         {
             Contract.Requires(null != s);
             Contract.Requires(null != rex);
             Contract.Requires(null != replacement);
             string next = s;
+            // single regex replacement may produce next string for replacement, thus the loop
             for (var prev = next; !prev.Equals(next = rex.Replace(prev, replacement, 1), StringComparison.CurrentCulture); prev = next) ;
             return next;
         }

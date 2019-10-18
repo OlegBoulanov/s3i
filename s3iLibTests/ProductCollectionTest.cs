@@ -40,12 +40,12 @@ SecondProduct    = ../../../Distrib/SecondProduct/9.4.188/SecondProduct.msi
         public async Task TestTwoProductProps()
         {
             using var stream = new MemoryStream(Encoding.ASCII.GetBytes(testConfig));
-            var products = await ProductCollection.FromIni(stream).ConfigureAwait(false); 
+            var products = await ProductCollection.FromIni(stream, null).ConfigureAwait(false); 
             products.MapToLocal("C:\\Temp\\");
             Assert.AreEqual(2, products.Count);
             Assert.AreEqual("ProductOne", products[0].Name);
             Assert.AreEqual("SecondProduct", products[1].Name);
-            Assert.AreEqual("https://xxx.s3.amazonaws.com/Test/Windows10/Distrib/ProductOne/12.6.16/ProductOne.msi", products[0].Uri);
+            Assert.AreEqual("https://xxx.s3.amazonaws.com/Test/Windows10/Distrib/ProductOne/12.6.16/ProductOne.msi", products[0].Uri.ToString());
             Assert.AreEqual(2, products[0].Props.Count);
             Assert.AreEqual("https://s3.amazonaws.com/config.company.com/Engineering/ESR/", products[0].Props["CONFIG_ROOT"]);
             Assert.AreEqual("https://s3.amazonaws.com/logs.company.com/{0:yyyy}/{0:MM}/{0:dd}/{1}/{0:yyMMdd_HH}{3:00}.log", products[0].Props["ROLLING_LOG"]);
@@ -65,13 +65,13 @@ Three    = https://xxx.s3.amazonaws.com/Test/Windows10/Distrib//SecondProduct/9.
         public async Task TestDownloadPaths()
         {
             using var stream = new MemoryStream(Encoding.ASCII.GetBytes(manyProducts));
-            var products = await ProductCollection.FromIni(stream).ConfigureAwait(false);
+            var products = await ProductCollection.FromIni(stream, null).ConfigureAwait(false);
             products.MapToLocal("C:\\Temp\\");
             var files = from p in products select new { product = p, local = p.LocalPath };
             Assert.AreEqual(3, products.Count);
             Assert.AreEqual(3, files.Count());
             var x = Path.DirectorySeparatorChar;
-            Assert.AreEqual($"c:{x}Temp{x}xxx.s3.amazonaws.com{x}Test{x}Windows10{x}Distrib{x}ProductOne{x}12.6.16{x}ProductOne.msi", files.First().local);
+            Assert.AreEqual($"C:{x}Temp{x}xxx.s3.amazonaws.com{x}Test{x}Windows10{x}Distrib{x}ProductOne{x}12.6.16{x}ProductOne.msi", files.First().local);
         }
 
         const string products1 = "[$products$]\nOne=https://x.amazonaws.com/one/config.ini\nTwo=https://x.amazonaws.com/one/config.ini\n[One]p11=1\np12=2\n[Two]\np21=11\np22=12\n";

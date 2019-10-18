@@ -18,17 +18,13 @@ namespace s3iLibTests
         {
             Assert.AreEqual(@"a/b\d/e/../g\x.y", StringExtentions.rexDotSegments.Replace(@"a/b\c\../d/e/f/..\../g\x.y", @""));
             Assert.AreEqual(@"a/b\d/g\x.y", StringExtentions.rexDotSegments.Replace(@"a/b\d/e/../g\x.y", @""));
-            Assert.AreEqual(@"a/b\d/g\x.y", @"a/b\c\../d/e/f/..\../g\x.y".ReplaceAll(StringExtentions.rexDotSegments, @""));
-            Assert.AreEqual(@"a/b/c/g/x.y", @"a/b/c/d/e/f/../../../g/x.y".ReplaceAll(StringExtentions.rexDotSegments, @""));
+            Assert.AreEqual(@"a/b\d/g\x.y", @"a/b\c\../d/e/f/..\../g\x.y".Replace(StringExtentions.rexDotSegments, @""));
+            Assert.AreEqual(@"a/b/c/g/x.y", @"a/b/c/d/e/f/../../../g/x.y".Replace(StringExtentions.rexDotSegments, @""));
             Assert.AreEqual("https://bucket.s3.amazonaws.com/directory1/die2/dir3/file.ext", "https://bucket.s3.amazonaws.com/directory1/die2/dir3/file.ext".RemoveDotSegments());
             Assert.AreEqual("https://bucket.s3.amazonaws.com/directory1/dir3/file.ext", "https://bucket.s3.amazonaws.com/directory1/die2/../dir3/file.ext".RemoveDotSegments());
             Assert.AreEqual("https://another.bucket.com.s3.amazonaws.com/Test/Windows10/Distrib/Installer/9.4.188/Installer.msi", 
                 "https://another.bucket.com.s3.amazonaws.com/Test/Windows10/Config/s3i/1/../../../Distrib/Installer/9.4.188/Installer.msi".RemoveDotSegments());
-        }
-        [Test]
-        public void TesttReplaceAll()
-        {
-
+                Assert.AreEqual($"C:{Path.DirectorySeparatorChar}Temp{Path.DirectorySeparatorChar}file.ext", @"C:\Temp\\/\/\file.ext".UnifySlashes());
         }
         [Test]
         public void BuildRelativeUri()
