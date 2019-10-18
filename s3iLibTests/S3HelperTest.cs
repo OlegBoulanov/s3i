@@ -16,14 +16,14 @@ using Amazon.S3.Model;
 using Amazon.S3.Util;
 
 using System.Net;
-
+using System.Runtime.InteropServices;
 using System.Diagnostics;
 
 using s3iLib;
 
 namespace s3iLibTests
 {
-    public class S3HelperTest
+    public class S3HelperTest : AwsProfileDependentTestBase
     {
         const string testProfileName = "test.s3i";
         const string testBucketName = "test.s3i";
@@ -78,16 +78,6 @@ namespace s3iLibTests
             }
         }
 
-        [Test]
-        [Conditional(()=>true)]
-        public void TrueConditional()
-        {
-        }
-        [Test]
-        [Conditional(()=>false)]
-        public void FalseConditional()
-        {
-        }
     }
 
 }

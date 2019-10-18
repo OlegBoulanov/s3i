@@ -5,12 +5,12 @@ using System.Linq;
 using System.Runtime.InteropServices;
 
 [AttributeUsage(AttributeTargets.Method, AllowMultiple = false)]
-public abstract class PlatformSpecificAttribute : CategoryAttribute { }
+public abstract class PlatformDependentAttribute : CategoryAttribute { }
 
-public sealed class WindowsOnlyAttribute : PlatformSpecificAttribute { }
-public sealed class LinuxOnlyAttribute : PlatformSpecificAttribute { }
-public sealed class OSXOnlyAttribute : PlatformSpecificAttribute { }
-public sealed class FreeBSDAttribute : PlatformSpecificAttribute { }
+public sealed class WindowsOnlyAttribute : PlatformDependentAttribute { }
+public sealed class LinuxOnlyAttribute : PlatformDependentAttribute { }
+public sealed class OSXOnlyAttribute : PlatformDependentAttribute { }
+public sealed class FreeBSDAttribute : PlatformDependentAttribute { }
 
 public class PlatformDependentTestBase
 {
