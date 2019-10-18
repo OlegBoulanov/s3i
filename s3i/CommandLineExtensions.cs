@@ -14,6 +14,7 @@ namespace s3i
     {
         static string DryRunHeader { get; } = "(DryRun)";
         static string ExecuteHeader { get; } = "(Execute)";
+#pragma warning disable CA1031// warning CA1031: Modify '***' to catch a more specific exception type, or rethrow the exception.
         internal static T LogAndExecute<T>(this CommandLine commandLine, string info, Func<bool, T> func, Func<Exception, T> onException, Action<string> log)
         {
             if (commandLine.Verbose)
@@ -24,18 +25,20 @@ namespace s3i
             {
                 return func(!commandLine.DryRun);
             }
-            catch(Exception x)
+            catch (Exception x)
             {
                 log($"? {x.Format(4)}");
                 return onException(x);
             }
         }
+#pragma warning restore CA1031
         internal static int DeleteStagingFolder(this CommandLine commandLine)
         {
             return commandLine.LogAndExecute($"Delete staging folder {commandLine.StagingFolder}",
-                (run) => { 
-                    if(run && Directory.Exists(commandLine.StagingFolder)) Directory.Delete(commandLine.StagingFolder, true); 
-                    return 0; 
+                (run) =>
+                {
+                    if (run && Directory.Exists(commandLine.StagingFolder)) Directory.Delete(commandLine.StagingFolder, true);
+                    return 0;
                 },
                 x => x.HResult,
                 s => Console.WriteLine(s)
@@ -44,7 +47,7 @@ namespace s3i
         internal static int DownloadProducts(this CommandLine commandLine, IEnumerable<ProductInfo> products, S3Helper s3, TimeSpan timeout)
         {
             return commandLine.LogAndExecute($"Download {products.Count()} product{products.Count().Plural()}:{products.Aggregate(new StringBuilder(), (sb, p) => { sb.AppendLine(); sb.Append($"  {p.Uri}"); return sb; }, sb => sb.ToString())}",
-                (run) => { if(run) ProductCollection.DownloadInstallers(products, s3, commandLine.StagingFolder).Wait(timeout); return 0; },
+                (run) => { if (run) ProductCollection.DownloadInstallers(products, s3, commandLine.StagingFolder).Wait(timeout); return 0; },
                 x => x.HResult,
                 s => Console.WriteLine(s)
                 );
@@ -65,9 +68,10 @@ namespace s3i
                 foreach (var f in Directory.EnumerateFiles(Path.GetDirectoryName(msiFilePath), $"{Path.GetFileNameWithoutExtension(msiFilePath)}.*", SearchOption.TopDirectoryOnly))
                 {
                     var res = commandLine.LogAndExecute($"Delete {f}",
-                        (run) => { 
-                            if(run) File.Delete(f); 
-                            return 0; 
+                        (run) =>
+                        {
+                            if (run) File.Delete(f);
+                            return 0;
                         },
                         x => x.HResult,
                         s => Console.WriteLine(s)
@@ -93,7 +97,7 @@ namespace s3i
             {
                 var localInfoFile = Path.ChangeExtension(product.LocalPath, ProductInfo.LocalInfoFileExtension);
                 // do not update if dry run
-                if(commandLine.DryRun && File.Exists(localInfoFile))
+                if (commandLine.DryRun && File.Exists(localInfoFile))
                 {
                     Console.WriteLine($"{DryRunHeader} Save {localInfoFile}");
                 }
@@ -114,7 +118,7 @@ namespace s3i
             }
             return retCode;
         }
-
+#pragma warning disable CA1031// warning CA1031: Modify '***' to catch a more specific exception type, or rethrow the exception.
         internal static Outcome<bool, string> Validate(this CommandLine commandLine)
         {
             if (null == commandLine) throw new NullReferenceException(nameof(commandLine));
@@ -134,9 +138,10 @@ namespace s3i
                 catch (Exception x)
                 {
                     outcome.AddErrors($"{x.GetType().Name} {x.Message}: {a}");
-                } 
+                }
             }
             return outcome;
         }
+#pragma warning restore CA1031
     }
 }
