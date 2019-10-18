@@ -8,7 +8,9 @@ using System.Threading.Tasks;
 
 using System.IO;
 using System.Net;
-using Newtonsoft.Json;
+//using Newtonsoft.Json;
+using System.Text.Json;
+using System.Text.Json.Serialization;
 
 using Amazon.S3.Util;
 
@@ -33,7 +35,7 @@ namespace s3iLib
         {
             using(var reader = new StreamReader(stream))
             {
-                return JsonConvert.DeserializeObject<ProductCollection>(await reader.ReadToEndAsync().ConfigureAwait(false));
+                return JsonSerializer.Deserialize<ProductCollection>(await reader.ReadToEndAsync().ConfigureAwait(false));
             }
         }
         static string MapToLocal(Uri uri, string localBasePath)

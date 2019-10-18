@@ -2,10 +2,11 @@
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
-using System.Text;
 using System.Threading.Tasks;
 
-using Newtonsoft.Json;
+//using Newtonsoft.Json;
+using System.Text.Json;
+using System.Text.Json.Serialization;
 
 namespace s3iLib
 {
@@ -40,7 +41,7 @@ namespace s3iLib
         #region Json Serialization
         public string ToJson()
         {
-            return JsonConvert.SerializeObject(this, Formatting.Indented);
+            return JsonSerializer.Serialize<ProductInfo>(this, new JsonSerializerOptions { WriteIndented = true } );
         }
         public async Task ToJson(Stream stream)
         {
@@ -53,7 +54,7 @@ namespace s3iLib
         {
             using (var reader = new StreamReader(stream))
             {
-                return JsonConvert.DeserializeObject<ProductInfo>(await reader.ReadToEndAsync().ConfigureAwait(false));
+                return JsonSerializer.Deserialize<ProductInfo>(await reader.ReadToEndAsync().ConfigureAwait(false));
             }
         }
         public static string LocalInfoFileExtension { get; } = ".json";
