@@ -15,7 +15,7 @@ namespace s3iLib
         public bool Succeeded { get { return !Failed; } }
         #endregion
         #region Constructors
-        public Outcome(TR result)
+        public Outcome(TR result = default)
         {
             Result = result;
         }
@@ -31,13 +31,10 @@ namespace s3iLib
         {
             return AddErrors(errors.ToList());
         }
-        #endregion
-        #region Shortcuts
-        public static Outcome<TR, TE> Success(TR result) { return new Outcome<TR, TE>(result); }
-        public static Outcome<TR, TE> Failure(params TE[] errors) { return Failure(default, errors); }
-        public static Outcome<TR, TE> Failure(IEnumerable<TE> errors) { return Failure(default, errors); }
-        public static Outcome<TR, TE> Failure(TR result, params TE[] errors) { return new Outcome<TR, TE>(result).AddErrors(errors); }
-        public static Outcome<TR, TE> Failure(TR result, IEnumerable<TE> errors) { return new Outcome<TR, TE> (result).AddErrors(errors); }
+        public void ResetErrors()
+        {
+            Errors = null;
+        }
         #endregion
         #region Composition
         public Outcome<TR, TE> Merge(Outcome<TR, TE> other, Func<TR, TR, TR> merge = null)

@@ -16,7 +16,7 @@ namespace s3iLib
             }
             catch (Exception x)
             {
-                outcome = exception?.Invoke(x) ?? Outcome<TR, TE>.Failure();
+                outcome = exception?.Invoke(x) ?? new Outcome<TR, TE>();
             }
             return outcome;
         }

@@ -11,21 +11,20 @@ namespace s3iLibTests
         [Test]
         public void Outcome()
         {
-            Assert.IsTrue(Outcome<bool, string>.Success(true).Succeeded);
-            Assert.IsTrue(Outcome<bool, string>.Success(false).Succeeded);
-            Assert.IsTrue(Outcome<bool, string>.Failure(true).Failed);
-            Assert.IsTrue(Outcome<bool, string>.Failure(false).Failed);
-            Assert.IsTrue(Outcome<int, string>.Success(1).Succeeded);
-            Assert.IsTrue(Outcome<int, string>.Failure(1).Failed);
-            var failed1 = Outcome<string, string>.Failure("no", "could", "not", "do");
+            Assert.IsTrue(new Outcome<bool, string>(true).Succeeded);
+            Assert.IsFalse(new Outcome<bool, string>(true).Failed);
+            Assert.IsTrue(new Outcome<bool, string>(true).AddErrors("err").Failed);
+            Assert.IsTrue(new Outcome<bool, string>(false).Succeeded);
+            Assert.IsTrue(new Outcome<bool, string>(false).AddErrors("err").Failed);
+            Assert.IsTrue(new Outcome<int, string>(1).Succeeded);
+            Assert.IsTrue(new Outcome<int, string>(1).AddErrors("error!").Failed);
+            var failed1 = new Outcome<string, string>("Ok").AddErrors("no", "could", "not", "do");
             Assert.IsTrue(failed1.Failed);
-            var failed2 = Outcome<string, string>.Failure("RESULT").AddErrors(new List<string> { "could", "not", "do" }).AddErrors("one", "two").AddErrors();
+            var failed2 = new Outcome<string, string>("RESULT").AddErrors(new List<string> { "could", "not", "do" }).AddErrors("one", "two").AddErrors();
             Assert.That(failed2.Errors.Count, Is.EqualTo(5));
             Assert.IsTrue(failed2.Failed);
-            Assert.IsFalse(Outcome<string, string>.Failure("no", "whatever").Succeeded);
-            Assert.IsFalse(Outcome<string, string>.Success("yes").Failed);
-            Assert.IsTrue(Outcome<string, string>.Success("yes").Succeeded);
-            failed2 = "success!!!";
+            failed2.ResetErrors();
+            failed2.Result = "success!!!";
             Assert.IsFalse(failed2.Failed);
             failed2.AddErrors("again");
             Assert.IsFalse(failed2.Succeeded);

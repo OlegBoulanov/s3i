@@ -124,10 +124,10 @@ namespace s3i
         {
             if (null == commandLine) throw new NullReferenceException(nameof(commandLine));
             // we must have staging folder
-            if (string.IsNullOrWhiteSpace(commandLine.StagingFolder)) return Outcome<bool, string>.Failure(false, "Staging folder is not specified, you may want to set TEMP or HOME environment variable");
+            if (string.IsNullOrWhiteSpace(commandLine.StagingFolder)) return new Outcome<bool, string>(false).AddErrors("Staging folder is not specified, you may want to set TEMP or HOME environment variable");
             if (!commandLine.StagingFolder.EndsWith(Path.DirectorySeparatorChar)) commandLine.StagingFolder += Path.DirectorySeparatorChar;
             // validate
-            var outcome = Outcome<bool, string>.Success(true);
+            var outcome = new Outcome<bool, string>(true);
             foreach (var a in commandLine.Arguments)
             {
                 try
