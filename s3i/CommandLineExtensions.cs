@@ -119,6 +119,7 @@ namespace s3i
             return retCode;
         }
 #pragma warning disable CA1031// warning CA1031: Modify '***' to catch a more specific exception type, or rethrow the exception.
+#pragma warning disable CA1303// warning CA1303: Method '***' passes a literal string as parameter 'value'
         internal static Outcome<bool, string> Validate(this CommandLine commandLine)
         {
             if (null == commandLine) throw new NullReferenceException(nameof(commandLine));
@@ -142,6 +143,7 @@ namespace s3i
             }
             return outcome;
         }
+#pragma warning restore CA1303
 #pragma warning restore CA1031
     }
 }

@@ -30,6 +30,7 @@ namespace s3i
                 return -1;
             }
         }
+#pragma warning disable CA1303// warning CA1303: Method '***' passes a literal string as parameter 'value'
         static async Task<int> AsyncMain(string[] args)
         {
             int exitCode = 0;
@@ -88,7 +89,7 @@ namespace s3i
             }
             return exitCode;
         }
-
+#pragma warning restore CA1303
         static async Task<int> ProcessAndExecute(CommandLine commandLine)
         {
             var exitCode = 0;
