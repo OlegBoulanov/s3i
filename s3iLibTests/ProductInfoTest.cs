@@ -14,7 +14,7 @@ namespace s3iLibTests
             var pi = new ProductInfo { Uri = new Uri("https://s3.something.com/install-me/me-me-me.msi"), Name = "TestProduct",  };
             pi.Props.Add("prop1", "value1");
             pi.Props.Add("prop2", "value2");
-            var json = pi.ToJson().Replace("\r", "");
+            var json = pi.ToJson().Replace("\r", "", StringComparison.CurrentCulture);
             Assert.AreEqual(
                 "{\n"
                 + "  \"Name\": \"TestProduct\",\n"

@@ -5,6 +5,7 @@ using NUnit.Framework;
 
 using s3iLib;
 
+#pragma warning disable CA1303  //warning CA1303: Method 'void ExceptionExtemsionsTest.ErrorMessage()' passes a literal string as parameter 'message' of a call to
 namespace s3iLibTests
 {
 
@@ -22,3 +23,4 @@ namespace s3iLibTests
         }
     }
 }
+#pragma warning restore CA1303

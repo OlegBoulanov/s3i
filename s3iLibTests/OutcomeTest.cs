@@ -6,7 +6,7 @@ using s3iLib;
 
 namespace s3iLibTests
 {
-    class OutcomeTest
+    public class OutcomeTest
     {
         [Test]
         public void Outcome()

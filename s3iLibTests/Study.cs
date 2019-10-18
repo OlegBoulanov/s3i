@@ -5,9 +5,9 @@ using System.Diagnostics;
 using System.Threading;
 using System.Threading.Tasks;
 
+#pragma warning disable CA2007  // Warning CA2007: Do not directly await a Task without calling ConfigureAwait
 namespace s3iLibTests
 {
-
     [Category("Study")]
     public class WhatTypeIsAsyncLambda
     {
@@ -62,3 +62,5 @@ namespace s3iLibTests
         }
     }
 }
+#pragma warning restore CA2007
+
