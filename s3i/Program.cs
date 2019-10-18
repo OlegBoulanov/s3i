@@ -6,7 +6,7 @@ using System.Linq;
 using System.Reflection;
 using System.Threading.Tasks;
 
-using s3i_lib;
+using s3iLib;
 
 namespace s3i
 {
@@ -30,6 +30,7 @@ namespace s3i
                 return -1;
             }
         }
+#pragma warning disable CA1303// warning CA1303: Method '***' passes a literal string as parameter 'value'
         static async Task<int> AsyncMain(string[] args)
         {
             int exitCode = 0;
@@ -68,7 +69,7 @@ namespace s3i
             if (0 < commandLine.Arguments.Count)
             {
                 var validateResult = commandLine.Validate();
-                if (!validateResult)
+                if (!validateResult.Result)
                 {
                     Console.WriteLine($"? Command line validation failed{(0 < validateResult.Errors.Count ? ":" : ".")}");
                     foreach (var e in validateResult.Errors) Console.WriteLine($"  {e}");
@@ -78,7 +79,7 @@ namespace s3i
                 {
                     Installer.MsiExec = commandLine.MsiExecCommand;
                     var clock = System.Diagnostics.Stopwatch.StartNew();
-                    exitCode = await ProcessAndExecute(commandLine);
+                    exitCode = await ProcessAndExecute(commandLine).ConfigureAwait(false);
                     if (commandLine.Verbose)
                     {
                         //Console.WriteLine();
@@ -88,7 +89,7 @@ namespace s3i
             }
             return exitCode;
         }
-
+#pragma warning restore CA1303
         static async Task<int> ProcessAndExecute(CommandLine commandLine)
         {
             var exitCode = 0;
@@ -96,13 +97,14 @@ namespace s3i
             IEnumerable<string> remove = new List<string>();
             IEnumerable<ProductInfo> uninstall = new List<ProductInfo>(), install = null;
             var s3 = new S3Helper(commandLine.ProfileName);
-            var products = await Products.ReadProducts(s3, commandLine.Arguments.Select((uri, index) => { return uri; }), commandLine.StagingFolder);
+            var products = await ProductCollection.ReadProducts(s3, commandLine.Arguments.Select((uri, index) => { return new Uri(uri); })).ConfigureAwait(false);
+            products.MapToLocal(commandLine.StagingFolder);
             if (commandLine.Verbose)
             {
                 Console.WriteLine($"Products [{products.Count}]:");
                 foreach (var p in products)
                 {
-                    Console.WriteLine($"  {p.Name}: {p.AbsoluteUri} => {p.LocalPath}");
+                    Console.WriteLine($"  {p.Name}: {p.Uri} => {p.LocalPath}");
                     foreach (var pp in p.Props) Console.WriteLine($"    {pp.Key} = {pp.Value}");
                 }
             }
@@ -141,12 +143,12 @@ namespace s3i
                 if (uninstall.Any())
                 {
                     Console.WriteLine($"Uninstall [{uninstall.Count()}]:");
-                    foreach (var f in uninstall) Console.WriteLine($"  {f.AbsoluteUri}");
+                    foreach (var f in uninstall) Console.WriteLine($"  {f.Uri}");
                 }
                 if (install.Any())
                 {
                     Console.WriteLine($"Install [{install.Count()}]:");
-                    foreach (var f in install) Console.WriteLine($"  {f.AbsoluteUri}");
+                    foreach (var f in install) Console.WriteLine($"  {f.Uri}");
                 }
             }
             // Ok, now we can proceed with changes:

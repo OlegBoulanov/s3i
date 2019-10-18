@@ -1,0 +1,62 @@
+{
+    "version": "2.0.0",
+    "tasks": [
+        {
+            "label": "build",
+            "type": "shell",
+            "command": "dotnet",
+            "args": [
+                "build",
+                "${workspaceFolder}/s3i/"
+            ],
+            "problemMatcher": {
+                "base": "$msCompile",
+                "fileLocation":"absolute"
+            },
+            "group": {
+                "kind": "build",
+                "isDefault": true
+            }
+        },
+        {
+            "label": "rebuild",
+            "type": "shell",
+            "command": "echo",
+            "args": [
+                "rebuild done: ${workspaceFolder}"
+            ],
+            "dependsOn":[
+                "clean", "build"
+            ],
+            "dependsOrder": "sequence",
+            "problemMatcher":"$msCompile",
+            "presentation": {
+                "panel": "new",
+                "clear": true
+            }
+        },
+        {
+            "label": "clean",
+            "type": "shell",
+            "command": "dotnet",
+            "args": [
+                "clean",
+                "${workspaceFolder}"
+            ],
+            "problemMatcher": "$msCompile"
+        },
+        {
+            "label": "test",
+            "type": "shell",
+            "command": "dotnet",
+            "args": [
+                "test",
+                "${workspaceFolder}/s3iLibTests/s3iLibTests.csproj"
+            ],
+            "dependsOn":[ 
+                "build" 
+            ],
+            "problemMatcher": "$msCompile"
+        }
+    ]
+}

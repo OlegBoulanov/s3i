@@ -1,14 +1,7 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
 
   <PropertyGroup>
-    <OutputType>Exe</OutputType>
-    <TargetFramework>netcoreapp3.0</TargetFramework>
-<!--
-    <PublishTrimmed>true</PublishTrimmed>
-    <PublishSingleFile>true</PublishSingleFile>
-    <RuntimeIdentifier>win-x64</RuntimeIdentifier>
--->
-    <GenerateFullPaths>true</GenerateFullPaths>
+    <TargetFramework>netstandard2.0</TargetFramework>
   </PropertyGroup>
 
   <PropertyGroup>
@@ -18,20 +11,20 @@
     <FileVersion>2.1.0.0</FileVersion>
     <Company>UselessExtras</Company>
     <Product>s3i</Product>
-    <PackageId>s3i</PackageId>
+    <PackageId>s3iLib</PackageId>
     <NeutralLanguage>en</NeutralLanguage>
     <Authors>Oleg Boulanov</Authors>
     <PackageProjectUrl>http://github.com/OlegBoulanov/s3i</PackageProjectUrl>
     <RepositoryUrl>http://github.com/OlegBoulanov/s3i</RepositoryUrl>
   </PropertyGroup>
-  
+
   <ItemGroup>
     <PackageReference Include="AWSSDK.S3" Version="3.3.104.34" />
-    <PackageReference Include="Newtonsoft.Json" Version="12.0.2" />
-  </ItemGroup>
-  
-  <ItemGroup>
-    <ProjectReference Include="..\s3iLib\s3iLib.csproj" />
+    <PackageReference Include="Microsoft.CodeAnalysis.FxCopAnalyzers" Version="2.9.3" />
+    <PackageReference Include="Newtonsoft.Json">
+      <Version>12.0.2</Version>
+    </PackageReference>
   </ItemGroup>
   
 </Project>
+
