@@ -19,6 +19,19 @@
             }
         },
         {
+            "label": "rebuild",
+            "type": "shell",
+            "command": "echo",
+            "args": [
+                "rebuild done: ${workspaceFolder}"
+            ],
+            "dependsOn":[
+                "clean", "build"
+            ],
+            "dependsOrder": "sequence",
+            "problemMatcher":"$msCompile"
+        },
+        {
             "label": "clean",
             "type": "shell",
             "command": "dotnet",
