@@ -72,16 +72,12 @@
         <File Id="AWSSDK.Core.dll" Name="AWSSDK.Core.dll" Source="$(var.s3i.TargetDir)AWSSDK.Core.dll" Vital="yes"/>
         <File Id="AWSSDK.S3.dll" Name="AWSSDK.S3.dll" Source="$(var.s3i.TargetDir)AWSSDK.S3.dll" Vital="yes"/>
       </Component>
-      <Component Id="Newtonsoft.Json" Guid="{374D9724-F04D-41C5-A0F3-936463FDF339}">
-        <File Id="Newtonsoft.json.dll" Name="Newtonsoft.Json.dll" Source="$(var.s3i.TargetDir)Newtonsoft.Json.dll" Vital="yes"/>
-      </Component>
     </DirectoryRef>
 
     <Feature Id="ProductFeature" Title="s3i" Level="1">
       <ComponentRef Id="s3i_command" />
       <ComponentRef Id="s3i_service" />
       <ComponentRef Id="AWSSDK" />
-      <ComponentRef Id="Newtonsoft.Json" />
     </Feature>
 
     <MajorUpgrade DowngradeErrorMessage="A newer than [ProductVersion] version of [ProductName] is already installed." />
