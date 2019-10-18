@@ -16,21 +16,6 @@ namespace s3iLib
 {
     public class ProductCollection : List<ProductInfo>
     {
-
-        public static AmazonS3Uri ParseS3Uri(string s)
-        {
-            try
-            {
-                var uri = new Uri(s);
-                // this shitty method may actually throw, so does TryParseAmazonS3Uri(string): https://github.com/aws/aws-sdk-net/issues/1426
-                if (!AmazonS3Uri.TryParseAmazonS3Uri(uri, out var s3uri)) throw new InvalidUriException(s, null);
-                return s3uri;
-            }
-            catch(Exception x)
-            {
-                throw new InvalidUriException(s, x);
-            }
-        }
         public static AmazonS3Uri ParseS3Uri(Uri uri)
         {
             try
