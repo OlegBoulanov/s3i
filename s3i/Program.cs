@@ -77,6 +77,10 @@ namespace s3i
                 }
                 else
                 {
+                    if(!DownloaderS3.SetProfile(commandLine.ProfileName))
+                    {
+                        throw new ApplicationException($"Can't locate AWS profile [{commandLine.ProfileName}]");
+                    }
                     Installer.MsiExec = commandLine.MsiExecCommand;
                     var clock = System.Diagnostics.Stopwatch.StartNew();
                     exitCode = await ProcessAndExecute(commandLine).ConfigureAwait(false);
@@ -96,8 +100,7 @@ namespace s3i
 
             IEnumerable<string> remove = new List<string>();
             IEnumerable<ProductInfo> uninstall = new List<ProductInfo>(), install = null;
-            var s3 = new S3Helper(commandLine.ProfileName);
-            var products = await ProductCollection.ReadProducts(s3, commandLine.Arguments.Select((uri, index) => { return new Uri(uri); })).ConfigureAwait(false);
+            var products = await ProductCollection.ReadProducts(commandLine.Arguments.Select((uri, index) => { return new Uri(uri); })).ConfigureAwait(false);
             products.MapToLocal(commandLine.StagingFolder);
             if (commandLine.Verbose)
             {
@@ -169,7 +172,7 @@ namespace s3i
                 // 3) Download/cache existing and new
                 if (install.Any())
                 {
-                    var err = commandLine.DownloadProducts(install, s3, commandLine.Timeout);
+                    var err = commandLine.DownloadProducts(install, commandLine.Timeout);
                     if (0 == err)
                     {
                         // 4) Install changed and new

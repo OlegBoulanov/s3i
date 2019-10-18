@@ -4,6 +4,8 @@ using System.IO;
 using System.Threading.Tasks;
 using System.Diagnostics.Contracts;
 
+using Amazon.Runtime;
+using Amazon.Runtime.CredentialManagement;
 using Amazon.S3;
 using Amazon.S3.Model;
 using Amazon.S3.Util;
@@ -23,7 +25,6 @@ namespace s3iLib
             return false;
 #pragma warning restore CA1031
         }
-        public static AmazonS3ClientMap ClientMap { get; set; }
         public override async Task<HttpStatusCode> DownloadAsync(Uri uri, DateTime modifiedSinceDateUtc, Func<Stream, Task> processStream)
         {
             Contract.Requires(null != uri);
@@ -40,5 +41,15 @@ namespace s3iLib
                 return response.HttpStatusCode;
             }
         }
+        public static bool SetProfile(string profileName)
+        {
+            if (new CredentialProfileStoreChain().TryGetAWSCredentials(profileName, out AWSCredentials credentials))
+            {
+                ClientMap = new AmazonS3ClientMap(credentials, null);
+                return true;
+            }
+            return false;
+        }
+        protected static AmazonS3ClientMap ClientMap { get; set; }
     }
 }

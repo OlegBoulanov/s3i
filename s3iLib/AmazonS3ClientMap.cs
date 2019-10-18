@@ -24,6 +24,11 @@ namespace s3iLib
         }
         public async Task<AmazonS3Client> GetClientAsync(string bucketName)
         {
+            if (null == Client)
+            {
+                Client = new AmazonS3Client(Credentials, RegionEndpoint.USEast1);
+                region2client[Client.Config.RegionEndpoint.SystemName] = Client;
+            }
             if (!bucket2region.TryGetValue(bucketName, out string regionName))
             {
                 var bucketLocationResponse = await Client.GetBucketLocationAsync(bucketName).ConfigureAwait(false);
