@@ -16,20 +16,22 @@ namespace s3iLib
     {
         public static bool CanDownload(Uri uri)
         {
+            return TryParse(uri, out _);
+        }
+        // See https://github.com/aws/aws-sdk-net/issues/1426
+        public static bool TryParse(Uri uri, out AmazonS3Uri s3uri)
+        {
+            Contract.Requires(null != uri);
 #pragma warning disable CA1031  // Modify '***' to catch a more specific exception type, or rethrow the exception.
-            try
-            {
-                return AmazonS3Uri.TryParseAmazonS3Uri(uri, out var s3url);
-            }
-            catch (Exception) { }
-            return false;
+            try { return AmazonS3Uri.TryParseAmazonS3Uri(uri, out s3uri); }
+            catch (Exception) { s3uri = null; return false; }
 #pragma warning restore CA1031
         }
         public override async Task<HttpStatusCode> DownloadAsync(Uri uri, DateTime modifiedSinceDateUtc, Func<Stream, Task> processStream)
         {
             Contract.Requires(null != uri);
             Contract.Requires(null != processStream);
-            if(!AmazonS3Uri.TryParseAmazonS3Uri(uri, out var s3uri)) throw new UriFormatException($"Can't parse as AWS S3 URI: {uri}");
+            if (!TryParse(uri, out var s3uri)) throw new UriFormatException($"Can't parse as AWS S3 URI: {uri}");
             var request = new GetObjectRequest { BucketName = s3uri.Bucket, Key = s3uri.Key, ModifiedSinceDateUtc = modifiedSinceDateUtc };
             var regionClient = await ClientMap.GetClientAsync(s3uri.Bucket).ConfigureAwait(false);
             using (var response = await regionClient.GetObjectAsync(request).ConfigureAwait(false))
@@ -41,15 +43,18 @@ namespace s3iLib
                 return response.HttpStatusCode;
             }
         }
-        public static bool SetProfile(string profileName)
+        #region Static data and methods
+        public static bool SetProfile(string profileName, AmazonS3Client defaultClient = null)
         {
+            Contract.Requires(null != profileName);
             if (new CredentialProfileStoreChain().TryGetAWSCredentials(profileName, out AWSCredentials credentials))
             {
-                ClientMap = new AmazonS3ClientMap(credentials, null);
+                ClientMap = new AmazonS3ClientMap(credentials, defaultClient);
                 return true;
             }
             return false;
         }
         protected static AmazonS3ClientMap ClientMap { get; set; }
+        #endregion
     }
 }

@@ -16,7 +16,6 @@ namespace s3iLib
             Contract.Requires(null != uri);
             Contract.Requires(null != localFilePath);
             var lastWriteTimeUtc = File.GetLastWriteTimeUtc(localFilePath);
-
             return await DownloadAsync(uri, lastWriteTimeUtc,
                 async (stream) =>
                 {
@@ -26,7 +25,6 @@ namespace s3iLib
                         await stream.CopyToAsync(file).ConfigureAwait(false);
                     }
                 }).ConfigureAwait(false);
-
         }
         public static Downloader Select(Uri url)
         {
