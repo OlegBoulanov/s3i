@@ -47,7 +47,7 @@ namespace s3iLib
         public static bool SetProfile(string profileName, AmazonS3Client defaultClient = null)
         {
             Contract.Requires(null != profileName);
-            if (new CredentialProfileStoreChain().TryGetAWSCredentials(profileName, out AWSCredentials credentials))
+            if (new CredentialProfileStoreChain().TryGetAWSCredentials(profileName, out var credentials))
             {
                 ClientMap = new AmazonS3ClientMap(credentials, defaultClient);
                 return true;
