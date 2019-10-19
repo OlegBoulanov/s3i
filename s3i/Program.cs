@@ -77,10 +77,7 @@ namespace s3i
                 }
                 else
                 {
-                    if(!DownloaderS3.SetProfile(commandLine.ProfileName))
-                    {
-                        throw new ApplicationException($"Can't locate AWS profile [{commandLine.ProfileName}]");
-                    }
+                    DownloaderS3.ProfileName = commandLine.ProfileName;
                     Installer.MsiExec = commandLine.MsiExecCommand;
                     var clock = System.Diagnostics.Stopwatch.StartNew();
                     exitCode = await ProcessAndExecute(commandLine).ConfigureAwait(false);
