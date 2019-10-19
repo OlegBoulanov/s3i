@@ -17,20 +17,11 @@
         },
         {
             "label": "rebuild",
-            "type": "shell",
-            "command": "echo",
-            "args": [
-                "rebuild done: ${workspaceFolder}"
-            ],
             "dependsOn":[
                 "clean", "build"
             ],
             "dependsOrder": "sequence",
-            "problemMatcher":"$msCompile",
-            "presentation": {
-                "panel": "new",
-                "clear": true
-            }
+            "problemMatcher": "$msCompile"
         },
         {
             "label": "clean",
