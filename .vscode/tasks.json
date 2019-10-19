@@ -9,10 +9,7 @@
                 "build",
                 "${workspaceFolder}/s3i/"
             ],
-            "problemMatcher": {
-                "base": "$msCompile",
-                "fileLocation":"absolute"
-            },
+            "problemMatcher": "$msCompile",
             "group": {
                 "kind": "build",
                 "isDefault": true
@@ -53,6 +50,7 @@
                 "test",
                 "${workspaceFolder}/s3iLibTests/s3iLibTests.csproj"
             ],
+            "group": "test",
             "dependsOn":[ 
                 "build" 
             ],
