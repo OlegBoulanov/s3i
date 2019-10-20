@@ -35,8 +35,11 @@
 
     <Property Id="CMDLINEARGS" Admin="yes"> </Property>
 
-    <Property Id="ARPCOMMENTS">Install products from AWS S3 buckets</Property>
+    <Property Id="ARPCOMMENTS">s3i msi package batch installer</Property>
+    <Property Id="ARPCONTACT">Oleg Boulanov</Property>
+    <Property Id="ARPHELPLINK">https://github.com/OlegBoulanov/s3i/</Property>
     <Property Id="ARPURLINFOABOUT">https://github.com/OlegBoulanov/s3i/</Property>
+    <Property Id="ARPREADME">https://github.com/OlegBoulanov/s3i/README.md</Property>
 
     <Directory Id="TARGETDIR" Name="SourceDir">
       <Directory Id="ProgramFilesFolder">
