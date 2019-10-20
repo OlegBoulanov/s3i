@@ -1,7 +1,7 @@
-﻿using System.Reflection;
+using System.Reflection;
 
-[assembly: AssemblyTitle("s3iService")]
-[assembly: AssemblyDescription("s3i Windows service")]
+[assembly: AssemblyTitle("s3iLib")]
+[assembly: AssemblyDescription("s3i components library")]
 [assembly: AssemblyConfiguration("")]
 [assembly: AssemblyCompany("UselessExtras")]
 [assembly: AssemblyProduct("s3i msi package batch installer")]
