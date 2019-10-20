@@ -5,7 +5,7 @@ using System.Reflection;
 [assembly: AssemblyConfiguration("")]
 [assembly: AssemblyCompany("UselessExtras")]
 [assembly: AssemblyProduct("s3i msi package batch installer")]
-[assembly: AssemblyCopyright("Copyright ©  2019")]
+[assembly: AssemblyCopyright("Copyright © 2019, Oleg Boulanov")]
 [assembly: AssemblyTrademark("")]
 [assembly: AssemblyCulture("")]
 
