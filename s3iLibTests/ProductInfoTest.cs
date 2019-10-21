@@ -18,14 +18,14 @@ namespace s3iLibTests
             pi.Props.Add("prop2", "value2");
             var json = pi.ToJson();
             Assert.AreEqual(
-                "{\r\n"
-                + "  \"Name\": \"TestProduct\",\r\n"
-                + "  \"Uri\": \"https://s3.something.com/install-me/me-me-me.msi\",\r\n"
-                + "  \"LocalPath\": null,\r\n"
-                + "  \"Props\": {\r\n"
-                + "    \"prop1\": \"value1\",\r\n"
-                + "    \"prop2\": \"value2\"\r\n"
-                + "  }\r\n"
+                "{" + Environment.NewLine
+                + "  \"Name\": \"TestProduct\"," + Environment.NewLine
+                + "  \"Uri\": \"https://s3.something.com/install-me/me-me-me.msi\"," + Environment.NewLine
+                + "  \"LocalPath\": null," + Environment.NewLine
+                + "  \"Props\": {" + Environment.NewLine
+                + "    \"prop1\": \"value1\"," + Environment.NewLine
+                + "    \"prop2\": \"value2\"" + Environment.NewLine
+                + "  }" + Environment.NewLine
                 + "}", 
                 json);
             using var ms = new MemoryStream(Encoding.UTF8.GetBytes(json));
