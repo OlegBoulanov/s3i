@@ -171,7 +171,7 @@ Three    = https://xxx.s3.amazonaws.com/Test/Windows10/Distrib//SecondProduct/9.
         }
 
         //[Test]
-        public void SelfTest()
+        public static void SelfTest()
         {
             var products = ProductCollection.ReadProducts(new List<Uri> { new Uri("https://raw.githubusercontent.com/OlegBoulanov/s3i/feature/downloader/s3iLibTests/ProductCollectionTest.ini") }).Result;
             Assert.AreEqual(1, products.Count);

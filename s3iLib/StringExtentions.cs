@@ -50,9 +50,19 @@ namespace s3iLib
         public static Uri BuildRelativeUri(this Uri baseUri, string path)
         {
             Contract.Requires(null != baseUri);
-            var builder = new UriBuilder(baseUri);
-            builder.Path = Path.Combine(Path.GetDirectoryName(builder.Path), path).RemoveDotSegments();
-            return builder.Uri;
+            try
+            {
+                return new Uri(path);
+            }
+#pragma warning disable CA1031  // ... catch more specific exception... can I even be more specific?
+            catch(UriFormatException)
+#pragma warning restore CA1031
+            {
+                // Not a URI: must be relative - do we need more checks?
+                var builder = new UriBuilder(baseUri);
+                builder.Path = Path.Combine(Path.GetDirectoryName(builder.Path), path).RemoveDotSegments();
+                return builder.Uri;
+            }
         }
         public static string Quote(this string s, string quote, params char[] spaces)
         {
