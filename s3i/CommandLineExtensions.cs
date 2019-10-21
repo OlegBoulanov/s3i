@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Diagnostics.Contracts;
 using System.IO;
 using System.Collections.Generic;
 using System.Linq;
@@ -118,11 +119,20 @@ namespace s3i
             }
             return retCode;
         }
+        internal static void SetDefaults(this CommandLine commandLine, string exeFileName)
+        {
+            Contract.Requires(null != commandLine);
+            if (string.IsNullOrWhiteSpace(commandLine.StagingFolder))
+            {
+                var temp = Environment.GetEnvironmentVariable("TEMP") ?? $"{Environment.GetEnvironmentVariable("HOME")}{Path.DirectorySeparatorChar}Temp";
+                commandLine.StagingFolder = $"{temp}{Path.DirectorySeparatorChar}{exeFileName}";
+            }
+        }
 #pragma warning disable CA1031// warning CA1031: Modify '***' to catch a more specific exception type, or rethrow the exception.
 #pragma warning disable CA1303// warning CA1303: Method '***' passes a literal string as parameter 'value'
         internal static Outcome<bool, string> Validate(this CommandLine commandLine)
         {
-            if (null == commandLine) throw new NullReferenceException(nameof(commandLine));
+            Contract.Requires(null != commandLine);
             // we must have staging folder
             if (string.IsNullOrWhiteSpace(commandLine.StagingFolder)) return new Outcome<bool, string>(false).AddErrors("Staging folder is not specified, you may want to set TEMP or HOME environment variable");
             if (!commandLine.StagingFolder.EndsWith(Path.DirectorySeparatorChar)) commandLine.StagingFolder += Path.DirectorySeparatorChar;
