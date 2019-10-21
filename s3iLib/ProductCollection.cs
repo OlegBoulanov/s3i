@@ -66,7 +66,7 @@ namespace s3iLib
             Contract.Requires(null != downloader);
             Contract.Requires(null != uri);
             var products = new ProductCollection();
-            await downloader.DownloadAsync(uri, DateTime.MinValue, async (stream) =>
+            var statusCode = await downloader.DownloadAsync(uri, DateTime.MinValue, async (stream) =>
             {
                   switch (Path.GetExtension(uri.AbsolutePath).ToUpperInvariant())
                   {
@@ -84,6 +84,14 @@ namespace s3iLib
                           throw new FormatException($"Unsupported file extension in {uri.ToString()}");
                   }
               }).ConfigureAwait(false);
+            switch(statusCode)
+            {
+                case HttpStatusCode.OK:
+                case HttpStatusCode.NotModified:
+                    break;
+                default:
+                    throw new ApplicationException($"Can't download {uri}, status: {statusCode}");
+            }
             return products;
         }
         public static async Task<ProductCollection> ReadProducts(IEnumerable<Uri> uris)
