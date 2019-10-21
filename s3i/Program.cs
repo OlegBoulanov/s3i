@@ -39,11 +39,12 @@ namespace s3i
             var version = FileVersionInfo.GetVersionInfo(assembly.Location);
             var commandLine = new CommandLine
             {
-                HelpHeader = $"{exeFileName}: S3 download and install v{version.ProductVersion}{Environment.NewLine}"
+                HelpHeader = $"{exeFileName}: msi package batch installer v{version.ProductVersion}{Environment.NewLine}"
                            + $" Usage:{Environment.NewLine}"
                            + $"  {exeFileName} [<option> ...] <products> ..."
             };
             commandLine.Parse(args.Select(a => Environment.ExpandEnvironmentVariables(a)));
+            commandLine.SetDefaults(exeFileName);
             // decide if help needed
             if (commandLine.Arguments.Count < 1)
             {

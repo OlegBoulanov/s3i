@@ -17,7 +17,7 @@ namespace s3i
         public string EnvironmentVariableName { get; set; } = "s3i_args";
 
         [CommandLineKey("Path to staging folder", "-s", "--stage <path>")]
-        public string StagingFolder { get; set; } = Environment.GetEnvironmentVariable("TEMP") ?? $"{Environment.GetEnvironmentVariable("HOME")}{Path.DirectorySeparatorChar}Temp";
+        public string StagingFolder { get; set; } = null;
 
         [CommandLineKey("Clear staging folder at startup", "-c", "--clean")]
         public bool ClearStagingFolder { get; set; } = false;
