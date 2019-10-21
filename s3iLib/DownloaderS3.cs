@@ -34,13 +34,21 @@ namespace s3iLib
             if (!TryParse(uri, out var s3uri)) throw new UriFormatException($"Can't parse as AWS S3 URI: {uri}");
             var regionClient = await ClientMap.Value.GetClientAsync(s3uri.Bucket).ConfigureAwait(false);
             var request = new GetObjectRequest { BucketName = s3uri.Bucket, Key = s3uri.Key, ModifiedSinceDateUtc = modifiedSinceDateUtc };
-            using (var response = await regionClient.GetObjectAsync(request).ConfigureAwait(false))
+            try
             {
-                using (var responseStream = response.ResponseStream)
+                using (var response = await regionClient.GetObjectAsync(request).ConfigureAwait(false))
                 {
-                    await processStream.Invoke(responseStream).ConfigureAwait(false);
+                    using (var responseStream = response.ResponseStream)
+                    {
+                        await processStream.Invoke(responseStream).ConfigureAwait(false);
+                    }
+                    return response.HttpStatusCode;
                 }
-                return response.HttpStatusCode;
+            }
+            catch(AmazonS3Exception x)
+            {
+                if (HttpStatusCode.NotModified == x.StatusCode) return x.StatusCode;
+                throw;
             }
         }
         #region Static data and methods
