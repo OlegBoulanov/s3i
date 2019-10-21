@@ -112,13 +112,12 @@ namespace s3iLib
             //return arrayOfProducts.Aggregate(new Products(), (p, pp) => { p.AddRange(pp); return p; });
         }
 
-        public static async Task DownloadInstallers(IEnumerable<ProductInfo> products, string localPathBase)
+        public static async Task DownloadInstallers(IEnumerable<ProductInfo> products)
         {
             await Task.WhenAll(
                 products.Aggregate(new List<Task<HttpStatusCode>>(),
                     (tasks, product) =>
                     {
-                        product.LocalPath = product.MapToLocalPath(localPathBase);
                         Directory.CreateDirectory(Path.GetDirectoryName(product.LocalPath));
                         tasks.Add(Downloader.Select(product.Uri).DownloadAsync(product.Uri, product.LocalPath));
                         return tasks;
