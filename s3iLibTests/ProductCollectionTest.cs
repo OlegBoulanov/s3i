@@ -169,6 +169,13 @@ Three    = https://xxx.s3.amazonaws.com/Test/Windows10/Distrib//SecondProduct/9.
             Assert.That(install.ElementAt(2).Uri.ToString(), Is.EqualTo("https://download/there/Prod03/12.5.4+downgrade/p3.msi"));
             Assert.That(install.ElementAt(3).Uri.ToString(), Is.EqualTo("https://download/from/Prod04/1.2.3+install/p4.msi"));
         }
+
+        [Test]
+        public void SelfTest()
+        {
+            var products = ProductCollection.ReadProducts(new List<Uri> { new Uri("https://github.com/OlegBoulanov/s3i/s3iLibTests/ProductCollectionTest.ini") }).Result;
+            Assert.AreEqual(1, products.Count);
+        }
     }
 
 
