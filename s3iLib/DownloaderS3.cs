@@ -46,7 +46,7 @@ namespace s3iLib
         #region Static data and methods
         public static string ProfileName { get; set; }
         public static AmazonS3Client DefaultClient { get; set; }
-        static Lazy<AmazonS3ClientMap> ClientMap = new Lazy<AmazonS3ClientMap>(() =>
+        static readonly Lazy<AmazonS3ClientMap> ClientMap = new Lazy<AmazonS3ClientMap>(() =>
         {
             if (!new CredentialProfileStoreChain().TryGetAWSCredentials(ProfileName, out var credentials))
                 throw new ApplicationException($"Can't find AWS profile [{ProfileName}]");
