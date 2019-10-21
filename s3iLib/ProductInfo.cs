@@ -15,7 +15,9 @@ namespace s3iLib
         public string Name { get; set; }
         public Uri Uri { get; set; }
         public string LocalPath { get; set; }
-        public ProductPropertiesDictionary Props { get; } = new ProductPropertiesDictionary();
+#pragma warning disable CA2227 // we need write access to deserialize
+        public ProductPropertiesDictionary Props { get; set; } = new ProductPropertiesDictionary();
+#pragma warning restore CA2227
         public string MapToLocalPath(string basePath)
         {
             return MapToLocalPath(basePath, Name, Path.GetFileName(Uri.AbsolutePath));
