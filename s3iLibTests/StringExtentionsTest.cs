@@ -30,6 +30,9 @@ namespace s3iLibTests
         public void BuildRelativeUri()
         {
             Assert.AreEqual("https://bucket.s3.amazonaws.com/directory1/another.one", new Uri("https://bucket.s3.amazonaws.com/directory1/dir2/dir3/file.ext").BuildRelativeUri("..\\..\\another.one").ToString());
+            var uri1 = new Uri("https://install.com.s3.amazonaws.com/builds/p1/develop/12.6.57/p1.msi");
+            var uri2 = new Uri("https://install.com.s3.amazonaws.com/builds/p2/develop/9.4.293/p2.msi");
+            Assert.AreEqual("https://install.com.s3.amazonaws.com/builds/p2/develop/9.4.293/p2.msi", uri1.BuildRelativeUri(uri2.ToString()).ToString());
         }
         [Test]
         public void RebaseUri()
