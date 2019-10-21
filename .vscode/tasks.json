@@ -9,10 +9,7 @@
                 "build",
                 "${workspaceFolder}/s3i/"
             ],
-            "problemMatcher": {
-                "base": "$msCompile",
-                "fileLocation":"absolute"
-            },
+            "problemMatcher": "$msCompile",
             "group": {
                 "kind": "build",
                 "isDefault": true
@@ -20,20 +17,11 @@
         },
         {
             "label": "rebuild",
-            "type": "shell",
-            "command": "echo",
-            "args": [
-                "rebuild done: ${workspaceFolder}"
-            ],
             "dependsOn":[
                 "clean", "build"
             ],
             "dependsOrder": "sequence",
-            "problemMatcher":"$msCompile",
-            "presentation": {
-                "panel": "new",
-                "clear": true
-            }
+            "problemMatcher": "$msCompile"
         },
         {
             "label": "clean",
@@ -53,6 +41,7 @@
                 "test",
                 "${workspaceFolder}/s3iLibTests/s3iLibTests.csproj"
             ],
+            "group": "test",
             "dependsOn":[ 
                 "build" 
             ],

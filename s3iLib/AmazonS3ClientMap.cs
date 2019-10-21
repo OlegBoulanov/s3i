@@ -24,21 +24,26 @@ namespace s3iLib
         }
         public async Task<AmazonS3Client> GetClientAsync(string bucketName)
         {
-            if (!bucket2region.TryGetValue(bucketName, out string regionName))
+            if (null == Client)
+            {
+                Client = new AmazonS3Client(Credentials, RegionEndpoint.USEast1);
+                region2client[Client.Config.RegionEndpoint.SystemName] = Client;
+            }
+            if (!bucket2region.TryGetValue(bucketName, out var bucketLocation))
             {
                 var bucketLocationResponse = await Client.GetBucketLocationAsync(bucketName).ConfigureAwait(false);
                 switch (bucketLocationResponse.HttpStatusCode)
                 {
                     case HttpStatusCode.OK:
-                        regionName = bucketLocationResponse.Location?.Value;
-                        if (string.IsNullOrWhiteSpace(regionName)) regionName = Client.Config.RegionEndpoint.SystemName;
-                        if (bucket2region.TryAdd(bucketName, regionName)) { }
+                        bucketLocation = bucketLocationResponse.Location?.Value;
+                        if (string.IsNullOrWhiteSpace(bucketLocation)) bucketLocation = Client.Config.RegionEndpoint.SystemName;
+                        if (bucket2region.TryAdd(bucketName, bucketLocation)) { }
                         break;
                 }
             }
-            return null == regionName ? null : region2client.GetOrAdd(regionName, (_regionName) =>
+            return null == bucketLocation ? null : region2client.GetOrAdd(bucketLocation, (regionName) =>
             {
-                return new AmazonS3Client(Credentials, new AmazonS3Config { RegionEndpoint = RegionEndpoint.GetBySystemName(_regionName), SignatureVersion = "4" });
+                return new AmazonS3Client(Credentials, new AmazonS3Config { RegionEndpoint = RegionEndpoint.GetBySystemName(regionName), SignatureVersion = "4" });
             });
         }
     }

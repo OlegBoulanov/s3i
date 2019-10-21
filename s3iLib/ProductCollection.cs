@@ -8,7 +8,9 @@ using System.Threading.Tasks;
 
 using System.IO;
 using System.Net;
-using Newtonsoft.Json;
+//using Newtonsoft.Json;
+using System.Text.Json;
+using System.Text.Json.Serialization;
 
 using Amazon.S3.Util;
 
@@ -16,39 +18,11 @@ namespace s3iLib
 {
     public class ProductCollection : List<ProductInfo>
     {
-
-        public static AmazonS3Uri ParseS3Uri(string s)
-        {
-            try
-            {
-                var uri = new Uri(s);
-                // this shitty method may actually throw, so does TryParseAmazonS3Uri(string): https://github.com/aws/aws-sdk-net/issues/1426
-                if (!AmazonS3Uri.TryParseAmazonS3Uri(uri, out var s3uri)) throw new InvalidUriException(s, null);
-                return s3uri;
-            }
-            catch(Exception x)
-            {
-                throw new InvalidUriException(s, x);
-            }
-        }
-        public static AmazonS3Uri ParseS3Uri(Uri uri)
-        {
-            try
-            {
-                // this shitty method may actually throw, so does TryParseAmazonS3Uri(string): https://github.com/aws/aws-sdk-net/issues/1426
-                if (!AmazonS3Uri.TryParseAmazonS3Uri(uri, out var s3uri)) throw new InvalidUriException(uri, null);
-                return s3uri;
-            }
-            catch (Exception x)
-            {
-                throw new InvalidUriException(uri, x);
-            }
-        }
         public static async Task<ProductCollection> FromJson(Stream stream)
         {
             using(var reader = new StreamReader(stream))
             {
-                return JsonConvert.DeserializeObject<ProductCollection>(await reader.ReadToEndAsync().ConfigureAwait(false));
+                return JsonSerializer.Deserialize<ProductCollection>(await reader.ReadToEndAsync().ConfigureAwait(false));
             }
         }
         static string MapToLocal(Uri uri, string localBasePath)
@@ -87,15 +61,14 @@ namespace s3iLib
             }).ConfigureAwait(false);
             return products;
         }
-        public static async Task<ProductCollection> ReadProducts(S3Helper s3, Uri uri)
+        public static async Task<ProductCollection> ReadProducts(Downloader downloader, Uri uri)
         {
-            Contract.Requires(null != s3);
+            Contract.Requires(null != downloader);
             Contract.Requires(null != uri);
             var products = new ProductCollection();
-            var s3uri = new AmazonS3Uri(uri);
-            await s3.DownloadAsync(s3uri.Bucket, s3uri.Key, DateTime.MinValue, async (contentType, stream) =>
+            var statusCode = await downloader.DownloadAsync(uri, DateTime.MinValue, async (stream) =>
             {
-                  switch (Path.GetExtension(s3uri.Key).ToUpperInvariant())
+                  switch (Path.GetExtension(uri.AbsolutePath).ToUpperInvariant())
                   {
                       case ".MSI":
                           products.Add(new ProductInfo { Name = uri.ToString(), Uri = uri });
@@ -111,9 +84,17 @@ namespace s3iLib
                           throw new FormatException($"Unsupported file extension in {uri.ToString()}");
                   }
               }).ConfigureAwait(false);
+            switch(statusCode)
+            {
+                case HttpStatusCode.OK:
+                case HttpStatusCode.NotModified:
+                    break;
+                default:
+                    throw new ApplicationException($"Can't download {uri}, status: {statusCode}");
+            }
             return products;
         }
-        public static async Task<ProductCollection> ReadProducts(S3Helper s3, IEnumerable<Uri> uris)
+        public static async Task<ProductCollection> ReadProducts(IEnumerable<Uri> uris)
         {
             var products = new ProductCollection();
             var arrayOfProducts = await Task.WhenAll(
@@ -122,7 +103,7 @@ namespace s3iLib
                 {
                     tasks.Add(Task<ProductCollection>.Run(() =>
                     {
-                        return ReadProducts(s3, configFileUri);
+                        return ReadProducts(Downloader.Select(configFileUri), configFileUri);
                     }));
                     return tasks;
                 })).ConfigureAwait(false);
@@ -131,16 +112,15 @@ namespace s3iLib
             //return arrayOfProducts.Aggregate(new Products(), (p, pp) => { p.AddRange(pp); return p; });
         }
 
-        public static async Task DownloadInstallers(IEnumerable<ProductInfo> products, S3Helper s3, string localPathBase)
+        public static async Task DownloadInstallers(IEnumerable<ProductInfo> products, string localPathBase)
         {
             await Task.WhenAll(
                 products.Aggregate(new List<Task<HttpStatusCode>>(),
                     (tasks, product) =>
                     {
-                        var uri = ParseS3Uri(product.Uri);
                         product.LocalPath = product.MapToLocalPath(localPathBase);
                         Directory.CreateDirectory(Path.GetDirectoryName(product.LocalPath));
-                        tasks.Add(s3.DownloadAsync(uri.Bucket, uri.Key, product.LocalPath));
+                        tasks.Add(Downloader.Select(product.Uri).DownloadAsync(product.Uri, product.LocalPath));
                         return tasks;
                     }
                 )
