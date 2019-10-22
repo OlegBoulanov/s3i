@@ -41,7 +41,7 @@ namespace s3iLib
             return this;
         }
         const string sectionProducts = "$products$";
-        public static async Task<ProductCollection> FromIni(Stream stream, Uri baseUri = null)
+        public static async Task<ProductCollection> FromIni(Stream stream, DateTimeOffset lastModified, Uri baseUri = null)
         {
             var products = new ProductCollection();
             await IniReader.Read(stream, (sectionName, keyName, keyValue) =>
@@ -49,7 +49,7 @@ namespace s3iLib
                 if (sectionProducts.Equals(sectionName, StringComparison.InvariantCultureIgnoreCase))
                 {
                     var nextUri = null != baseUri ? baseUri.BuildRelativeUri(keyValue) : new Uri(keyValue);
-                    products.Add(new ProductInfo { Name = keyName, Uri = nextUri });
+                    products.Add(new ProductInfo { Name = keyName, Uri = nextUri, LastModified = lastModified });
                     baseUri = nextUri;
                 }
                 else
@@ -66,16 +66,16 @@ namespace s3iLib
             Contract.Requires(null != downloader);
             Contract.Requires(null != uri);
             var products = new ProductCollection();
-            var statusCode = await downloader.DownloadAsync(uri, DateTime.MinValue, async (stream) =>
+            var statusCode = await downloader.DownloadAsync(uri, DateTime.MinValue, async (stream, lastModified) =>
             {
                   switch (Path.GetExtension(uri.AbsolutePath).ToUpperInvariant())
                   {
                       case ".MSI":
-                          products.Add(new ProductInfo { Name = uri.ToString(), Uri = uri });
+                          products.Add(new ProductInfo { Name = uri.ToString(), Uri = uri, LastModified = lastModified });
                           await Task.CompletedTask.ConfigureAwait(false);
                           break;
                       case ".INI":
-                          products.AddRange(await ProductCollection.FromIni(stream, uri).ConfigureAwait(false));
+                          products.AddRange(await ProductCollection.FromIni(stream, lastModified, uri).ConfigureAwait(false));
                           break;
                       case ".JSON":
                           products.AddRange(await ProductCollection.FromJson(stream).ConfigureAwait(false));
