@@ -112,13 +112,7 @@ Similar results can be achieved by setting `msiexec` command to `echo msiexec`:
 ```
 C:\Users\current-user>s3i https://install.company.com.s3.amazonaws.com/Test/Group/products.ini --verbose --msiexec "echo msiexec"
 Products [2]:
-  SomethingUseless: https://deployment.s3.amazonaws.com/useless.product/develop/1.2.3-beta2+test/installer.msi
-      => C:\Users\current-user\AppData\Local\Temp\s3i\deployment.s3.amazonaws.com\useless.product/develop/1.2.3-beta2+test/installer.msi
-    ImportantProperty = just an example
-    NotSoImportant = but we pass it anyway, just for fun
-  EvenMoreUseless = https://deployment.s3.amazonaws.com/other.product/release/3.7.5/setup.msi
-      => C:\Users\current-user\AppData\Local\Temp\s3i\deployment.s3.amazonaws.com\other.product\release\3.7.5\setup.msi
-    HelloWorld = You welcome!
+...
 Install [2]:
 ...
 (Execute) Download ...
