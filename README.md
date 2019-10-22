@@ -25,9 +25,9 @@ s3i allows to install/upgrade/downgrade software packaged for Microsoft Installe
 
 ```
            command line to run on host       S3/http
-/------\                                  /------------\
-| Host | -- s3i http://../config.ini -->  | config.ini |   host (group) configuration file
-\------/                                  \------------/
+/------\                                  /--------------\
+| Host | -- s3i http://../products.ini->  | products.ini |   host (group) configuration file
+\------/                                  \--------------/
   /|\                                           | |
    |               S3/http                      | |  links to products to be downloaded and installed
    |              /-------\                     | |
@@ -35,7 +35,7 @@ s3i allows to install/upgrade/downgrade software packaged for Microsoft Installe
   download        \-------/ |  <------------------/
  and install        \------/  
                       /|\
-                       |        /-------------\
+                       |        /--------------\
                        \--------| CI/CD system | uploads *.msi(s) to version-specific subfolders
                                 \--------------/
 ```
