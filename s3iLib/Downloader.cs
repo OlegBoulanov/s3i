@@ -10,20 +10,21 @@ namespace s3iLib
 {
     public abstract class Downloader
     {
-        public abstract Task<HttpStatusCode> DownloadAsync(Uri uri, DateTime modifiedSinceDateUtc, Func<Stream, Task> processStream);
+        public abstract Task<HttpStatusCode> DownloadAsync(Uri uri, DateTime modifiedSinceDateUtc, Func<Stream,DateTimeOffset, Task> processStream);
         public async Task<HttpStatusCode> DownloadAsync(Uri uri, string localFilePath)
         {
             Contract.Requires(null != uri);
             Contract.Requires(null != localFilePath);
             var lastWriteTimeUtc = File.GetLastWriteTimeUtc(localFilePath);
             return await DownloadAsync(uri, lastWriteTimeUtc,
-                async (stream) =>
+                async (stream, lastModified) =>
                 {
                     Directory.CreateDirectory(Path.GetDirectoryName(localFilePath));
                     using (var file = File.Create(localFilePath))
                     {
                         await stream.CopyToAsync(file).ConfigureAwait(false);
                     }
+                    File.SetLastWriteTimeUtc(localFilePath, lastModified.UtcDateTime);
                 }).ConfigureAwait(false);
         }
         public static Downloader Select(Uri url)

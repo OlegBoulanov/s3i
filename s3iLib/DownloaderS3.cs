@@ -27,7 +27,7 @@ namespace s3iLib
             catch (Exception) { s3uri = null; return false; }
 #pragma warning restore CA1031
         }
-        public override async Task<HttpStatusCode> DownloadAsync(Uri uri, DateTime modifiedSinceDateUtc, Func<Stream, Task> processStream)
+        public override async Task<HttpStatusCode> DownloadAsync(Uri uri, DateTime modifiedSinceDateUtc, Func<Stream, DateTimeOffset, Task> processStream)
         {
             Contract.Requires(null != uri);
             Contract.Requires(null != processStream);
@@ -40,7 +40,7 @@ namespace s3iLib
                 {
                     using (var responseStream = response.ResponseStream)
                     {
-                        await processStream.Invoke(responseStream).ConfigureAwait(false);
+                        await processStream.Invoke(responseStream, response.LastModified).ConfigureAwait(false);
                     }
                     return response.HttpStatusCode;
                 }

@@ -40,7 +40,7 @@ SecondProduct    = ../../../Distrib/SecondProduct/9.4.188/SecondProduct.msi
         public async Task TestTwoProductProps()
         {
             using var stream = new MemoryStream(Encoding.ASCII.GetBytes(testConfig));
-            var products = await ProductCollection.FromIni(stream, null).ConfigureAwait(false); 
+            var products = await ProductCollection.FromIni(stream, DateTimeOffset.UtcNow, null).ConfigureAwait(false); 
             products.MapToLocal("C:\\Temp\\");
             Assert.AreEqual(2, products.Count);
             Assert.AreEqual("ProductOne", products[0].Name);
@@ -65,7 +65,7 @@ Three    = https://xxx.s3.amazonaws.com/Test/Windows10/Distrib//SecondProduct/9.
         public async Task TestDownloadPaths()
         {
             using var stream = new MemoryStream(Encoding.ASCII.GetBytes(manyProducts));
-            var products = await ProductCollection.FromIni(stream, null).ConfigureAwait(false);
+            var products = await ProductCollection.FromIni(stream, DateTimeOffset.UtcNow, null).ConfigureAwait(false);
             products.MapToLocal("C:\\Temp\\");
             var files = from p in products select new { product = p, local = p.LocalPath };
             Assert.AreEqual(3, products.Count);
@@ -85,9 +85,9 @@ Three    = https://xxx.s3.amazonaws.com/Test/Windows10/Distrib//SecondProduct/9.
             using var stream1 = new MemoryStream(Encoding.ASCII.GetBytes(products1));
             using var stream2 = new MemoryStream(Encoding.ASCII.GetBytes(products2));
             using var stream3 = new MemoryStream(Encoding.ASCII.GetBytes(products3));
-            var p1 = await ProductCollection.FromIni(stream1).ConfigureAwait(false);
-            var p2 = await ProductCollection.FromIni(stream2).ConfigureAwait(false);
-            var p3 = await ProductCollection.FromIni(stream3).ConfigureAwait(false);
+            var p1 = await ProductCollection.FromIni(stream1, DateTimeOffset.UtcNow).ConfigureAwait(false);
+            var p2 = await ProductCollection.FromIni(stream2, DateTimeOffset.UtcNow).ConfigureAwait(false);
+            var p3 = await ProductCollection.FromIni(stream3, DateTimeOffset.UtcNow).ConfigureAwait(false);
         }
 
         [Test]

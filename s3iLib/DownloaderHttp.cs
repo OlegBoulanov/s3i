@@ -9,7 +9,7 @@ namespace s3iLib
 {
     public class DownloaderHttp : Downloader
     {
-        public override async Task<HttpStatusCode> DownloadAsync(Uri uri, DateTime modifiedSinceDateUtc, Func<Stream, Task> processStream)
+        public override async Task<HttpStatusCode> DownloadAsync(Uri uri, DateTime modifiedSinceDateUtc, Func<Stream, DateTimeOffset, Task> processStream)
         {
             Contract.Requires(null != uri);
             Contract.Requires(null != processStream);
@@ -21,7 +21,7 @@ namespace s3iLib
                 {
                     using (var responseStream = await result.Content.ReadAsStreamAsync().ConfigureAwait(false))
                     {
-                        await processStream.Invoke(responseStream).ConfigureAwait(false);
+                        await processStream.Invoke(responseStream, result.Content.Headers.LastModified ?? DateTimeOffset.UtcNow).ConfigureAwait(false);
                     }
                 }
                 return result.StatusCode;

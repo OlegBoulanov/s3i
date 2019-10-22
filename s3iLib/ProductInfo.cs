@@ -18,6 +18,8 @@ namespace s3iLib
 #pragma warning disable CA2227 // we need write access to deserialize
         public ProductPropertiesDictionary Props { get; set; } = new ProductPropertiesDictionary();
 #pragma warning restore CA2227
+        [JsonIgnore]
+        public DateTimeOffset LastModified { get; set; }
         public string MapToLocalPath(string basePath)
         {
             return MapToLocalPath(basePath, Name, Path.GetFileName(Uri.AbsolutePath));
@@ -66,6 +68,7 @@ namespace s3iLib
             {
                 await ToJson(fs).ConfigureAwait(false);
             }
+            File.SetLastWriteTimeUtc(path, LastModified.UtcDateTime);
         }
         public static async Task<ProductInfo> FindInstalled(string path)
         {
