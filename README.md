@@ -28,12 +28,16 @@ s3i allows to install/upgrade/downgrade software packaged for Microsoft Installe
 /------\                                  /------------\
 | Host | -- s3i http://../config.ini -->  | config.ini |   host (group) configuration file
 \------/                                  \------------/
-   ^                                         | |
-   |            S3/http                      | |  links to products to be downloaded and installed
-   |           /-------\                     | |
-   \------<<<  | *.msi |-\  <----------------/ |
-               \-------/ |  <------------------/
-                  \------/  <<<<-------------------<<< CI/CD system may upload these (with version tags in URL)
+  /|\                                           | |
+   |               S3/http                      | |  links to products to be downloaded and installed
+   |              /-------\                     | |
+   \------------  | *.msi |-\  <----------------/ |
+  download        \-------/ |  <------------------/
+ and install        \------/  
+                      /|\
+                       |        /-------------\
+                       \--------| CI/CD system | uploads *.msi(s) to version-specific subfolders
+                                \--------------/
 ```
 s3i reads configuration files, specified in command line, downloads and caches product installers and properties, and performs required installations, upgrades, or downgrades by invoking Windows msiexec.exe with proper arguments.
 
