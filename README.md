@@ -125,4 +125,18 @@ Can be done the same way, as upgrading, but the version in the URL should be ear
 
 __Removing product:__
 
-To remove, delete (or comment out with semicolon) product `name = URL` form [$products$] section of config file, and run s3i.
+To remove, delete (or comment out with semicolon) product `name = URL` from `[$products$]` section of the config file, and run s3i.
+
+## Simple automation
+
+### s3i Windows Service
+
+`s3i service` runs s3i with service arguments passed to the program at computer startup.
+
+CMDLINEARGS s3i installer property allows to set s3i command line parameters for the service at service installation time.
+
+### s3i_args Environment variable
+
+`set s3i_args= https://install.company.s3.amazonaws.com/Test/Group/products.ini --verbosen`
+
+Running s3i with no arguments will now produce the same result as in examples above
