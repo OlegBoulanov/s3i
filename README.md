@@ -41,18 +41,23 @@ s3i reads configuration files, specified in command line, downloads and caches p
 
 Configuration file contains one or several product specifications:
 - Product name, for example, `SomethingUseless`
-- Product installer URL: `https://deployment-bucket.s3.amazonaws.com/useless.product/develop/1.2.3.4-beta2+test/installer.msi`
+- Product installer URL, like `https://deployment.s3.amazonaws.com/useless.product/develop/1.2.3.4-beta2+test/installer.msi`
 - Set of properties (key/value pairs) to be passed to unattended MSI installation
 
-Here is an example of `useless.ini` file:
+Here is an example of `products.ini` file:
 ```
 ; List of product name = installer URL
 [$products$]
-SomethingUseless = https://deployment-bucket.s3.amazonaws.com/useless.product/develop/1.2.3.4-beta2+test/installer.msi
+SomethingUseless = https://deployment.s3.amazonaws.com/useless.product/develop/1.2.3-beta2+test/installer.msi
+EvenMoreUseless = https://deployment.s3.amazonaws.com/other.product/release/3.7.5/setup.msi
 
 ; Sections specify optional product properties
 [SomethingUseless]
 ImportantProperty = just an example
+NotSoImportant = but we pass it anyway, just for fun
+
+[EvenMoreUseless]
+HelloWorld = You welcome!
 ```
 ## Use
 
@@ -66,7 +71,7 @@ s3i: msi package batch installer v1.0.243
   -h, --help                        Print this help info [False]
   -p, --profile <profile-name>      AWS user profile name [default]
   -e, --envvar <var-name>           Environment variable name (default command line) [s3i_args]
-  -s, --stage <path>                Path to staging folder [C:\Users\olegb\AppData\Local\Temp\s3i]
+  -s, --stage <path>                Path to staging folder [C:\Users\current-user\AppData\Local\Temp\s3i]
   -m, --msiexec <path>              MsiExec command [msiexec.exe]
   -a, --msiargs <args>              MsiExec extra args [/passive]
   -t, --timeout <timespan>          Installation timeout [00:03:00]
@@ -74,7 +79,18 @@ s3i: msi package batch installer v1.0.243
   -v, --verbose                     Print full log info [False]
 ```
 
-Installing products in configuration file in AWS S3:
+Installing products from configuration file on AWS S3:
 ```
 C:\Users\current-user>s3i https://install.company.com.s3.amazonaws.com/Test/Group/products.ini --verbose
+Products [2]:
+  SomethingUseless: https://deployment.s3.amazonaws.com/useless.product/develop/1.2.3-beta2+test/installer.msii => C:\Users\current-user\AppData\Local\Temp\s3i\deployment.s3.amazonaws.com\useless.product/develop/1.2.3-beta2+test/installer.msi
+    ImportantProperty = just an example
+    NotSoImportant = but we pass it anyway, just for fun
+  EvenMoreUseless = https://deployment.s3.amazonaws.com/other.product/release/3.7.5/setup.msi => C:\Users\current-user\AppData\Local\Temp\s3i\deployment.s3.amazonaws.com\other.product\release\3.7.5\setup.msi
+    HelloWorld = You welcome!
+Install [2]:
+...
+Download ...
+Execute Install ...
+Save ...
 ```
