@@ -17,7 +17,7 @@ Latest version of `s3i.msi` can be found on the project's [Releases tab](https:/
 # Functionality
 
 ## Use case
-Having a fleet of Windows computers, we need to automate software installation and configuration, depending on individual or group settings. Software amy be produced by a separate CI/CD system and uploaded to version specific folders and/or AWS S3 buckets automatically. Upgarding a group of hosts to newer version would require changing a single line in group configuration file. s3i, ran manually or automatically, would compare already installed version with requested one and take proper actions.
+Having a fleet of (real, not virtual) Windows computers, we need to automate software installation and configuration, depending on individual or group settings. Software amy be produced by a separate CI/CD system and uploaded to version specific folders and/or AWS S3 buckets automatically. Upgarding a group of hosts to newer version would require changing a single line in group configuration file. s3i, ran manually or automatically, would compare already installed version with requested one and take proper actions.
 
 s3i allows to install/upgrade/downgrade software packaged for Microsoft Installer, downloading configuration files and installers from remote storage (http servers, like github releases, or AWS S3 buckets)
 
