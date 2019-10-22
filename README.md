@@ -12,7 +12,7 @@
 - Windows 7/10
 - [.NET Core Runtime 3.0.0](https://dotnet.microsoft.com/download/dotnet-core/3.0)
 
-'s3i.msi' can be found on the project Releases tab
+`s3i.msi` can be found on the project's [Releases tab](/releases)
 
 # Functionality
 
