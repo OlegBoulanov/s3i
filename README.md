@@ -9,7 +9,7 @@ This is a simple learning project I created to become familiar with .NET Core 3.
   develop:
 [![Build status](https://ci.appveyor.com/api/projects/status/s5poqaqr1xn2e5ml/branch/develop?svg=true)](https://ci.appveyor.com/project/OlegBoulanov/s3i/branch/develop)
 
-## Installation requirements
+## Installation Prerequisites
 
 - Windows 7/10
 - [.NET Core Runtime 3.0.0](https://dotnet.microsoft.com/download/dotnet-core/3.0)
