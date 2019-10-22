@@ -1,4 +1,4 @@
-# s3i - batch Windows MSI installer 
+# s3i - Batch Windows MSI installer 
 
 ## Build Status
 
@@ -6,6 +6,13 @@
 [![Build status](https://ci.appveyor.com/api/projects/status/s5poqaqr1xn2e5ml/branch/master?svg=true)](https://ci.appveyor.com/project/OlegBoulanov/s3i/branch/master)
   develop:
 [![Build status](https://ci.appveyor.com/api/projects/status/s5poqaqr1xn2e5ml/branch/develop?svg=true)](https://ci.appveyor.com/project/OlegBoulanov/s3i/branch/develop)
+
+## Installation requirements
+
+- Windows 7/10
+- [.NET Core Runtime 3.0.0](https://dotnet.microsoft.com/download/dotnet-core/3.0)
+
+'s3i.msi' can be found on the project Releases tab
 
 # Functionality
 
@@ -46,4 +53,23 @@ SomethingUseless = https://deployment-bucket.s3.amazonaws.com/useless.product/de
 ; Sections specify optional product properties
 [SomethingUseless]
 ImportantProperty = just an example
+```
+## Use
+
+Printing help info:
+```
+C:\Users\current-user>s3i
+s3i: msi package batch installer v1.0.243
+ Usage:
+  s3i [<option> ...] <products> ...
+ Options:
+  -h, --help                        Print this help info [False]
+  -p, --profile <profile-name>      AWS user profile name [default]
+  -e, --envvar <var-name>           Environment variable name (default command line) [s3i_args]
+  -s, --stage <path>                Path to staging folder [C:\Users\olegb\AppData\Local\Temp\s3i]
+  -m, --msiexec <path>              MsiExec command [msiexec.exe]
+  -a, --msiargs <args>              MsiExec extra args [/passive]
+  -t, --timeout <timespan>          Installation timeout [00:03:00]
+  -d, --dryrun                      Dry run [False]
+  -v, --verbose                     Print full log info [False]
 ```
