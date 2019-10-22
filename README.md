@@ -37,6 +37,10 @@ s3i allows to install/upgrade/downgrade software packaged for Microsoft Installe
 ```
 s3i reads configuration files, specified in command line, downloads and caches product installers and properties, and performs required installations, upgrades, or downgrades by invoking Windows msiexec.exe with proper arguments.
 
+### AWS S3 prerequisites
+
+By default, s3i uses current user's `[default]` AWS profile. Profile name can be changed using `--profile` command line option.
+
 ### Configuration file format
 
 Configuration file contains one or several product specifications:
@@ -137,6 +141,6 @@ CMDLINEARGS s3i installer property allows to set s3i command line parameters for
 
 ### s3i_args Environment variable
 
-`set s3i_args= https://install.company.s3.amazonaws.com/Test/Group/products.ini --verbosen`
+`set s3i_args= https://install.company.s3.amazonaws.com/Test/Group/products.ini --verbose`
 
 Running s3i with no arguments will now produce the same result as in examples above
