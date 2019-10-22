@@ -49,7 +49,7 @@ By default, s3i uses current user's `[default]` AWS profile. Profile name can be
 
 ### Product Installer Reqirements
 
-Product Installer (.msi) is expected to be able to run in unattended mode, being configured with use of public properties, passed as msiexec command line arguments ([s3iSetup project](https://github.com/OlegBoulanov/s3i/s3i_setup/) is an example of such product itself) 
+Product Installer (.msi) is expected to be able to run in unattended mode, being configured with use of public properties, passed as msiexec command line arguments ([s3i_setup project](https://github.com/OlegBoulanov/s3i/s3i_setup) is an example of such product itself) 
 
 ### Configuration file format
 
