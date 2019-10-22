@@ -11,7 +11,7 @@ This is a simple learning project I created to become familiar with .NET Core 3.
 
 ## Installation Prerequisites
 
-- Windows 7/10
+- Windows 7/10 (with [Windows Installer](https://docs.microsoft.com/en-us/windows/win32/msi/overview-of-windows-installer))
 - [.NET Core Runtime 3.0.0](https://dotnet.microsoft.com/download/dotnet-core/3.0)
 
 Latest version of `s3i.msi` can be found on the project's [Releases tab](https://github.com/OlegBoulanov/s3i/releases)
