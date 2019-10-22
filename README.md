@@ -115,6 +115,14 @@ Products [2]:
 Install [1]:
 ...
 (Execute) Download ...
-(Execute) Install https://deployment.s3.amazonaws.com/useless.product/release/1.2.4/installer.msii
+(Execute) Install https://deployment.s3.amazonaws.com/useless.product/release/1.2.4/installer.msi
 Save C:\Users\current-user\AppData\Local\Temp\s3i\deployment.s3.amazonaws.com\useless.product/release/1/2/4/installer.json
 ```
+
+__Downgrading:__
+
+Can be done the same way, as upgrading, but the version in the URL should be earlier than already installed, and the product will be unbinstalled first, and the earlier version installed back.
+
+__Removing product:__
+
+To remove, delete (or comment out with semicolon) product `name = URL` form [$products$] section of config file, and run s3i.
