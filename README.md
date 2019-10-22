@@ -39,7 +39,7 @@ s3i reads configuration files, specified in command line, downloads and caches p
 
 ### AWS S3 prerequisites
 
-By default, s3i uses current user's `[default]` AWS profile. Profile name can be changed using `--profile` command line option.
+By default, s3i uses current user's `[default]` AWS profile. Profile name can be changed using `--profile` command line option. Profile credentials should allow read access to all necessary S3 buckets and prefixes.
 
 ### Configuration file format
 
