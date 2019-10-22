@@ -61,7 +61,7 @@ HelloWorld = You welcome!
 ```
 ## Use
 
-Printing help info:
+__Printing help info:__
 ```
 C:\Users\current-user>s3i
 s3i: msi package batch installer v1.0.243
@@ -79,7 +79,7 @@ s3i: msi package batch installer v1.0.243
   -v, --verbose                     Print full log info [False]
 ```
 
-Installing products from configuration file on AWS S3:
+__Installing products from configuration file on AWS S3:__
 ```
 C:\Users\current-user>s3i https://install.company.com.s3.amazonaws.com/Test/Group/products.ini --verbose
 Products [2]:
@@ -93,6 +93,27 @@ Products [2]:
 Install [2]:
 ...
 (Execute) Download ...
-(Execute) Install ...
-Save ...
+(Execute) Install https://deployment.s3.amazonaws.com/useless.product/develop/1.2.3-beta2+test/installer.msii
+(Execute) Install https://deployment.s3.amazonaws.com/other.product/release/3.7.5/setup.msi
+Save C:\Users\current-user\AppData\Local\Temp\s3i\deployment.s3.amazonaws.com\useless.product/develop/1.2.3-beta2+test/installer.json
+Save C:\Users\current-user\AppData\Local\Temp\s3i\deployment.s3.amazonaws.com\other.product\release\3.7.5\setup.json
+```
+
+__Upgrading one product:__
+After changing `products.ini` file: ~~develop/1.2.3-beta2+test~~ _release/1.2.4_, run the same s3i command again:
+```
+C:\Users\current-user>s3i https://install.company.com.s3.amazonaws.com/Test/Group/products.ini --verbose
+Products [2]:
+  SomethingUseless: https://deployment.s3.amazonaws.com/useless.product/release/1.2.4/installer.msii
+      => C:\Users\current-user\AppData\Local\Temp\s3i\deployment.s3.amazonaws.com\useless.product/release/1.2.4/installer.msi
+    ImportantProperty = just an example
+    NotSoImportant = but we pass it anyway, just for fun
+  EvenMoreUseless = https://deployment.s3.amazonaws.com/other.product/release/3.7.5/setup.msi
+      => C:\Users\current-user\AppData\Local\Temp\s3i\deployment.s3.amazonaws.com\other.product\release\3.7.5\setup.msi
+    HelloWorld = You welcome!
+Install [1]:
+...
+(Execute) Download ...
+(Execute) Install https://deployment.s3.amazonaws.com/useless.product/release/1.2.4/installer.msii
+Save C:\Users\current-user\AppData\Local\Temp\s3i\deployment.s3.amazonaws.com\useless.product/release/1/2/4/installer.json
 ```
