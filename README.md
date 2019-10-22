@@ -161,9 +161,9 @@ Install [1]:
 Save C:\Users\current-user\AppData\Local\Temp\s3i\deployment.s3.amazonaws.com\useless.product/release/1/2/4/installer.json
 ```
 
-__Downgrading:__
+__Downgrading or change of product properties:__
 
-Can be done the same way, as upgrading, but the version in the URL should be earlier than already installed, and the product will be unbinstalled first, and the earlier version installed back.
+Can be done the same way, as upgrading, but the version in the URL should be earlier than already installed, and the newer version of the product will be uninstalled first, and then the earlier version will be installed back.
 
 __Uninstalling product:__
 
