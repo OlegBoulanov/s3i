@@ -47,6 +47,10 @@ s3i reads configuration files, specified in command line, downloads and caches p
 
 By default, s3i uses current user's `[default]` AWS profile. Profile name can be changed using `--profile` command line option. Profile credentials should allow read access to all necessary S3 buckets and prefixes.
 
+### Product Installer Reqirements
+
+Product Installer (.msi) is expected to be able to run in unattended mode, being configured with use of public properties, passed as msiexec command line arguments ([s3iSetup project](https://github.com/OlegBoulanov/s3i/s3iSetup/) is an example of such product itself) 
+
 ### Configuration file format
 
 Configuration file contains one or several product specifications:
