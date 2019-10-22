@@ -175,7 +175,7 @@ To uninstall a product, delete (or comment out with semicolon) product `name = U
 
 `s3i service` runs s3i with service arguments passed to the program at Windows startup.
 
-CMDLINEARGS s3i installer property allows to set s3i command line parameters for the service at service installation time:
+`CMDLINEARGS` s3i.msi installer property allows to set s3i command line parameters for the service at service installation time:
 `C:\>msiexec /i s3i.msi CMDLINEARGS="https://install.company.com.s3.amazonaws.com/Test/Group/products.ini --verbose"`
 
 ### s3i_args Environment variable
