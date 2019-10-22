@@ -1,5 +1,4 @@
-# s3i
-Install Windows Installer MSI from S3
+# s3i - batch Windows MSI installer 
 
 ## Build Status
 
