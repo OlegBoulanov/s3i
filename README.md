@@ -12,7 +12,7 @@
 - Windows 7/10
 - [.NET Core Runtime 3.0.0](https://dotnet.microsoft.com/download/dotnet-core/3.0)
 
-Latest version of `s3i.msi` can be found on the project's Releases page
+Latest version of `s3i.msi` can be found on the project's [Releases tab](https://github.com/OlegBoulanov/s3i/releases)
 
 # Functionality
 
