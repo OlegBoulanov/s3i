@@ -1,6 +1,6 @@
 # s3i - Batch Windows MSI installer 
 
-This is a simple learning project I created to become familiar with .NET Core 3.0, its Windows/Linux binary portability and [FDE](https://docs.microsoft.com/en-us/dotnet/core/deploying/#framework-dependent-executables-fde) deployment model. Also, it includes certain useful features like automating builds with [AppVeyor](https://appveyor.com) and deployment to GitHub Releases
+This is a simple learning project I created to become familiar with .NET Core 3.0, its Windows/Linux binary portability and [FDE](https://docs.microsoft.com/en-us/dotnet/core/deploying/#framework-dependent-executables-fde) application deployment model. Also, it includes certain useful features like automating builds with [AppVeyor](https://appveyor.com) and deployment to GitHub Releases
 
 ## Build Status
 
@@ -89,6 +89,44 @@ s3i: msi package batch installer v1.0.12345
   -v, --verbose                     Print full log info [False]
 ```
 
+__Dry run (running with no actual installation):__
+```
+C:\Users\current-user>s3i https://install.company.com.s3.amazonaws.com/Test/Group/products.ini --verbose --dryrun
+Products [2]:
+  SomethingUseless: https://deployment.s3.amazonaws.com/useless.product/develop/1.2.3-beta2+test/installer.msii
+      => C:\Users\current-user\AppData\Local\Temp\s3i\deployment.s3.amazonaws.com\useless.product/develop/1.2.3-beta2+test/installer.msi
+    ImportantProperty = just an example
+    NotSoImportant = but we pass it anyway, just for fun
+  EvenMoreUseless = https://deployment.s3.amazonaws.com/other.product/release/3.7.5/setup.msi
+      => C:\Users\current-user\AppData\Local\Temp\s3i\deployment.s3.amazonaws.com\other.product\release\3.7.5\setup.msi
+    HelloWorld = You welcome!
+Install [2]:
+...
+(DryRun) Download ...
+(DryRun) Install https://deployment.s3.amazonaws.com/useless.product/develop/1.2.3-beta2+test/installer.msi
+(DryRun) Install https://deployment.s3.amazonaws.com/other.product/release/3.7.5/setup.msi
+Save C:\Users\current-user\AppData\Local\Temp\s3i\deployment.s3.amazonaws.com\useless.product/develop/1.2.3-beta2+test/installer.json
+Save C:\Users\current-user\AppData\Local\Temp\s3i\deployment.s3.amazonaws.com\other.product\release\3.7.5\setup.json
+```
+Similar results can be achieved by setting `msiexec` command to `echo msiexec`:
+```
+C:\Users\current-user>s3i https://install.company.com.s3.amazonaws.com/Test/Group/products.ini --verbose --msiexec "echo msiexec"
+Products [2]:
+  SomethingUseless: https://deployment.s3.amazonaws.com/useless.product/develop/1.2.3-beta2+test/installer.msi
+      => C:\Users\current-user\AppData\Local\Temp\s3i\deployment.s3.amazonaws.com\useless.product/develop/1.2.3-beta2+test/installer.msi
+    ImportantProperty = just an example
+    NotSoImportant = but we pass it anyway, just for fun
+  EvenMoreUseless = https://deployment.s3.amazonaws.com/other.product/release/3.7.5/setup.msi
+      => C:\Users\current-user\AppData\Local\Temp\s3i\deployment.s3.amazonaws.com\other.product\release\3.7.5\setup.msi
+    HelloWorld = You welcome!
+Install [2]:
+...
+(Execute) Download ...
+(Execute) Install https://deployment.s3.amazonaws.com/useless.product/develop/1.2.3-beta2+test/installer.msi
+msiexec /i C:\Users\current-user\AppData\Local\Temp\s3i\deployment.s3.amazonaws.com\useless.product/develop/1.2.3-beta2+test/installer.msi /passive
+...
+```
+
 __Installing products from configuration file on AWS S3:__
 ```
 C:\Users\current-user>s3i https://install.company.com.s3.amazonaws.com/Test/Group/products.ini --verbose
@@ -115,7 +153,7 @@ After changing `products.ini` file: ~~develop/1.2.3-beta2+test~~ _release/1.2.4_
 ```
 C:\Users\current-user>s3i https://install.company.com.s3.amazonaws.com/Test/Group/products.ini --verbose
 Products [2]:
-  SomethingUseless: https://deployment.s3.amazonaws.com/useless.product/release/1.2.4/installer.msii
+  SomethingUseless: https://deployment.s3.amazonaws.com/useless.product/release/1.2.4/installer.msi
       => C:\Users\current-user\AppData\Local\Temp\s3i\deployment.s3.amazonaws.com\useless.product/release/1.2.4/installer.msi
     ImportantProperty = just an example
     NotSoImportant = but we pass it anyway, just for fun
