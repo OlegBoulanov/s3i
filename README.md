@@ -19,44 +19,54 @@ Latest version of `s3i.msi` can be found on the project's [Releases tab](https:/
 # Functionality
 
 ## Use case
-Having a fleet of (real, not virtual) Windows computers, we need to automate software installation and configuration, depending on individual or group settings. Software amy be produced by a separate CI/CD system and uploaded to version specific folders and/or AWS S3 buckets automatically. Upgarding a group of hosts to newer version would require changing a single line in group configuration file. s3i, ran manually or automatically, would compare already installed product semantic version and properties with requested one and take proper actions, like install, reinstall, or uninstall. A newer version would be installed over existing one in one pass, reinstall (to downgrade or change of properties) would require uninstall, followed by install.
+Having a fleet of (real, not virtual) Windows computers, we need to automate software installation and configuration, 
+depending on individual or group settings. Software amy be produced by a separate CI/CD system and uploaded to version 
+specific folders and/or AWS S3 buckets automatically. Upgarding a group of hosts to newer version would require changing 
+a single line in group configuration file. s3i, ran manually or automatically, would compare already installed product 
+semantic version and properties with requested one and take proper actions, like install, reinstall, or uninstall. 
+A newer version would be installed over existing one in one pass, reinstall (to downgrade or change of properties) 
+would require uninstall, followed by install.
 
-s3i allows to install/upgrade/downgrade software packaged for Microsoft Installer, downloading configuration files and installers from remote storage (http servers, like github releases, or AWS S3 buckets)
+s3i allows to install/upgrade/downgrade software packaged for Microsoft Installer, downloading configuration files and 
+installers from remote storage (only public Web server, like GitHub Releases, or AWS S3 bucket supported recently)
 
-## Setup
+## Setup Example
 
 ```
            command line to run on host       S3/http
-/------\                                  /--------------\
-| Host | -- s3i http://../products.ini->  | products.ini |   host (group) configuration file
-\------/                                  \--------------/
-  /|\                                           | |
-   |               S3/http                      | |  links to products to be downloaded and installed
-   |              /-------\                     | |
-   \------------  | *.msi |-\  <----------------/ |
-  download        \-------/ |  <------------------/
- and install        \------/  
-                      /|\
-                       |        /--------------\
-                       \--------| CI/CD system | uploads *.msi(s) to version-specific subfolders
-                                \--------------/
+/------\                                    /--------------\
+| Host | -- s3i http://../products.ini--->  | products.ini |   host (group) configuration file
+\------/                                    \--------------/
+  /|\                                             | |
+   |               S3/http                        | |  links to products to be downloaded and installed
+   |              /-------\                       | |
+   \------------  | *.msi |---\  <----------------/ |
+  download        \-------/   |  <------------------/
+ and install          \-------/  
+                        /|\
+                         |        /--------------\
+                         \--------| CI/CD system | uploads *.msi(s) to version-specific subfolders
+                                  \--------------/
 ```
-s3i reads configuration files, specified in command line, downloads and caches product installers and properties, and performs required installations, upgrades, or downgrades by invoking Windows msiexec.exe with proper arguments.
+s3i reads configuration files, specified in command line, downloads and caches product installers and properties, 
+and performs required installations, upgrades, or downgrades by invoking Windows msiexec.exe with proper arguments.
 
 ### AWS S3 prerequisites
 
-By default, s3i uses current user's `[default]` AWS profile. Profile name can be changed using `--profile` command line option. Profile credentials should allow read access to all necessary S3 buckets and prefixes.
+By default, s3i uses current user's `[default]` AWS profile. Profile name can be changed using `--profile` command line option. 
+Profile credentials should allow read access to all necessary S3 buckets and prefixes.
 
 ### Product Installer Reqirements
 
-Product Installer (.msi) is expected to be able to run in unattended mode, being configured with use of public properties, passed as msiexec command line arguments (`s3i_setup` project is a simple example of such product) 
+Product Installer (.msi) is expected to be able to run in unattended mode, being configured with use of public properties, 
+passed as msiexec command line arguments (`s3i_setup` project is a simple example of such product) 
 
 ### Configuration file format
 
 Configuration file contains one or several product specifications:
 - Product name, for example, `SomethingUseless`
 - Product installer URL, like `https://deployment.s3.amazonaws.com/useless.product/develop/1.2.3.4-beta2+test/installer.msi`
-- Set of properties (key/value pairs) to be passed to unattended MSI installation
+- Optional set of product public properties (key/value pairs) to be passed to unattended MSI installation
 
 Here is an example of `products.ini` file:
 ```
@@ -75,7 +85,7 @@ HelloWorld = You welcome!
 ```
 ## Use
 
-__Printing s3i help info:__
+__Printing s3i help info__
 ```
 C:\Users\current-user>s3i
 s3i: msi package batch installer v1.0.12345
@@ -93,7 +103,7 @@ s3i: msi package batch installer v1.0.12345
   -v, --verbose                     Print full log info [False]
 ```
 
-__Dry run (running with no actual installation):__
+__Dry run (running with no actual installation)__
 ```
 C:\Users\current-user>s3i https://install.company.com.s3.amazonaws.com/Test/Group/products.ini --verbose --dryrun
 Products [2]:
@@ -125,7 +135,7 @@ msiexec /i C:\Users\current-user\AppData\Local\Temp\s3i\deployment.s3.amazonaws.
 ...
 ```
 
-__Installing products from configuration file on AWS S3:__
+__Installing products from configuration file on AWS S3__
 ```
 C:\Users\current-user>s3i https://install.company.com.s3.amazonaws.com/Test/Group/products.ini --verbose
 Products [2]:
@@ -145,7 +155,7 @@ Save C:\Users\current-user\AppData\Local\Temp\s3i\deployment.s3.amazonaws.com\us
 Save C:\Users\current-user\AppData\Local\Temp\s3i\deployment.s3.amazonaws.com\other.product\release\3.7.5\setup.json
 ```
 
-__Upgrading one product:__
+__Upgrading one product__
 
 After changing `products.ini` file: ~~develop/1.2.3-beta2+test~~ _release/1.2.4_, run the same s3i command again:
 ```
@@ -165,13 +175,15 @@ Install [1]:
 Save C:\Users\current-user\AppData\Local\Temp\s3i\deployment.s3.amazonaws.com\useless.product/release/1/2/4/installer.json
 ```
 
-__Downgrading or change of product properties:__
+__Downgrading or change of product properties__
 
-Can be done the same way, as upgrading, but the version in the URL should be earlier than already installed, and the newer version of the product will be uninstalled first, and then the earlier version will be installed back.
+Can be done the same way, as upgrading, but the version in the URL should be earlier than already installed, 
+and the newer version of the product will be uninstalled first, and then the earlier version will be installed back.
 
 __Uninstalling product:__
 
-To uninstall a product, delete (or comment out with semicolon) product `name = URL` entry from `[$products$]` section of the config file, and run s3i again.
+To uninstall a product, delete (or comment out with semicolon) product `name = URL` entry 
+from `[$products$]` section of the config file, and run s3i again.
 
 ## Simple automation
 
