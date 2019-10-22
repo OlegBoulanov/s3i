@@ -1,6 +1,6 @@
 # s3i - Batch Windows MSI installer 
 
-This is a simple learning project I created to become familiar with .NET Core 3.0, its Windows/Linux binary portability and [FDE](https://docs.microsoft.com/en-us/dotnet/core/deploying/#framework-dependent-executables-fde) application deployment model. Also, it includes certain useful features like automating builds with [AppVeyor](https://appveyor.com) and deployment to GitHub Releases
+This is a simple learning project I created to become familiar with .NET Core 3.0, its Windows/Linux binary portability and [FDE](https://docs.microsoft.com/en-us/dotnet/core/deploying/#framework-dependent-executables-fde) application deployment model. Also, it gives an example of using certain features like automating builds with [AppVeyor](https://appveyor.com), with deployment to GitHub Releases
 
 ## Build Status
 
