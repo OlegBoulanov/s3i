@@ -171,9 +171,9 @@ __Downgrading:__
 
 Can be done the same way, as upgrading, but the version in the URL should be earlier than already installed, and the product will be unbinstalled first, and the earlier version installed back.
 
-__Removing product:__
+__Uninstalling product:__
 
-To remove, delete (or comment out with semicolon) product `name = URL` from `[$products$]` section of the config file, and run s3i.
+To uninstall a product, delete (or comment out with semicolon) product `name = URL` entry from `[$products$]` section of the config file, and run s3i again.
 
 ## Simple automation
 
