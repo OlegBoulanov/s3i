@@ -131,7 +131,7 @@ To remove, delete (or comment out with semicolon) product `name = URL` from `[$p
 
 ### s3i Windows Service
 
-`s3i service` runs s3i with service arguments passed to the program at computer startup.
+`s3i service` runs s3i with service arguments passed to the program at Windows startup.
 
 CMDLINEARGS s3i installer property allows to set s3i command line parameters for the service at service installation time.
 
