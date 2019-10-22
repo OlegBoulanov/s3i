@@ -1,6 +1,6 @@
 # s3i - Batch Windows MSI installer 
 
-This is a simple learning project, to become familiar with .NET Core 3.0, Windows/Linux binary portability and [FDE deployment](https://docs.microsoft.com/en-us/dotnet/core/deploying/#framework-dependent-executables-fde) deployment model
+This is a simple learning project I created to become familiar with .NET Core 3.0, its Windows/Linux binary portability and [FDE](https://docs.microsoft.com/en-us/dotnet/core/deploying/#framework-dependent-executables-fde) deployment model
 
 ## Build Status
 
