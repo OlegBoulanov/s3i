@@ -18,11 +18,13 @@ namespace s3iLib
 {
     public class ProductCollection : List<ProductInfo>
     {
-        public static async Task<ProductCollection> FromJson(Stream stream)
+        public static async Task<ProductCollection> FromJson(Stream stream, DateTimeOffset lastModified)
         {
             using(var reader = new StreamReader(stream))
             {
-                return JsonSerializer.Deserialize<ProductCollection>(await reader.ReadToEndAsync().ConfigureAwait(false));
+                var products = JsonSerializer.Deserialize<ProductCollection>(await reader.ReadToEndAsync().ConfigureAwait(false));
+                products.ForEach(p => p.LastModified = lastModified.UtcDateTime);
+                return products;
             }
         }
         static string MapToLocal(Uri uri, string localBasePath)
@@ -78,7 +80,7 @@ namespace s3iLib
                           products.AddRange(await ProductCollection.FromIni(stream, lastModified, uri).ConfigureAwait(false));
                           break;
                       case ".JSON":
-                          products.AddRange(await ProductCollection.FromJson(stream).ConfigureAwait(false));
+                          products.AddRange(await ProductCollection.FromJson(stream, lastModified).ConfigureAwait(false));
                           break;
                       default:
                           throw new FormatException($"Unsupported file extension in {uri.ToString()}");
