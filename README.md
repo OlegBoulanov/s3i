@@ -61,10 +61,10 @@ HelloWorld = You welcome!
 ```
 ## Use
 
-__Printing help info:__
+__Printing s3i help info:__
 ```
 C:\Users\current-user>s3i
-s3i: msi package batch installer v1.0.243
+s3i: msi package batch installer v1.0.12345
  Usage:
   s3i [<option> ...] <products> ...
  Options:
@@ -72,7 +72,7 @@ s3i: msi package batch installer v1.0.243
   -p, --profile <profile-name>      AWS user profile name [default]
   -e, --envvar <var-name>           Environment variable name (default command line) [s3i_args]
   -s, --stage <path>                Path to staging folder [C:\Users\current-user\AppData\Local\Temp\s3i]
-  -m, --msiexec <path>              MsiExec command [msiexec.exe]
+  -m, --msiexec <command>           MsiExec command [msiexec.exe]
   -a, --msiargs <args>              MsiExec extra args [/passive]
   -t, --timeout <timespan>          Installation timeout [00:03:00]
   -d, --dryrun                      Dry run [False]
@@ -100,6 +100,7 @@ Save C:\Users\current-user\AppData\Local\Temp\s3i\deployment.s3.amazonaws.com\ot
 ```
 
 __Upgrading one product:__
+
 After changing `products.ini` file: ~~develop/1.2.3-beta2+test~~ _release/1.2.4_, run the same s3i command again:
 ```
 C:\Users\current-user>s3i https://install.company.com.s3.amazonaws.com/Test/Group/products.ini --verbose
