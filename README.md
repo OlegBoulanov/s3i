@@ -12,7 +12,7 @@
 - Windows 7/10
 - [.NET Core Runtime 3.0.0](https://dotnet.microsoft.com/download/dotnet-core/3.0)
 
-`s3i.msi` can be found on the project's [Releases tab](/releases)
+`s3i.msi` can be found on the project's Releases tab
 
 # Functionality
 
@@ -72,4 +72,9 @@ s3i: msi package batch installer v1.0.243
   -t, --timeout <timespan>          Installation timeout [00:03:00]
   -d, --dryrun                      Dry run [False]
   -v, --verbose                     Print full log info [False]
+```
+
+Installing products in configuration file in AWS S3:
+```
+C:\Users\current-user>s3i https://install.company.com.s3.amazonaws.com/Test/Group/products.ini --verbose
 ```
