@@ -25,7 +25,7 @@ namespace s3iWorker
                 services.AddHostedService<Worker>()
                 .Configure<EventLogSettings>(config =>
                 {
-                    config.LogName = $"s3i Service";
+                    //config.LogName = $"Application";
                     config.SourceName = "s3i";
                 });
             })
