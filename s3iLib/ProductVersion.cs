@@ -59,7 +59,7 @@ namespace s3iLib
         public static bool operator !=(ProductVersion thisVersion, ProductVersion otherVersion) { Contract.Requires(null != thisVersion); return 0 != thisVersion.CompareTo(otherVersion); }
         public override int GetHashCode()
         {
-            return ToString().GetHashCode(StringComparison.CurrentCulture);
+            return ToString().GetHashCode();
         }
         public override bool Equals(object obj)
         {
