@@ -29,7 +29,7 @@ namespace s3iWorker
 
         static IHostBuilder CreateHostBuilder(string[] args) =>
             Host.CreateDefaultBuilder(args)
-            .ConfigureLogging(options => options.AddFilter<EventLogLoggerProvider>(level => LogLevel.Warning <= level))
+            //.ConfigureLogging(options => options.AddFilter<EventLogLoggerProvider>(level => LogLevel.Warning <= level))
             .ConfigureServices((hostContext, services) =>
             {
                 services.AddHostedService<Worker>()

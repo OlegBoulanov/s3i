@@ -24,7 +24,6 @@ namespace s3iWorker
         protected override async Task ExecuteAsync(CancellationToken stoppingToken)
         {
 #pragma warning disable CA1303 // literal string, use resource...
-            _logger.LogWarning($"ExecuteAsync({ProcessFileName})");
             if (string.IsNullOrWhiteSpace(ProcessFileName))
             {
                 _logger.LogWarning($"No ProcessFileName set, exiting");
@@ -36,7 +35,6 @@ namespace s3iWorker
                 var exited = null != process ? process.WaitForExit(3 * 60 * 1000) : false;
                 _logger.LogInformation($"Ran: {(null == process ? $"failed" : exited ? $"{Win32Helper.ErrorMessage(process.ExitCode)}" : $"timed out")}");
             }
-            _logger.LogWarning($"ExecuteAsync() exiting");
             await Task.CompletedTask.ConfigureAwait(false);
 #pragma warning restore CA1303
         }
@@ -47,7 +45,6 @@ namespace s3iWorker
         {
             try
             {
-                _logger.LogWarning($"StartProcess({path} {commandLineArgs})");
                 return Process.Start(path, commandLineArgs);
             }
 #pragma warning disable CA1031    // catch specific
