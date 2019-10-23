@@ -88,7 +88,7 @@ namespace s3iLib
             // product version patch to be ignored in semver compare, so we push it to metadata, keeping prerelease empty
             return new SemanticVersion { Major = productVersion.Major, Minor = productVersion.Minor, Patch = productVersion.Build, Prerelease = null, Metadata = productVersion.Patch.ToString(CultureInfo.CurrentCulture), };
         }           
-        static char[] pathSeparatorChars = new char[] { '/', '\\' };
+        static readonly char[] pathSeparatorChars = new char[] { '/', '\\' };
         public static SemanticVersion From(string path, string separators = null)
         {
             Contract.Requires(null != path);
