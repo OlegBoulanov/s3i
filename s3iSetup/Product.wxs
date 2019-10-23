@@ -70,7 +70,50 @@
           <ServiceDependency Id="LanmanServer"/>
         </ServiceInstall>
         <ServiceControl Id="s3i_service_control" Name="s3i" Start="install" Stop="both" Remove="uninstall" />
-      </Component>      
+      </Component>
+      <Component Id="s3iWorker" Guid="{8BB0518E-EABA-4CC1-906E-CE2D4CC88F9A}">
+        <File Id="s3iWorker.exe" Name="s3iWorker.exe" Source="$(var.s3iWorker.TargetDir)s3iWorker.exe" Vital="yes" KeyPath="yes"/>
+        <File Id="s3iWorker.dll" Name="s3iWorker.dll" Source="$(var.s3iWorker.TargetDir)s3iWorker.dll" Vital="yes"/>
+        <File Id="s3iWorker.deps.json" Name="s3iWorker.deps.json" Source="$(var.s3iWorker.TargetDir)s3iWorker.deps.json" Vital="yes"/>
+        <File Id="s3iWorker.runtimeconfig.dev.json" Name="s3iWorker.runtimeconfig.dev.json" Source="$(var.s3iWorker.TargetDir)s3iWorker.runtimeconfig.dev.json" Vital="yes"/>
+        <File Id="s3iWorker.runtimeconfig.json" Name="s3iWorker.runtimeconfig.json" Source="$(var.s3iWorker.TargetDir)s3iWorker.runtimeconfig.json" Vital="yes"/>
+        <File Id="appsettings.Development.json" Name="appsettings.Development.json" Source="$(var.s3iWorker.TargetDir)appsettings.Development.json" Vital="yes"/>
+        <File Id="appsettings.json" Name="appsettings.json" Source="$(var.s3iWorker.TargetDir)appsettings.json" Vital="yes"/>
+        <ServiceInstall Id="s3iWorker_install" Name="s3iw" DisplayName="s3iw batch product installer service" Description="Install product batches from S3 buckets" Start="auto" Arguments="[CMDLINEARGS]" ErrorControl="normal" Type="ownProcess" Vital="yes">
+          <util:ServiceConfig ServiceName="s3iw" ResetPeriodInDays="1" RestartServiceDelayInSeconds="30" FirstFailureActionType="restart" SecondFailureActionType="restart" ThirdFailureActionType="restart" />
+          <ServiceDependency Id="LanmanServer"/>
+        </ServiceInstall>
+        <ServiceControl Id="s3iWorker_control" Name="s3iw" Start="install" Stop="both" Remove="uninstall" />
+        <!-- never ending list of ms crap... -->
+        <File Id="Microsoft.Extensions.Configuration.Abstractions.dll" Name="Microsoft.Extensions.Configuration.Abstractions.dll" Source="$(var.s3iWorker.TargetDir)Microsoft.Extensions.Configuration.Abstractions.dll" Vital="yes"/>
+        <File Id="Microsoft.Extensions.Configuration.Binder.dll" Name="Microsoft.Extensions.Configuration.Binder.dll" Source="$(var.s3iWorker.TargetDir)Microsoft.Extensions.Configuration.Binder.dll" Vital="yes"/>
+        <File Id="Microsoft.Extensions.Configuration.CommandLine.dll" Name="Microsoft.Extensions.Configuration.CommandLine.dll" Source="$(var.s3iWorker.TargetDir)Microsoft.Extensions.Configuration.CommandLine.dll" Vital="yes"/>
+        <File Id="Microsoft.Extensions.Configuration.dll" Name="Microsoft.Extensions.Configuration.dll" Source="$(var.s3iWorker.TargetDir)Microsoft.Extensions.Configuration.dll" Vital="yes"/>
+        <File Id="Microsoft.Extensions.Configuration.EnvironmentVariables.dll" Name="Microsoft.Extensions.Configuration.EnvironmentVariables.dll" Source="$(var.s3iWorker.TargetDir)Microsoft.Extensions.Configuration.EnvironmentVariables.dll" Vital="yes"/>
+        <File Id="Microsoft.Extensions.Configuration.FileExtensions.dll" Name="Microsoft.Extensions.Configuration.FileExtensions.dll" Source="$(var.s3iWorker.TargetDir)Microsoft.Extensions.Configuration.FileExtensions.dll" Vital="yes"/>
+        <File Id="Microsoft.Extensions.Configuration.Json.dll" Name="Microsoft.Extensions.Configuration.Json.dll" Source="$(var.s3iWorker.TargetDir)Microsoft.Extensions.Configuration.Json.dll" Vital="yes"/>
+        <File Id="Microsoft.Extensions.Configuration.UserSecrets.dll" Name="Microsoft.Extensions.Configuration.UserSecrets.dll" Source="$(var.s3iWorker.TargetDir)Microsoft.Extensions.Configuration.UserSecrets.dll" Vital="yes"/>
+        <File Id="Microsoft.Extensions.DependencyInjection.Abstractions.dll" Name="Microsoft.Extensions.DependencyInjection.Abstractions.dll" Source="$(var.s3iWorker.TargetDir)Microsoft.Extensions.DependencyInjection.Abstractions.dll" Vital="yes"/>
+        <File Id="Microsoft.Extensions.DependencyInjection.dll" Name="Microsoft.Extensions.DependencyInjection.dll" Source="$(var.s3iWorker.TargetDir)Microsoft.Extensions.DependencyInjection.dll" Vital="yes"/>
+        <File Id="Microsoft.Extensions.FileProviders.Abstractions.dll" Name="Microsoft.Extensions.FileProviders.Abstractions.dll" Source="$(var.s3iWorker.TargetDir)Microsoft.Extensions.FileProviders.Abstractions.dll" Vital="yes"/>
+        <File Id="Microsoft.Extensions.FileProviders.Physical.dll" Name="Microsoft.Extensions.FileProviders.Physical.dll" Source="$(var.s3iWorker.TargetDir)Microsoft.Extensions.FileProviders.Physical.dll" Vital="yes"/>
+        <File Id="Microsoft.Extensions.FileSystemGlobbing.dll" Name="Microsoft.Extensions.FileSystemGlobbing.dll" Source="$(var.s3iWorker.TargetDir)Microsoft.Extensions.FileSystemGlobbing.dll" Vital="yes"/>
+        <File Id="Microsoft.Extensions.Hosting.Abstractions.dll" Name="Microsoft.Extensions.Hosting.Abstractions.dll" Source="$(var.s3iWorker.TargetDir)Microsoft.Extensions.Hosting.Abstractions.dll" Vital="yes"/>
+        <File Id="Microsoft.Extensions.Hosting.dll" Name="Microsoft.Extensions.Hosting.dll" Source="$(var.s3iWorker.TargetDir)Microsoft.Extensions.Hosting.dll" Vital="yes"/>
+        <File Id="Microsoft.Extensions.Hosting.WindowsServices.dll" Name="Microsoft.Extensions.Hosting.WindowsServices.dll" Source="$(var.s3iWorker.TargetDir)Microsoft.Extensions.Hosting.WindowsServices.dll" Vital="yes"/>
+        <File Id="Microsoft.Extensions.Logging.Abstractions.dll" Name="Microsoft.Extensions.Logging.Abstractions.dll" Source="$(var.s3iWorker.TargetDir)Microsoft.Extensions.Logging.Abstractions.dll" Vital="yes"/>
+        <File Id="Microsoft.Extensions.Logging.Configuration.dll" Name="Microsoft.Extensions.Logging.Configuration.dll" Source="$(var.s3iWorker.TargetDir)Microsoft.Extensions.Logging.Configuration.dll" Vital="yes"/>
+        <File Id="Microsoft.Extensions.Logging.Console.dll" Name="Microsoft.Extensions.Logging.Console.dll" Source="$(var.s3iWorker.TargetDir)Microsoft.Extensions.Logging.Console.dll" Vital="yes"/>
+        <File Id="Microsoft.Extensions.Logging.Debug.dll" Name="Microsoft.Extensions.Logging.Debug.dll" Source="$(var.s3iWorker.TargetDir)Microsoft.Extensions.Logging.Debug.dll" Vital="yes"/>
+        <File Id="Microsoft.Extensions.Logging.dll" Name="Microsoft.Extensions.Logging.dll" Source="$(var.s3iWorker.TargetDir)Microsoft.Extensions.Logging.dll" Vital="yes"/>
+        <File Id="Microsoft.Extensions.Logging.EventLog.dll" Name="Microsoft.Extensions.Logging.EventLog.dll" Source="$(var.s3iWorker.TargetDir)Microsoft.Extensions.Logging.EventLog.dll" Vital="yes"/>
+        <File Id="Microsoft.Extensions.Logging.EventSource.dll" Name="Microsoft.Extensions.Logging.EventSource.dll" Source="$(var.s3iWorker.TargetDir)Microsoft.Extensions.Logging.EventSource.dll" Vital="yes"/>
+        <File Id="Microsoft.Extensions.Options.ConfigurationExtensions.dll" Name="Microsoft.Extensions.Options.ConfigurationExtensions.dll" Source="$(var.s3iWorker.TargetDir)Microsoft.Extensions.Options.ConfigurationExtensions.dll" Vital="yes"/>
+        <File Id="Microsoft.Extensions.Options.dll" Name="Microsoft.Extensions.Options.dll" Source="$(var.s3iWorker.TargetDir)Microsoft.Extensions.Options.dll" Vital="yes"/>
+        <File Id="Microsoft.Extensions.Primitives.dll" Name="Microsoft.Extensions.Primitives.dll" Source="$(var.s3iWorker.TargetDir)Microsoft.Extensions.Primitives.dll" Vital="yes"/>
+        <File Id="System.Diagnostics.EventLog.dll" Name="System.Diagnostics.EventLog.dll" Source="$(var.s3iWorker.TargetDir)System.Diagnostics.EventLog.dll" Vital="yes"/>
+        <File Id="System.ServiceProcess.ServiceController.dll" Name="System.ServiceProcess.ServiceController.dll" Source="$(var.s3iWorker.TargetDir)System.ServiceProcess.ServiceController.dll" Vital="yes"/>        <!-- service -->
+      </Component>
       <Component Id="AWSSDK" Guid="{F61F6544-DBBF-472D-93D2-3714E0C1D4DB}">
         <File Id="AWSSDK.Core.dll" Name="AWSSDK.Core.dll" Source="$(var.s3i.TargetDir)AWSSDK.Core.dll" Vital="yes"/>
         <File Id="AWSSDK.S3.dll" Name="AWSSDK.S3.dll" Source="$(var.s3i.TargetDir)AWSSDK.S3.dll" Vital="yes"/>
@@ -80,6 +123,7 @@
     <Feature Id="ProductFeature" Title="s3i" Level="1">
       <ComponentRef Id="s3i_command" />
       <ComponentRef Id="s3i_service" />
+      <ComponentRef Id="s3iWorker" />
       <ComponentRef Id="AWSSDK" />
     </Feature>
 

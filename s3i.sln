@@ -21,6 +21,8 @@ Project("{930C7802-8A8C-48F9-8165-68863BCCD9DD}") = "s3iSetup", "s3iSetup\s3iSet
 EndProject
 Project("{930C7802-8A8C-48F9-8165-68863BCCD9DD}") = "wixExample", "wixExample\wixExample.wixproj", "{FC1547BC-7B64-4135-A4B3-02C2AF648CA1}"
 EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "s3iWorker", "s3iWorker\s3iWorker.csproj", "{8801A6EF-C2C5-4BEE-8D79-748FE0902717}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -77,6 +79,14 @@ Global
 		{FC1547BC-7B64-4135-A4B3-02C2AF648CA1}.Release|Any CPU.Build.0 = Release|x86
 		{FC1547BC-7B64-4135-A4B3-02C2AF648CA1}.Release|x86.ActiveCfg = Release|x86
 		{FC1547BC-7B64-4135-A4B3-02C2AF648CA1}.Release|x86.Build.0 = Release|x86
+		{8801A6EF-C2C5-4BEE-8D79-748FE0902717}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{8801A6EF-C2C5-4BEE-8D79-748FE0902717}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{8801A6EF-C2C5-4BEE-8D79-748FE0902717}.Debug|x86.ActiveCfg = Debug|Any CPU
+		{8801A6EF-C2C5-4BEE-8D79-748FE0902717}.Debug|x86.Build.0 = Debug|Any CPU
+		{8801A6EF-C2C5-4BEE-8D79-748FE0902717}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{8801A6EF-C2C5-4BEE-8D79-748FE0902717}.Release|Any CPU.Build.0 = Release|Any CPU
+		{8801A6EF-C2C5-4BEE-8D79-748FE0902717}.Release|x86.ActiveCfg = Release|Any CPU
+		{8801A6EF-C2C5-4BEE-8D79-748FE0902717}.Release|x86.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
