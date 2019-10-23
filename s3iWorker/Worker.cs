@@ -32,8 +32,8 @@ namespace s3iWorker
             {
                 _logger.LogInformation($"Start: {ProcessFileName} {CommandLineArguments}");
                 var process = StartProcess(ProcessFileName, CommandLineArguments);
-                var exited = process.WaitForExit(3 * 60 * 1000);
-                _logger.LogInformation($"Ran: {(exited ? $"{Win32Helper.ErrorMessage(process.ExitCode)}" : $"timed out")}");
+                var exited = null != process ? process.WaitForExit(3 * 60 * 1000) : false;
+                _logger.LogInformation($"Ran: {(null == process ? $"failed" : exited ? $"{Win32Helper.ErrorMessage(process.ExitCode)}" : $"timed out")}");
             }
             await Task.CompletedTask.ConfigureAwait(false);
 #pragma warning restore CA1303

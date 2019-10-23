@@ -9,6 +9,7 @@ using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Hosting.WindowsServices;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Logging.EventLog;
+using System.Web;
 
 namespace s3iWorker
 {
@@ -16,7 +17,7 @@ namespace s3iWorker
     {
         public static async Task Main(string[] args)
         {
-            var exeFilePath = new Uri(System.Reflection.Assembly.GetExecutingAssembly().CodeBase).AbsolutePath;
+            var exeFilePath = HttpUtility.UrlDecode(new Uri(System.Reflection.Assembly.GetExecutingAssembly().CodeBase).AbsolutePath);
             Worker.ProcessFileName = $"{Path.GetDirectoryName(exeFilePath)}{Path.DirectorySeparatorChar}s3i.exe";
             Worker.CommandLineArguments = args.Aggregate("", (a, s) => { return $"{a} {s}"; });
             //
