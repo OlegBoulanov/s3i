@@ -8,6 +8,8 @@ using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
 using System.Diagnostics;
 
+using s3iLib;
+
 namespace s3iWorker
 {
     public class Worker : BackgroundService
@@ -31,7 +33,7 @@ namespace s3iWorker
                 _logger.LogInformation($"Start: {ProcessFileName} {CommandLineArguments}");
                 var process = StartProcess(ProcessFileName, CommandLineArguments);
                 var exited = process.WaitForExit(3 * 60 * 1000);
-                _logger.LogInformation($"Ran: {(exited ? $"{process.ExitCode}" : $"could not exit")}");
+                _logger.LogInformation($"Ran: {(exited ? $"{Win32Helper.ErrorMessage(process.ExitCode)}" : $"timed out")}");
             }
             await Task.CompletedTask.ConfigureAwait(false);
 #pragma warning restore CA1303
@@ -40,19 +42,16 @@ namespace s3iWorker
         public static string ProcessFileName { get; set; }
         public static string CommandLineArguments { get; set; }
         protected Process StartProcess(string path, string commandLineArgs)
-        { 
-            if (!string.IsNullOrWhiteSpace(commandLineArgs))
+        {
+            try
             {
-                try
-                {
-                    return Process.Start(path, commandLineArgs);
-                }
+                return Process.Start(path, commandLineArgs);
+            }
 #pragma warning disable CA1031    // catch specific
-                catch (Exception x)
+            catch (Exception x)
 #pragma warning restore CA1031
-                {
-                    _logger.LogError($"Worker.StartProcess({path}, {commandLineArgs}) error:{Environment.NewLine}{x.Message}{Environment.NewLine}{x.StackTrace}");
-                }
+            {
+                _logger.LogError($"Worker.StartProcess({path}, {commandLineArgs}) error:{Environment.NewLine}{x.Message}{Environment.NewLine}{x.StackTrace}");
             }
             return null;
         }
