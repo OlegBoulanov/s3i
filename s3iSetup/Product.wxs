@@ -45,6 +45,15 @@
       <Directory Id="ProgramFilesFolder">
         <Directory Id="INSTALLDIR" Name="$(var.Manufacturer)">
           <Directory Id="Product_Root" Name="$(var.ProductName)">
+            <!--runtimes\win\lib\netstandard2.0-->
+            <Directory Id="runtimes" Name="runtimes">
+              <Directory Id="runtimes.win" Name="win">
+                <Directory Id="runtimes.win.lib" Name="lib">
+                  <Directory Id="runtimes.win.lib.netcoreapp2.0" Name="netcoreapp2.0" />
+                  <Directory Id="runtimes.win.lib.netstandard2.0" Name="netstandard2.0" />
+                </Directory>
+              </Directory>"
+            </Directory>
           </Directory>
         </Directory>
       </Directory>
@@ -120,10 +129,23 @@
       </Component>
     </DirectoryRef>
 
+    <DirectoryRef Id="runtimes.win.lib.netcoreapp2.0">
+      <Component Id="netcoreapp2.0" Guid="{A42FF591-8E16-40DB-8720-2D95490F63E7}">
+        <File Id="System.Diagnostics.EventLog.dll" Name="System.Diagnostics.EventLog.dll" Source="$(var.s3iWorker.TargetDir)runtimes\win\lib\netcoreapp2.0\System.Diagnostics.EventLog.dll" Vital="yes" KeyPath="yes"/>
+      </Component>
+    </DirectoryRef>
+    <DirectoryRef Id="runtimes.win.lib.netstandard2.0">
+      <Component Id="netstandard2.0" Guid="{A42FF591-8E16-40DB-8720-2D95490F63E7}">
+        <File Id="System.ServiceProcess.ServiceController.dll" Name="System.ServiceProcess.ServiceController.dll" Source="$(var.s3iWorker.TargetDir)runtimes\win\lib\netstandard2.0\System.ServiceProcess.ServiceController.dll" Vital="yes" KeyPath="yes"/>
+      </Component>
+    </DirectoryRef>
+
     <Feature Id="ProductFeature" Title="s3i" Level="1">
       <ComponentRef Id="s3i_command" />
       <ComponentRef Id="s3i_service" />
       <ComponentRef Id="s3iWorker" />
+      <ComponentRef Id="runtimes.win.lib.netcoreapp2.0"/>
+      <ComponentRef Id="runtimes.win.lib.netstandard2.0"/>
       <ComponentRef Id="AWSSDK" />
     </Feature>
 
