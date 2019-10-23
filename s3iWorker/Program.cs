@@ -1,5 +1,7 @@
 using System;
+using System.IO;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Linq;
 using System.Threading.Tasks;
 using Microsoft.Extensions.DependencyInjection;
@@ -10,14 +12,21 @@ using Microsoft.Extensions.Logging.EventLog;
 
 namespace s3iWorker
 {
-    public static class Program
+    internal static class Program
     {
-        public static void Main(string[] args)
+        public static async Task Main(string[] args)
         {
-            CreateHostBuilder(args).Build().Run();
+            var exeFilePath = new Uri(System.Reflection.Assembly.GetExecutingAssembly().CodeBase).AbsolutePath;
+            Worker.ProcessFileName = $"{Path.GetDirectoryName(exeFilePath)}{Path.DirectorySeparatorChar}s3i.exe";
+            Worker.CommandLineArguments = args.Aggregate("", (a, s) => { return $"{a} {s}"; });
+            //
+            var isService = (!Debugger.IsAttached || args.Contains("--console"));
+            var builder = CreateHostBuilder(args);
+            var task = isService ? builder.UseWindowsService().Build().RunAsync() : builder.RunConsoleAsync();
+            await task.ConfigureAwait(false);
         }
 
-        public static IHostBuilder CreateHostBuilder(string[] args) =>
+        static IHostBuilder CreateHostBuilder(string[] args) =>
             Host.CreateDefaultBuilder(args)
             .ConfigureLogging(options => options.AddFilter<EventLogLoggerProvider>(level => LogLevel.Warning <= level))
             .ConfigureServices((hostContext, services) =>
@@ -28,7 +37,6 @@ namespace s3iWorker
                     //config.LogName = $"Application";
                     config.SourceName = "s3i";
                 });
-            })
-            .UseWindowsService();
+            });
     }
 }

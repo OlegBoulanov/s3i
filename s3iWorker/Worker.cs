@@ -22,14 +22,39 @@ namespace s3iWorker
         protected override async Task ExecuteAsync(CancellationToken stoppingToken)
         {
 #pragma warning disable CA1303 // literal string, use resource...
-            _logger.LogWarning("s3iWorker started");
-            while (!stoppingToken.IsCancellationRequested)
+            if (string.IsNullOrWhiteSpace(ProcessFileName))
             {
-                _logger.LogInformation("Worker running at: {time}", DateTimeOffset.Now);
-                await Task.Delay(1000, stoppingToken).ConfigureAwait(false);
+                _logger.LogWarning($"No ProcessFileName set, exiting");
             }
-            _logger.LogWarning("s3iWorker exiting");
+            else
+            {
+                _logger.LogInformation($"Start: {ProcessFileName} {CommandLineArguments}");
+                var process = StartProcess(ProcessFileName, CommandLineArguments);
+                var exited = process.WaitForExit(3 * 60 * 1000);
+                _logger.LogInformation($"Ran: {(exited ? $"{process.ExitCode}" : $"could not exit")}");
+            }
+            await Task.CompletedTask.ConfigureAwait(false);
 #pragma warning restore CA1303
+        }
+
+        public static string ProcessFileName { get; set; }
+        public static string CommandLineArguments { get; set; }
+        protected Process StartProcess(string path, string commandLineArgs)
+        { 
+            if (!string.IsNullOrWhiteSpace(commandLineArgs))
+            {
+                try
+                {
+                    return Process.Start(path, commandLineArgs);
+                }
+#pragma warning disable CA1031    // catch specific
+                catch (Exception x)
+#pragma warning restore CA1031
+                {
+                    _logger.LogError($"Worker.StartProcess({path}, {commandLineArgs}) error:{Environment.NewLine}{x.Message}{Environment.NewLine}{x.StackTrace}");
+                }
+            }
+            return null;
         }
     }
 }
