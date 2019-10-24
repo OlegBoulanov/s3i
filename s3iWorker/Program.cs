@@ -20,6 +20,7 @@ namespace s3iWorker
             commandLine.Parse(args);
             Worker.ProcessFileName = commandLine.ProcessFilePath;
             Worker.ProcessTimeout = commandLine.ProcessTimeout;
+            Worker.StartProcessDelay = commandLine.StartProcessDelay;
             var isService = (!Debugger.IsAttached || commandLine.RunConsole);
             var builder = CreateHostBuilder(args);
             var task = isService ? builder.UseWindowsService().Build().RunAsync() : builder.RunConsoleAsync();

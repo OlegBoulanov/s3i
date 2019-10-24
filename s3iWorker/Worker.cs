@@ -26,19 +26,26 @@ namespace s3iWorker
 #pragma warning disable CA1303 // literal string, use resource...
             if (string.IsNullOrWhiteSpace(ProcessFileName))
             {
-                _logger.LogWarning($"No ProcessFileName set, exiting");
+                _logger.LogWarning($"ProcessFileName not set, will do nothing");
             }
             else
             {
-                _logger.LogInformation($"Start: {ProcessFileName}");
-                var process = StartProcess(ProcessFileName, "");
-                var exited = null != process ? process.WaitForExit((int)ProcessTimeout.TotalMilliseconds) : false;
-                _logger.LogInformation($"{ProcessFileName}: {(null == process ? $"failed" : exited ? $"{Win32Helper.ErrorMessage(process.ExitCode)}" : $"timed out")}");
+                await Task.Delay(StartProcessDelay, stoppingToken).ConfigureAwait(false);
+                if (!stoppingToken.IsCancellationRequested)
+                {
+                    _logger.LogInformation($"Start: {ProcessFileName}");
+                    var process = StartProcess(ProcessFileName, "");
+                    var failed = null == process;
+                    var exited = !failed ? process.WaitForExit((int)ProcessTimeout.TotalMilliseconds) : false;
+                    _logger.Log(exited && 0 == process.ExitCode ? LogLevel.Information : LogLevel.Error,
+                        $"{nameof(s3iWorker)}: {ProcessFileName} {(failed ? $"failed" : exited ? $"exited: {Win32Helper.ErrorMessage(process.ExitCode)}" : $"timed out")}");
+                }
             }
             await Task.CompletedTask.ConfigureAwait(false);
 #pragma warning restore CA1303
         }
 
+        public static TimeSpan StartProcessDelay { get; set; } = TimeSpan.FromSeconds(60);
         public static string ProcessFileName { get; set; }
         public static TimeSpan ProcessTimeout { get; set; } = TimeSpan.FromMinutes(5);
         protected Process StartProcess(string path, string commandLineArgs)
