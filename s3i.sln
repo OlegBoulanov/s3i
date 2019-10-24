@@ -21,6 +21,11 @@ Project("{930C7802-8A8C-48F9-8165-68863BCCD9DD}") = "wixExample", "wixExample\wi
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "s3iWorker", "s3iWorker\s3iWorker.csproj", "{8801A6EF-C2C5-4BEE-8D79-748FE0902717}"
 EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Examples", "Examples", "{B1FEC4B2-40C0-44D5-A98B-689FE2168900}"
+	ProjectSection(SolutionItems) = preProject
+		Config.ini = Config.ini
+	EndProjectSection
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -80,6 +85,9 @@ Global
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(NestedProjects) = preSolution
+		{B1FEC4B2-40C0-44D5-A98B-689FE2168900} = {26BA2AE3-05FD-45B2-B99B-B283F3D784D0}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {4C8E9B15-5892-47B4-9028-853B42AB6CD7}
