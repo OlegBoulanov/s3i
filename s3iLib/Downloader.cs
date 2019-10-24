@@ -31,6 +31,7 @@ namespace s3iLib
         {
             Contract.Requires(null != url);
             if (DownloaderS3.CanDownload(url)) return new DownloaderS3();
+            if (DownloaderFile.CanDownload(url)) return new DownloaderFile();
             return new DownloaderHttp();
         }
     }
