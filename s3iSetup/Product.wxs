@@ -35,7 +35,7 @@
 
     <Property Id="CMDLINEARGS" Admin="yes"> </Property>
 
-    <Property Id="ARPCOMMENTS">s3i msi package batch installer</Property>
+    <Property Id="ARPCOMMENTS">s3i - MSI Package Batch Installer</Property>
     <Property Id="ARPCONTACT">Oleg Boulanov</Property>
     <Property Id="ARPHELPLINK">https://github.com/OlegBoulanov/s3i/</Property>
     <Property Id="ARPURLINFOABOUT">https://github.com/OlegBoulanov/s3i/</Property>
@@ -61,7 +61,11 @@
 
     <?define s3i_service_file=s3iService?>
     <DirectoryRef Id="Product_Root" FileSource="$(var.s3i.TargetDir)">
-      <Component Id="s3i_command" Guid="{36119CD0-A673-4695-BA85-3D109D2F76DE}">
+      <Component Id="AWSSDK" Guid="{F61F6544-DBBF-472D-93D2-3714E0C1D4DB}">
+        <File Id="AWSSDK.Core.dll" Name="AWSSDK.Core.dll" Source="$(var.s3i.TargetDir)AWSSDK.Core.dll" Vital="yes"/>
+        <File Id="AWSSDK.S3.dll" Name="AWSSDK.S3.dll" Source="$(var.s3i.TargetDir)AWSSDK.S3.dll" Vital="yes"/>
+      </Component>
+      <Component Id="s3iCommandLine" Guid="{36119CD0-A673-4695-BA85-3D109D2F76DE}">
         <RemoveFolder Id="Product_Root" On="uninstall"/>
         <File Id="s3i.dll" Name="s3i.dll" Vital="yes" KeyPath="yes"/>
         <File Id="s3i.exe" Name="s3i.exe" Vital="yes"/>
@@ -79,11 +83,11 @@
         <File Id="s3iWorker.runtimeconfig.json" Name="s3iWorker.runtimeconfig.json" Source="$(var.s3iWorker.TargetDir)s3iWorker.runtimeconfig.json" Vital="yes"/>
         <File Id="appsettings.Development.json" Name="appsettings.Development.json" Source="$(var.s3iWorker.TargetDir)appsettings.Development.json" Vital="yes"/>
         <File Id="appsettings.json" Name="appsettings.json" Source="$(var.s3iWorker.TargetDir)appsettings.json" Vital="yes"/>
-        <ServiceInstall Id="s3iWorker_install" Name="s3iw" DisplayName="s3iw batch product installer service" Description="Install product batches from S3 buckets" Start="auto" Arguments="[CMDLINEARGS]" ErrorControl="normal" Type="ownProcess" Vital="yes">
+        <ServiceInstall Id="s3iWorker_install" Name="s3i" DisplayName="MSI package batch installer service" Description="Installs batches of MSI packages from S3 buckets and/or Web sites" Start="auto" Arguments="[CMDLINEARGS]" ErrorControl="normal" Type="ownProcess" Vital="yes">
           <util:ServiceConfig ServiceName="s3i" ResetPeriodInDays="1" RestartServiceDelayInSeconds="30" FirstFailureActionType="restart" SecondFailureActionType="restart" ThirdFailureActionType="restart" />
           <ServiceDependency Id="LanmanServer"/>
         </ServiceInstall>
-        <ServiceControl Id="s3iWorker_control" Name="s3iw" Start="install" Stop="both" Remove="uninstall" />
+        <ServiceControl Id="s3iWorker_control" Name="s3i" Start="install" Stop="both" Remove="uninstall" />
         <!-- never ending list of ms crap... -->
         <File Id="Microsoft.Extensions.Configuration.Abstractions.dll" Name="Microsoft.Extensions.Configuration.Abstractions.dll" Source="$(var.s3iWorker.TargetDir)Microsoft.Extensions.Configuration.Abstractions.dll" Vital="yes"/>
         <File Id="Microsoft.Extensions.Configuration.Binder.dll" Name="Microsoft.Extensions.Configuration.Binder.dll" Source="$(var.s3iWorker.TargetDir)Microsoft.Extensions.Configuration.Binder.dll" Vital="yes"/>
@@ -114,10 +118,6 @@
         <File Id="System.Diagnostics.EventLog.dll" Name="System.Diagnostics.EventLog.dll" Source="$(var.s3iWorker.TargetDir)System.Diagnostics.EventLog.dll" Vital="yes"/>
         <File Id="System.ServiceProcess.ServiceController.dll" Name="System.ServiceProcess.ServiceController.dll" Source="$(var.s3iWorker.TargetDir)System.ServiceProcess.ServiceController.dll" Vital="yes"/>        <!-- service -->
       </Component>
-      <Component Id="AWSSDK" Guid="{F61F6544-DBBF-472D-93D2-3714E0C1D4DB}">
-        <File Id="AWSSDK.Core.dll" Name="AWSSDK.Core.dll" Source="$(var.s3i.TargetDir)AWSSDK.Core.dll" Vital="yes"/>
-        <File Id="AWSSDK.S3.dll" Name="AWSSDK.S3.dll" Source="$(var.s3i.TargetDir)AWSSDK.S3.dll" Vital="yes"/>
-      </Component>
     </DirectoryRef>
 
     <DirectoryRef Id="runtimes.win.lib.netcoreapp2.0">
@@ -132,7 +132,7 @@
     </DirectoryRef>
 
     <Feature Id="ProductFeature" Title="s3i" Level="1">
-      <ComponentRef Id="s3i_command" />
+      <ComponentRef Id="s3iCommandLine" />
       <ComponentRef Id="s3iWorker" />
       <ComponentRef Id="runtimes.netcoreapp2.0"/>
       <ComponentRef Id="runtimes.netstandard2.0"/>

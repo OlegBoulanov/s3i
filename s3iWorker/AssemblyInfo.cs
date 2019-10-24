@@ -1,10 +1,10 @@
 using System.Reflection;
 
-[assembly: AssemblyTitle("s3iw")]
-[assembly: AssemblyDescription("s3i worker")]
+[assembly: AssemblyTitle("s3i")]
+[assembly: AssemblyDescription("s3i worker service")]
 [assembly: AssemblyConfiguration("")]
 [assembly: AssemblyCompany("UselessExtras")]
-[assembly: AssemblyProduct("s3i msi package batch installer")]
+[assembly: AssemblyProduct("s3i - MSI Package Batch Installer")]
 [assembly: AssemblyCopyright("Copyright © 2019, Oleg Boulanov")]
 [assembly: AssemblyTrademark("")]
 [assembly: AssemblyCulture("")] // must be empty, allowed for satellite assemblies only

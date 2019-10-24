@@ -38,7 +38,7 @@ namespace s3iWorker
                     var failed = null == process;
                     var exited = !failed ? process.WaitForExit((int)ProcessTimeout.TotalMilliseconds) : false;
                     _logger.Log(exited && 0 == process.ExitCode ? LogLevel.Information : LogLevel.Error,
-                        $"{nameof(s3iWorker)}: {ProcessFileName} {(failed ? $"failed" : exited ? $"exited: {Win32Helper.ErrorMessage(process.ExitCode)}" : $"timed out")}");
+                        $"{nameof(s3iWorker)}: {ProcessFileName}{(failed ? $" failed" : exited ? $": {Win32Helper.ErrorMessage(process.ExitCode)}" : $" timed out after {ProcessTimeout}")}");
                 }
             }
             await Task.CompletedTask.ConfigureAwait(false);

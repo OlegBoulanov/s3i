@@ -4,7 +4,7 @@ using System.Reflection;
 [assembly: AssemblyDescription("s3i command line tool")]
 [assembly: AssemblyConfiguration("")]
 [assembly: AssemblyCompany("UselessExtras")]
-[assembly: AssemblyProduct("s3i msi package batch installer")]
+[assembly: AssemblyProduct("s3i - MSI Package Batch Installer")]
 [assembly: AssemblyCopyright("Copyright © 2019, Oleg Boulanov")]
 [assembly: AssemblyTrademark("")]
 [assembly: AssemblyCulture("")] // must be empty, allowed for satellite assemblies only
