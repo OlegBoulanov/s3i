@@ -30,17 +30,17 @@ namespace s3iWorker
             }
             else
             {
-                _logger.LogInformation($"Start: {ProcessFileName} {CommandLineArguments}");
-                var process = StartProcess(ProcessFileName, CommandLineArguments);
-                var exited = null != process ? process.WaitForExit(3 * 60 * 1000) : false;
-                _logger.LogInformation($"Ran: {(null == process ? $"failed" : exited ? $"{Win32Helper.ErrorMessage(process.ExitCode)}" : $"timed out")}");
+                _logger.LogInformation($"Start: {ProcessFileName}");
+                var process = StartProcess(ProcessFileName, "");
+                var exited = null != process ? process.WaitForExit((int)ProcessTimeout.TotalMilliseconds) : false;
+                _logger.LogInformation($"{ProcessFileName}: {(null == process ? $"failed" : exited ? $"{Win32Helper.ErrorMessage(process.ExitCode)}" : $"timed out")}");
             }
             await Task.CompletedTask.ConfigureAwait(false);
 #pragma warning restore CA1303
         }
 
         public static string ProcessFileName { get; set; }
-        public static string CommandLineArguments { get; set; }
+        public static TimeSpan ProcessTimeout { get; set; } = TimeSpan.FromMinutes(5);
         protected Process StartProcess(string path, string commandLineArgs)
         {
             try

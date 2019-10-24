@@ -17,25 +17,24 @@ namespace s3iWorker
     {
         public static async Task Main(string[] args)
         {
-            var exeFilePath = HttpUtility.UrlDecode(new Uri(System.Reflection.Assembly.GetExecutingAssembly().CodeBase).AbsolutePath);
-            Worker.ProcessFileName = $"{Path.GetDirectoryName(exeFilePath)}{Path.DirectorySeparatorChar}s3i.exe";
-            Worker.CommandLineArguments = args.Aggregate("", (a, s) => { return $"{a} {s}"; });
-            //
-            var isService = (!Debugger.IsAttached || args.Contains("--console"));
+            commandLine.Parse(args);
+            Worker.ProcessFileName = commandLine.ProcessFilePath;
+            Worker.ProcessTimeout = commandLine.ProcessTimeout;
+            var isService = (!Debugger.IsAttached || commandLine.RunConsole);
             var builder = CreateHostBuilder(args);
             var task = isService ? builder.UseWindowsService().Build().RunAsync() : builder.RunConsoleAsync();
             await task.ConfigureAwait(false);
         }
-
+        static readonly CommandLine commandLine = new CommandLine();
         static IHostBuilder CreateHostBuilder(string[] args) =>
             Host.CreateDefaultBuilder(args)
-            //.ConfigureLogging(options => options.AddFilter<EventLogLoggerProvider>(level => LogLevel.Warning <= level))
+            .ConfigureLogging(options => options.AddFilter<EventLogLoggerProvider>(level => commandLine.LogLevel <= level))
             .ConfigureServices((hostContext, services) =>
             {
                 services.AddHostedService<Worker>()
                 .Configure<EventLogSettings>(config =>
                 {
-                    //config.LogName = $"Application";
+                    config.LogName = $"Application";    // null would do just the same
                     config.SourceName = "s3i";
                 });
             });
