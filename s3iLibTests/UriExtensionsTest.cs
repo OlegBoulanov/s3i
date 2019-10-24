@@ -28,7 +28,7 @@ namespace s3iLibTests
             Assert.AreEqual("https", uri.Scheme);
             Assert.AreEqual("server.com", uri.Host);
             Assert.AreEqual(UriHostNameType.Dns, uri.HostNameType);
-            Assert.AreEqual($"{Path.DirectorySeparatorChar}folder{Path.DirectorySeparatorChar}file.ext", uri.AbsolutePath);
+            Assert.AreEqual($"/folder/file.ext", uri.AbsolutePath);
             Assert.Throws(typeof(FormatException), () => uri.GetAbsoluteFilePath());
             // File URI
             var fileUri = new Uri("file:///c:\\folder\\file.ext");
