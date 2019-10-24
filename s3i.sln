@@ -23,7 +23,7 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "s3iWorker", "s3iWorker\s3iW
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Examples", "Examples", "{B1FEC4B2-40C0-44D5-A98B-689FE2168900}"
 	ProjectSection(SolutionItems) = preProject
-		Config.ini = Config.ini
+		Examples\Config.ini = Examples\Config.ini
 	EndProjectSection
 EndProject
 Global
