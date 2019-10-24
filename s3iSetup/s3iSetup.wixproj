@@ -31,14 +31,6 @@
       <RefProjectOutputGroups>Binaries;Content;Satellites</RefProjectOutputGroups>
       <RefTargetDir>INSTALLFOLDER</RefTargetDir>
     </ProjectReference>
-    <ProjectReference Include="..\s3iService\s3iService.csproj">
-      <Name>s3iService</Name>
-      <Project>{8ef1416c-b82b-4164-b22e-cbc2ea01431d}</Project>
-      <Private>True</Private>
-      <DoNotHarvest>True</DoNotHarvest>
-      <RefProjectOutputGroups>Binaries;Content;Satellites</RefProjectOutputGroups>
-      <RefTargetDir>INSTALLFOLDER</RefTargetDir>
-    </ProjectReference>
     <ProjectReference Include="..\s3iWorker\s3iWorker.csproj">
       <Name>s3iWorker</Name>
       <Project>{8801a6ef-c2c5-4bee-8d79-748fe0902717}</Project>

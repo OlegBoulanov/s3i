@@ -71,15 +71,6 @@
         <File Id="s3iLib.dll" Name="s3iLib.dll" Vital="yes"/>
         <Environment Id="path" Name="PATH" Value="[Product_Root]" Action="set" System="yes" Part="last" Permanent="no" />
       </Component>
-      <Component Id="s3i_service" Guid="{B0238396-CF59-471E-8793-2A407D45E411}">
-        <File Id="s3i_service.exe" Name="$(var.s3i_service_file).exe" Source="$(var.s3iService.TargetDir)$(var.s3i_service_file).exe" Vital="yes"/>
-        <!-- service -->
-        <ServiceInstall Id="s3i_service_install" Name="s3i" DisplayName="s3i batch product installer service" Description="Install product batches from S3 buckets" Start="auto" Arguments="[CMDLINEARGS]" ErrorControl="normal" Type="ownProcess" Vital="yes">
-          <util:ServiceConfig ServiceName="s3i" ResetPeriodInDays="1" RestartServiceDelayInSeconds="30" FirstFailureActionType="restart" SecondFailureActionType="restart" ThirdFailureActionType="restart" />
-          <ServiceDependency Id="LanmanServer"/>
-        </ServiceInstall>
-        <ServiceControl Id="s3i_service_control" Name="s3i" Start="install" Stop="both" Remove="uninstall" />
-      </Component>
       <Component Id="s3iWorker" Guid="{8BB0518E-EABA-4CC1-906E-CE2D4CC88F9A}">
         <File Id="s3iWorker.exe" Name="s3iWorker.exe" Source="$(var.s3iWorker.TargetDir)s3iWorker.exe" Vital="yes" KeyPath="yes"/>
         <File Id="s3iWorker.dll" Name="s3iWorker.dll" Source="$(var.s3iWorker.TargetDir)s3iWorker.dll" Vital="yes"/>
@@ -89,7 +80,7 @@
         <File Id="appsettings.Development.json" Name="appsettings.Development.json" Source="$(var.s3iWorker.TargetDir)appsettings.Development.json" Vital="yes"/>
         <File Id="appsettings.json" Name="appsettings.json" Source="$(var.s3iWorker.TargetDir)appsettings.json" Vital="yes"/>
         <ServiceInstall Id="s3iWorker_install" Name="s3iw" DisplayName="s3iw batch product installer service" Description="Install product batches from S3 buckets" Start="auto" Arguments="[CMDLINEARGS]" ErrorControl="normal" Type="ownProcess" Vital="yes">
-          <util:ServiceConfig ServiceName="s3iw" ResetPeriodInDays="1" RestartServiceDelayInSeconds="30" FirstFailureActionType="restart" SecondFailureActionType="restart" ThirdFailureActionType="restart" />
+          <util:ServiceConfig ServiceName="s3i" ResetPeriodInDays="1" RestartServiceDelayInSeconds="30" FirstFailureActionType="restart" SecondFailureActionType="restart" ThirdFailureActionType="restart" />
           <ServiceDependency Id="LanmanServer"/>
         </ServiceInstall>
         <ServiceControl Id="s3iWorker_control" Name="s3iw" Start="install" Stop="both" Remove="uninstall" />
@@ -142,7 +133,6 @@
 
     <Feature Id="ProductFeature" Title="s3i" Level="1">
       <ComponentRef Id="s3i_command" />
-      <ComponentRef Id="s3i_service" />
       <ComponentRef Id="s3iWorker" />
       <ComponentRef Id="runtimes.netcoreapp2.0"/>
       <ComponentRef Id="runtimes.netstandard2.0"/>
