@@ -137,7 +137,8 @@ namespace s3i
                         if (string.IsNullOrEmpty(installedProduct.LocalPath)) installedProduct.LocalPath = localMsiFile;
                     }
                     return installedProduct;
-                });
+                },
+                commandLine.VersionPrefixes.Split(','));
             }
             if (commandLine.Verbose)
             {

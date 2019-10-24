@@ -89,15 +89,24 @@ namespace s3iLib
             return new SemanticVersion { Major = productVersion.Major, Minor = productVersion.Minor, Patch = productVersion.Build, Prerelease = null, Metadata = productVersion.Patch.ToString(CultureInfo.CurrentCulture), };
         }           
         static readonly char[] pathSeparatorChars = new char[] { '/', '\\' };
-        public static SemanticVersion From(string path, string separators = null)
+        public static SemanticVersion From(string path, params string [] prefixes)
         {
             Contract.Requires(null != path);
-            return path.Split(separators?.ToCharArray() ?? pathSeparatorChars, StringSplitOptions.RemoveEmptyEntries).Aggregate(None, (a, s) => { return SemanticVersion.TryParse(s, out var v) ? v : a; });
+            return From(path, pathSeparatorChars, prefixes);
         }
-        public static SemanticVersion From(Uri uri)
+        public static SemanticVersion From(string path, char [] separators, params string[] prefixes)
+        {
+            Contract.Requires(null != path);
+            return path.Split(separators ?? pathSeparatorChars, StringSplitOptions.RemoveEmptyEntries)
+                .Aggregate(None, (a, s) => {
+                    foreach (var p in prefixes) { if (s.StartsWith(p, StringComparison.CurrentCulture)) { s = s.Substring(p.Length); break; } }
+                    return SemanticVersion.TryParse(s, out var v) ? v : a;
+                });
+        }
+        public static SemanticVersion From(Uri uri, params string [] prefixes)
         {
             Contract.Requires(null != uri);
-            return From(uri.AbsolutePath);
+            return From(uri.AbsolutePath, pathSeparatorChars, prefixes);
         }
         public bool Equals(SemanticVersion other)
         {

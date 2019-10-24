@@ -28,13 +28,10 @@ namespace s3iLib
         {
             return $"{Path.Combine(Path.Combine(basePath, productName), fileName)}";
         }
-        public Installer.Action CompareAndSelectAction(ProductInfo installedProduct)
+        public Installer.Action CompareAndSelectAction(ProductInfo installedProduct, params string [] prefixes)
         {
             if(null == installedProduct) return Installer.Action.Install;
-            // use absolute uri to compare versions
-            var thisVersion = SemanticVersion.From(Uri);
-            var installedVersion = SemanticVersion.From(installedProduct.Uri);
-            var versionIsNewer = thisVersion.CompareTo(installedVersion);
+            var versionIsNewer = Uri.CompareSemanticVersion(installedProduct.Uri, prefixes);
             // if new is greater, install
             if (0 < versionIsNewer) return Installer.Action.Install;
             // else (if less or props changed) reinstall

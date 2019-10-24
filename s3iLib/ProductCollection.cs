@@ -144,7 +144,7 @@ namespace s3iLib
             if (null == compare) compare = (s1, s2) => { return 0 == string.Compare(s1, s2, StringComparison.CurrentCultureIgnoreCase); };
             return files.Where(e => !Exists(product => compare(product.LocalPath, e)));
         }
-        public (IEnumerable<ProductInfo> filesToUninstall, IEnumerable<ProductInfo> productsToInstall) Separate(Func<string, ProductInfo> findInstalledProduct)
+        public (IEnumerable<ProductInfo> filesToUninstall, IEnumerable<ProductInfo> productsToInstall) Separate(Func<string, ProductInfo> findInstalledProduct, params string [] prefixes)
         {
             var uninstall = new List<ProductInfo>();
             var install = new List<ProductInfo>();
@@ -156,7 +156,7 @@ namespace s3iLib
                     install.Add(product);
                     continue;
                 }
-                var installerAction = product.CompareAndSelectAction(installedProduct);
+                var installerAction = product.CompareAndSelectAction(installedProduct, prefixes);
                 switch (installerAction)
                 {
                     case Installer.Action.Install:

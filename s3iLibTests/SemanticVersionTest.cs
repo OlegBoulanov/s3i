@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Numerics;
 using NUnit.Framework;
 
 using s3iLib;
@@ -10,11 +11,11 @@ namespace s3iLibTests
     {
         void CanParse(string s)
         {
-            Assert.IsTrue(SemanticVersion.TryParse(s, out var v1));
+            Assert.IsTrue(SemanticVersion.TryParse(s, out _));
         }
         void CantParse(string s)
         {
-            Assert.IsFalse(SemanticVersion.TryParse(s, out var v1));
+            Assert.IsFalse(SemanticVersion.TryParse(s, out _));
         }
         void Less(string one, string two)
         {
@@ -177,6 +178,15 @@ beta
             Assert.IsTrue(0 == SemanticVersion.From(v1234).CompareTo(SemanticVersion.From(v1235)));
             Assert.IsTrue(ProductVersion.TryParse("1.2.4.5", out var v1245));
             Assert.IsTrue(0 > SemanticVersion.From(v1234).CompareTo(SemanticVersion.From(v1245)));
+        }
+
+        [Test]
+        public void RealRelease()
+        {
+            var v1 = SemanticVersion.From("https://github.com/OlegBoulanov/s3i/releases/download/v1.0.265/wixExample.msi", "v", "Ver");
+            Assert.AreEqual(new BigInteger(1), v1.Major);
+            Assert.That(v1.Minor.Equals(0));
+            Assert.That(v1.Patch.Equals(265));
         }
     }
 }

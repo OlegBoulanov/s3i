@@ -18,10 +18,10 @@ namespace s3iLib
             var subPath = $"{builder.Host}{Path.DirectorySeparatorChar}{builder.Path.Substring(1)}";
             return Path.Combine(localPath, subPath).Replace('/', Path.DirectorySeparatorChar).Replace('\\', Path.DirectorySeparatorChar);
         }
-        public static int CompareSemanticVersion(this Uri thisUri, Uri otherUri)
+        public static int CompareSemanticVersion(this Uri thisUri, Uri otherUri, params string [] prefixes)
         {
-            var thisVer = SemanticVersion.From(thisUri);
-            var otherVer = SemanticVersion.From(otherUri);
+            var thisVer = SemanticVersion.From(thisUri, prefixes);
+            var otherVer = SemanticVersion.From(otherUri, prefixes);
             if (SemanticVersion.None == thisVer) return SemanticVersion.None == otherVer ? 0 : -1; else if (SemanticVersion.None == otherVer) return +1;
             return thisVer.CompareTo(otherVer);
         }

@@ -13,6 +13,9 @@ namespace s3i
         [CommandLineKey("AWS user profile name", "-p", "--profile <profile-name>")]
         public string ProfileName { get; set; } = "default";
 
+        [CommandLineKey("List of comma separated allowed version prefixes", "-x", "--prefixes <list>")]
+        public string VersionPrefixes { get; set; } = "v,V,ver,Ver";
+
         [CommandLineKey("Environment variable name (default command line)", "-e", "--envvar <var-name>")]
         public string EnvironmentVariableName { get; set; } = "s3i_args";
 
