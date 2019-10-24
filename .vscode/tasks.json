@@ -46,6 +46,50 @@
                 "build" 
             ],
             "problemMatcher": "$msCompile"
+        },
+        {
+            "label": "debugRunNoArgs",
+            "type": "shell",
+            "command": "dotnet",
+            "args": [
+                "${workspaceFolder}/s3i/bin/Debug/netcoreapp3.0/s3i.dll"
+            ],
+            "group": "none",
+            "dependsOn":[ 
+                "build" 
+            ],
+            "problemMatcher": "$msCompile"
+        },
+        {
+            "label": "ExampleDryRun",
+            "type": "shell",
+            "command": "dotnet",
+            "args": [ 
+                "${workspaceFolder}/s3i/bin/Debug/netcoreapp3.0/s3i.dll", 
+                "https://raw.githubusercontent.com/OlegBoulanov/s3i/develop/Examples/Config.ini",
+                "--verbose",
+                "--dryrun"
+            ],
+            "group": "none",
+            "dependsOn":[ 
+                "build" 
+            ],
+            "problemMatcher": "$msCompile"
+        },
+        {
+            "label": "ExampleRun",
+            "type": "shell",
+            "command": "dotnet",
+            "args": [ 
+                "${workspaceFolder}/s3i/bin/Debug/netcoreapp3.0/s3i.dll", 
+                "https://raw.githubusercontent.com/OlegBoulanov/s3i/develop/Examples/Config.ini",
+                "--verbose"
+            ],
+            "group": "none",
+            "dependsOn":[ 
+                "build" 
+            ],
+            "problemMatcher": "$msCompile"
         }
     ]
 }
