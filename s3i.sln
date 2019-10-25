@@ -26,6 +26,8 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Examples", "Examples", "{B1
 		Examples\Config.ini = Examples\Config.ini
 	EndProjectSection
 EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Docs", "Docs", "{34EBCDEE-EC29-46FB-8E29-84D33C0BA080}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -88,6 +90,7 @@ Global
 	EndGlobalSection
 	GlobalSection(NestedProjects) = preSolution
 		{B1FEC4B2-40C0-44D5-A98B-689FE2168900} = {26BA2AE3-05FD-45B2-B99B-B283F3D784D0}
+		{34EBCDEE-EC29-46FB-8E29-84D33C0BA080} = {26BA2AE3-05FD-45B2-B99B-B283F3D784D0}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {4C8E9B15-5892-47B4-9028-853B42AB6CD7}
