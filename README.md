@@ -21,7 +21,8 @@ like AWS S3 can be used for storing configuration and/or software installers.
 ## Installation Prerequisites
 
 - Windows 7/10 (with [Windows Installer](https://docs.microsoft.com/en-us/windows/win32/msi/overview-of-windows-installer))
-   - or Linux (I develop and test on Ubuntu 18.04) - but only  dry run and simulation would work, since there is no `msiexec` for Linux
+   - or Linux (I develop and test on Ubuntu 18.04) - but only  dry run and simulation would work, 
+   - since there is no Windows Installer (`msiexec.exe`) for Linux I'm aware of
 - [.NET Core Runtime 3.0.0](https://dotnet.microsoft.com/download/dotnet-core/3.0), which runs on Windows, Linux, or OSX
 
 Latest version of `s3i.msi` can be found on the project's [Releases tab](https://github.com/OlegBoulanov/s3i/releases/latest)
@@ -29,6 +30,8 @@ Latest version of `s3i.msi` can be found on the project's [Releases tab](https:/
 ## Self Test
 
 Download and install `s3i.msi` from the link above first. Then, run the follwing command in Windows (or Linux) Command Line window:
+
+### Dry run
 ```
 C:\Users\olegb\> s3i https://raw.githubusercontent.com/OlegBoulanov/s3i/develop/Examples/Config.ini --verbose --dryrun
 ```
@@ -54,10 +57,49 @@ Also, one file is created in your %TEMP% directory:
 C:\Users\olegb\AppData\Local\Temp\s3i\github.com\OlegBoulanov\s3i\releases\download\v1.0.265\wixExample.json
 ```
 Linux directory will be different, but still user-specific.
+
+### Test wixExample installation
+
+If you remove `--dryrun` option, real installation will be attempted, ... and, most probably, fail - if my example configuration file and releases go out of sync, 
+which is quite possible (as a side effect of continuous integration and manual intervention of cleaning out outdated releases). 
+
+To fix it, just download config file, and edit product URI, pointing it to one of the latest versions of `wixExample.msi` on Releases page:
+```
+[$products$]
+UselessProduct = https://github.com/OlegBoulanov/s3i/releases/download/v1.0.274/wixExample.msi
+[UselessProduct]
+UselessProperty = doing nothing at all
+
+```
+And run again with that local file:
+```
+C:\Users\olegb> s3i C:\Users\olegb\AppData\Local\Temp\s3i\config\Config.ini --verbose
+Products [1]:
+  UselessProduct: https://github.com/OlegBoulanov/s3i/releases/download/v1.0.274/wixExample.msi => C:\Users\olegb\AppData\Local\Temp\s3i\github.com\OlegBoulanov\s3i\releases\download\v1.0.274\wixExample.msi
+    UselessProperty = doing nothing at all
+Install [1]:
+  https://github.com/OlegBoulanov/s3i/releases/download/v1.0.274/wixExample.msi
+(Execute) Download 1 product:
+  https://github.com/OlegBoulanov/s3i/releases/download/v1.0.274/wixExample.msi
+(Execute) Install C:\Users\olegb\AppData\Local\Temp\s3i\github.com\OlegBoulanov\s3i\releases\download\v1.0.274\wixExample.msi
+Save C:\Users\olegb\AppData\Local\Temp\s3i\github.com\OlegBoulanov\s3i\releases\download\v1.0.274\wixExample.json
+Elapsed: 00:00:16.5867625
+```
+This time wixExample should be installed
+
 ## Functionality and more detailed examples
 
-### Operational model
+### Motivation and Operational model
 
+So we have a park of hundreds of Windows computers, operating 24x7x365, hosting important user services, provided by our great software. 
+Redundant, geographically distributed, etc. We designed the whole system in a way allowing 
+different versions of the software to run on different hosts simultaneousy and flawlessly.
 
+Here is the question - how do we perform upgrades with minimum human intervention? 
+Obviously, hosts should be able check for updates during periods of inactivity (maybe self initiated), and upgrade themselves as needed. 
+Doing that on regular scheduled reboot (once a week, or a day) seems to be a natural first step.
+
+`s3i` allows us to configure each host only once, marking its group identity with configuration file URI. 
+After that, at each s3i service restart (computer reboot), it's software configuration will be synchronized with remote config file.
 
 Detailed desription can be found in [wiki](https://github.com/OlegBoulanov/s3i/wiki)
