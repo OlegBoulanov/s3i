@@ -39,34 +39,34 @@ C:\Users\olegb\> s3i https://raw.githubusercontent.com/OlegBoulanov/s3i/develop/
 Output should be similar to that:
 ```
 Products [1]:
-  UselessProduct: https://github.com/OlegBoulanov/s3i/releases/download/v1.0.265/wixExample.msi => C:\Users\olegb\AppData\Local\Temp\s3i\github.com\OlegBoulanov\s3i\releases\download\v1.0.265\wixExample.msi
+  UselessProduct: https://github.com/OlegBoulanov/s3i/releases/download/v1.0.267/wixExample.msi => C:\Users\olegb\AppData\Local\Temp\s3i\github.com\OlegBoulanov\s3i\releases\download\v1.0.267\wixExample.msi
     UselessProperty = doing nothing at all
 Uninstall [1]:
-  https://github.com/OlegBoulanov/s3i/releases/download/v1.0.265/wixExample.msi
+  https://github.com/OlegBoulanov/s3i/releases/download/v1.0.267/wixExample.msi
 Install [1]:
-  https://github.com/OlegBoulanov/s3i/releases/download/v1.0.265/wixExample.msi
-(DryRun) Uninstall C:\Users\olegb\AppData\Local\Temp\s3i\github.com\OlegBoulanov\s3i\releases\download\v1.0.265\wixExample.msi
+  https://github.com/OlegBoulanov/s3i/releases/download/v1.0.267/wixExample.msi
+(DryRun) Uninstall C:\Users\olegb\AppData\Local\Temp\s3i\github.com\OlegBoulanov\s3i\releases\download\v1.0.267\wixExample.msi
 (DryRun) Download 1 product:
-  https://github.com/OlegBoulanov/s3i/releases/download/v1.0.265/wixExample.msi
-(DryRun) Install C:\Users\olegb\AppData\Local\Temp\s3i\github.com\OlegBoulanov\s3i\releases\download\v1.0.265\wixExample.msi
-(DryRun) Save C:\Users\olegb\AppData\Local\Temp\s3i\github.com\OlegBoulanov\s3i\releases\download\v1.0.265\wixExample.json
+  https://github.com/OlegBoulanov/s3i/releases/download/v1.0.267/wixExample.msi
+(DryRun) Install C:\Users\olegb\AppData\Local\Temp\s3i\github.com\OlegBoulanov\s3i\releases\download\v1.0.267\wixExample.msi
+(DryRun) Save C:\Users\olegb\AppData\Local\Temp\s3i\github.com\OlegBoulanov\s3i\releases\download\v1.0.267\wixExample.json
 Elapsed: 00:00:00.8382180
 ```
 Also, one file is created in your %TEMP% directory:
 ```
-C:\Users\olegb\AppData\Local\Temp\s3i\github.com\OlegBoulanov\s3i\releases\download\v1.0.265\wixExample.json
+C:\Users\olegb\AppData\Local\Temp\s3i\github.com\OlegBoulanov\s3i\releases\download\v1.0.267\wixExample.json
 ```
 Linux directory will be different, but still user-specific.
 
 ### Test wixExample installation
 
-If you remove `--dryrun` option, real installation will be attempted, ... and, most probably, fail - if my example configuration file and releases go out of sync, 
+If you remove `--dryrun` option, real installation will be attempted ... and may fail - if my example configuration file and releases go out of sync, 
 which is quite possible (as a side effect of continuous integration and manual intervention of cleaning out outdated releases). 
 
 To fix it, just download config file, and edit product URI, pointing it to one of the latest versions of `wixExample.msi` on Releases page:
 ```
 [$products$]
-UselessProduct = https://github.com/OlegBoulanov/s3i/releases/download/v1.0.274/wixExample.msi
+UselessProduct = https://github.com/OlegBoulanov/s3i/releases/download/v1.0.267/wixExample.msi
 [UselessProduct]
 UselessProperty = doing nothing at all
 
@@ -75,14 +75,14 @@ And run again with that local file:
 ```
 C:\Users\olegb> s3i C:\Users\olegb\AppData\Local\Temp\s3i\config\Config.ini --verbose
 Products [1]:
-  UselessProduct: https://github.com/OlegBoulanov/s3i/releases/download/v1.0.274/wixExample.msi => C:\Users\olegb\AppData\Local\Temp\s3i\github.com\OlegBoulanov\s3i\releases\download\v1.0.274\wixExample.msi
+  UselessProduct: https://github.com/OlegBoulanov/s3i/releases/download/v1.0.267/wixExample.msi => C:\Users\olegb\AppData\Local\Temp\s3i\github.com\OlegBoulanov\s3i\releases\download\v1.0.267\wixExample.msi
     UselessProperty = doing nothing at all
 Install [1]:
-  https://github.com/OlegBoulanov/s3i/releases/download/v1.0.274/wixExample.msi
+  https://github.com/OlegBoulanov/s3i/releases/download/v1.0.267/wixExample.msi
 (Execute) Download 1 product:
-  https://github.com/OlegBoulanov/s3i/releases/download/v1.0.274/wixExample.msi
-(Execute) Install C:\Users\olegb\AppData\Local\Temp\s3i\github.com\OlegBoulanov\s3i\releases\download\v1.0.274\wixExample.msi
-Save C:\Users\olegb\AppData\Local\Temp\s3i\github.com\OlegBoulanov\s3i\releases\download\v1.0.274\wixExample.json
+  https://github.com/OlegBoulanov/s3i/releases/download/v1.0.267/wixExample.msi
+(Execute) Install C:\Users\olegb\AppData\Local\Temp\s3i\github.com\OlegBoulanov\s3i\releases\download\v1.0.267\wixExample.msi
+Save C:\Users\olegb\AppData\Local\Temp\s3i\github.com\OlegBoulanov\s3i\releases\download\v1.0.267\wixExample.json
 Elapsed: 00:00:16.5867625
 ```
 This time wixExample should be installed
