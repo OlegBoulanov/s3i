@@ -28,7 +28,10 @@ namespace s3iLib
         public static string GetAbsoluteFilePath(this Uri uri)
         {
             Contract.Requires(null != uri);
-            if(!"file".Equals(uri.Scheme, StringComparison.InvariantCulture)) throw new FormatException("Uri 'file:' scheme expected");
+            if(!"file".Equals(uri.Scheme, StringComparison.InvariantCulture))
+#pragma warning disable CA1303
+                throw new FormatException("Uri 'file:' scheme expected");
+#pragma warning restore CA1303
             // "[file:///]\\\\server\\folder\\file.ext"
             // "[file:///]c:\\folder\\file.ext"
             var host = 0 < uri.Host.Length ? $"\\\\{uri.Host}" : null;

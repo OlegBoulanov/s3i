@@ -16,6 +16,7 @@ namespace s3iLib
     {
         public static bool CanDownload(Uri uri)
         {
+            Contract.Requires(null != uri);
             return "file" == uri.Scheme;
         }
         public override async Task<HttpStatusCode> DownloadAsync(Uri uri, DateTime modifiedSinceDateUtc, Func<Stream, DateTimeOffset, Task> processStream)
