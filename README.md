@@ -89,17 +89,4 @@ This time wixExample should be installed
 
 ## Functionality and more detailed examples
 
-### Motivation and Operational model
-
-So we have a park of hundreds of Windows computers, operating 24x7x365, hosting important user services, provided by our great software. 
-Redundant, geographically distributed, etc. We designed the whole system in a way allowing 
-different versions of the software to run on different hosts simultaneousy and flawlessly.
-
-Here is the question - how do we perform upgrades with minimum human intervention? 
-Obviously, hosts should be able check for updates during periods of inactivity (maybe self initiated), and upgrade themselves as needed. 
-Doing that on regular scheduled reboot (once a week, or a day) seems to be a natural first step.
-
-`s3i` allows us to configure each host only once, marking its group identity with configuration file URI. 
-After that, at each s3i service restart (computer reboot), it's software configuration will be synchronized with remote config file.
-
 Detailed desription can be found in [wiki](https://github.com/OlegBoulanov/s3i/wiki)
