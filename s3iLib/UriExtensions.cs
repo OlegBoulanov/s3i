@@ -25,5 +25,14 @@ namespace s3iLib
             if (SemanticVersion.None == thisVer) return SemanticVersion.None == otherVer ? 0 : -1; else if (SemanticVersion.None == otherVer) return +1;
             return thisVer.CompareTo(otherVer);
         }
+        public static string GetAbsoluteFilePath(this Uri uri)
+        {
+            Contract.Requires(null != uri);
+            if(!"file".Equals(uri.Scheme, StringComparison.InvariantCulture)) throw new FormatException("Uri 'file:' scheme expected");
+            // "[file:///]\\\\server\\folder\\file.ext"
+            // "[file:///]c:\\folder\\file.ext"
+            var host = 0 < uri.Host.Length ? $"\\\\{uri.Host}" : null;
+            return $"{host}{uri.AbsolutePath}";
+        }
     }
 }

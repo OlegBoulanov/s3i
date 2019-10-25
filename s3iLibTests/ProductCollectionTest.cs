@@ -170,14 +170,28 @@ Three    = https://xxx.s3.amazonaws.com/Test/Windows10/Distrib//SecondProduct/9.
             Assert.That(install.ElementAt(3).Uri.ToString(), Is.EqualTo("https://download/from/Prod04/1.2.3+install/p4.msi"));
         }
 
-        //[Test]
-        public static void SelfTest()
+        static string ThisFilePath([System.Runtime.CompilerServices.CallerFilePath] string thisFilePath = "") { return thisFilePath; }
+
+        [Test]
+        public static void SelfTestLocal()
         {
-            var products = ProductCollection.ReadProducts(new List<Uri> { new Uri("https://raw.githubusercontent.com/OlegBoulanov/s3i/feature/downloader/s3iLibTests/ProductCollectionTest.ini") }).Result;
+            //Assert.AreEqual("", ThisFilePath());
+            var uri = new Uri(Path.Combine(Path.GetDirectoryName(ThisFilePath()), "ProductCollectionTest.ini"));
+            //Assert.AreEqual("", uri.GetAbsoluteFilePath());
+            var products = ProductCollection.ReadProducts(new List<Uri> { uri }).Result;
             Assert.AreEqual(1, products.Count);
             var product1 = products.FirstOrDefault();
-            Assert.AreEqual("one", product1.Name);
-            Assert.AreEqual(2, product1.Props.Count);
+            Assert.AreEqual("UselessProduct", product1.Name);
+            Assert.AreEqual(1, product1.Props.Count);
+        }
+        [Test]
+        public static void SelfTestGitHub()
+        {
+            var products = ProductCollection.ReadProducts(new List<Uri> { new Uri("https://raw.githubusercontent.com/OlegBoulanov/s3i/develop/s3iLibTests/ProductCollectionTest.ini") }).Result;
+            Assert.AreEqual(1, products.Count);
+            var product1 = products.FirstOrDefault();
+            Assert.AreEqual("UselessProduct", product1.Name);
+            Assert.AreEqual(1, product1.Props.Count);
         }
     }
 
