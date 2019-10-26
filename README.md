@@ -1,15 +1,19 @@
 # s3i - MSI Package Batch Installer 
 
 This is a simple learning project I created to become familiar with .NET Core 3.0, 
-its Windows/Linux binary portability and 
-[FDE](https://docs.microsoft.com/en-us/dotnet/core/deploying/#framework-dependent-executables-fde) 
-application deployment model. 
+and Windows/Linux project and binary portability. 
 
 Also, it gives an example of using certain features 
 like continuous integrations with [AppVeyor](https://appveyor.com), 
 and continuous deployment to Windows computers from [GitHub Releases](https://help.github.com/en/github/administering-a-repository/about-releases) - 
 all completely free for open source projects! For private projects, a secure storage, 
 like AWS S3 can be used for storing configuration and/or software installers.
+
+## Functionality
+
+s3i is a small Windows command line utility and service for managing Windows Installer packages products on groups of computers. Each managed host has s3i installed and configured for polling of group-specific configuration file. Changes of this file eventually lead to products being installed, reconfigured, upgraded, downgraded or uninstalled - on all computers in the same group.
+
+Detailed desription can be found in [wiki](https://github.com/OlegBoulanov/s3i/wiki)
 
 ## Build Status
 
@@ -18,17 +22,10 @@ like AWS S3 can be used for storing configuration and/or software installers.
   develop:
 [![Build status](https://ci.appveyor.com/api/projects/status/s5poqaqr1xn2e5ml/branch/develop?svg=true)](https://ci.appveyor.com/project/OlegBoulanov/s3i/branch/develop)
 
-## Functionality
-
-s3i is a small Windows command line utility and service for managing Windows Installer packages products on groups of computers. Each managed host has s3i installed and configured for polling of group-specific configuration file. Changes of this file eventually lead to products being installed, reconfigured, upgraded, downgraded or uninstalled - on all computers in the same group.
-
-Detailed desription can be found in [wiki](https://github.com/OlegBoulanov/s3i/wiki)
 
 ## Installation Prerequisites
 
 - Windows 7/10 (with [Windows Installer](https://docs.microsoft.com/en-us/windows/win32/msi/overview-of-windows-installer))
-   - or Linux (I develop and test on Ubuntu 18.04) - but only  dry run and simulation would work, 
-   - since there is no Windows Installer (`msiexec.exe`) for Linux I'm aware of
 - [.NET Core Runtime 3.0.0](https://dotnet.microsoft.com/download/dotnet-core/3.0), which runs on Windows, Linux, or OSX
 
 ## Installation 
