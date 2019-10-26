@@ -15,6 +15,8 @@ s3i is a small Windows command line utility and service for managing Windows Ins
 
 In essence, s3i is a simple Continuous Deployment complement for already established Continuous Integration system (this project itself is an example of such)
 
+![Deployment with s3i](./Docs/Deployment-with-s3i.png "Deployment with s3i")
+
 Detailed desription can be found in [wiki](https://github.com/OlegBoulanov/s3i/wiki)
 
 ## Build Status
