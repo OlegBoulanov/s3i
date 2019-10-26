@@ -26,7 +26,6 @@ Detailed desription can be found in [wiki](https://github.com/OlegBoulanov/s3i/w
   develop:
 [![Build status](https://ci.appveyor.com/api/projects/status/s5poqaqr1xn2e5ml/branch/develop?svg=true)](https://ci.appveyor.com/project/OlegBoulanov/s3i/branch/develop)
 
-
 ## Installation Prerequisites
 
 - Windows 7/10/* (comes with [Windows Installer](https://docs.microsoft.com/en-us/windows/win32/msi/overview-of-windows-installer))
