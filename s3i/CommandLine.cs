@@ -1,37 +1,43 @@
 ﻿using System;
+using System.IO;
 
-using s3i_lib;
+using s3iLib;
 
 namespace s3i
 {
     public class CommandLine : CommandLineBase
     {
-        [CommandLine("Print help info", "-h", "--help")]
+        [CommandLineKey("Print this help info", "-h", "--help")]
         public bool PrintHelp { get; set; } = false;
-        [CommandLine("AWS user profile name", "-p", "--profile")]
+
+        [CommandLineKey("AWS user profile name", "-p", "--profile <profile-name>")]
         public string ProfileName { get; set; } = "default";
 
-        [CommandLine("Path to temp folder", "-e", "--temp")]
-        public string TempFolder { get; set; } = Environment.GetEnvironmentVariable("TEMP");
+        [CommandLineKey("List of comma separated allowed version prefixes", "-x", "--prefixes <list>")]
+        public string VersionPrefixes { get; set; } = "v,V,ver,Ver";
 
-        [CommandLine("MsiExec command", "-m", "--msiexec")]
+        [CommandLineKey("Environment variable name (default command line)", "-e", "--envvar <var-name>")]
+        public string EnvironmentVariableName { get; set; } = "s3i_args";
+
+        [CommandLineKey("Path to staging folder", "-s", "--stage <path>")]
+        public string StagingFolder { get; set; } = null;
+
+        [CommandLineKey("Clear staging folder at startup", "-c", "--clean")]
+        public bool ClearStagingFolder { get; set; } = false;
+
+        [CommandLineKey("MsiExec command", "-m", "--msiexec <path>")]
         public string MsiExecCommand { get; set; } = "msiexec.exe";
 
-        [CommandLine("MsiExec keys", "-k", "--msikeys")]
-        public string MsiExecKeys { get; set; } = "/i";
+        [CommandLineKey("MsiExec extra args", "-a", "--msiargs <args>")]
+        public string MsiExecArgs { get; set; } = "/passive";
 
-        [CommandLine("MsiExec extra args", "-a", "--msiargs")]
-        public string MsiExecArgs { get; set; }
-
-        [CommandLine("Installation timeout", "-t", "--timeout")]
+        [CommandLineKey("Installation timeout", "-t", "--timeout <timespan>")]
         public TimeSpan Timeout { get; set; } = TimeSpan.FromMinutes(3);
 
-        [CommandLine("Dry run", "-d", "--dryrun")]
+        [CommandLineKey("Dry run", "-d", "--dryrun")]
         public bool DryRun { get; set; } = false;
 
-        [CommandLine("Print full log info", "-v", "--verbose")]
+        [CommandLineKey("Print full log info", "-v", "--verbose")]
         public bool Verbose { get; set; }
-        [CommandLine("Clear stored command line and exit", "-r", "--reset")]
-        public bool ResetDefaultCommandLine { get; set; }
     }
 }

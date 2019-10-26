@@ -1,0 +1,144 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<Wix xmlns="http://schemas.microsoft.com/wix/2006/wi" xmlns:util="http://schemas.microsoft.com/wix/UtilExtension" xmlns:netfx="http://schemas.microsoft.com/wix/NetFxExtension">
+
+  <?define ProductName=s3i?>
+  <?define ProductVersion=!(bind.FileVersion.s3i.exe)?>
+  <?define Manufacturer=UselessExtras?>
+
+  <!-- change for a major upgrade -->
+  <?define ProductCode=*?>
+  <!-- NEVER CHANGE UpgradeCode - actually it is PRODUCT ID -->
+  <?define UpgradeCode={e34c5e85-21ad-4a6c-b4ef-be5925074846}?>
+
+  <Product UpgradeCode="$(var.UpgradeCode)" Id="$(var.ProductCode)" Version="$(var.ProductVersion)" Name="$(var.ProductName)" Language="1033" Manufacturer="$(var.Manufacturer)">
+
+    <Package InstallerVersion="300" Compressed="yes" InstallScope="perMachine" />
+    <Media Id="1" Cabinet="$(var.ProductName).cab" EmbedCab="yes" />
+
+    <!-- Full list of version ids is here: https://msdn.microsoft.com/en-us/library/hh925568%28v=vs.110%29.aspx?f=255&MSPPError=-2147217396#net_d -->
+    <!--
+    <PropertyRef Id="WIXNETFX4RELEASEINSTALLED"/>
+    <?define NetFx472 = 461808 ?>
+    <Condition Message='This setup requires the .NET Framework 4.7.2 or higher, [WIXNETFX4RELEASEINSTALLED] found, #$(var.NetFx472) required'>
+      <![CDATA[Installed OR (WIXNETFX4RELEASEINSTALLED >= "#$(var.NetFx472)")]]>
+    </Condition>
+    -->
+    
+    <Property Id="NETCOREHOSTVERSION">
+      <RegistrySearch Id="NetCoreHostVersion" Type="raw" Win64="yes" Root="HKLM" Key="SOFTWARE\dotnet\Setup\InstalledVersions\x64\sharedhost" Name="Version" />
+    </Property>
+    <Condition Message="This setup requires .NET Core 3.0">
+      <![CDATA[Installed OR (NETCOREHOSTVERSION >= "3.0.0")]]>
+    </Condition>
+
+    <util:Group Id="AdminGroup" Name="Administrators"/>
+
+    <Property Id="CMDLINEARGS" Admin="yes"> </Property>
+
+    <Property Id="ARPCOMMENTS">s3i - MSI Package Batch Installer</Property>
+    <Property Id="ARPCONTACT">Oleg Boulanov</Property>
+    <Property Id="ARPHELPLINK">https://github.com/OlegBoulanov/s3i/</Property>
+    <Property Id="ARPURLINFOABOUT">https://github.com/OlegBoulanov/s3i/</Property>
+    <Property Id="ARPREADME">https://github.com/OlegBoulanov/s3i/README.md</Property>
+
+    <Directory Id="TARGETDIR" Name="SourceDir">
+      <Directory Id="ProgramFilesFolder">
+        <Directory Id="INSTALLDIR" Name="$(var.Manufacturer)">
+          <Directory Id="Product_Root" Name="$(var.ProductName)">
+            <!--runtimes\win\lib\netstandard2.0-->
+            <Directory Id="runtimes" Name="runtimes">
+              <Directory Id="runtimes.win" Name="win">
+                <Directory Id="runtimes.win.lib" Name="lib">
+                  <Directory Id="runtimes.win.lib.netcoreapp2.0" Name="netcoreapp2.0" />
+                  <Directory Id="runtimes.win.lib.netstandard2.0" Name="netstandard2.0" />
+                </Directory>
+              </Directory>
+            </Directory>
+          </Directory>
+        </Directory>
+      </Directory>
+    </Directory>
+
+    <?define s3i_service_file=s3iService?>
+    <DirectoryRef Id="Product_Root" FileSource="$(var.s3i.TargetDir)">
+      <Component Id="AWSSDK" Guid="{F61F6544-DBBF-472D-93D2-3714E0C1D4DB}">
+        <File Id="AWSSDK.Core.dll" Name="AWSSDK.Core.dll" Source="$(var.s3i.TargetDir)AWSSDK.Core.dll" Vital="yes"/>
+        <File Id="AWSSDK.S3.dll" Name="AWSSDK.S3.dll" Source="$(var.s3i.TargetDir)AWSSDK.S3.dll" Vital="yes"/>
+      </Component>
+      <Component Id="s3iCommandLine" Guid="{36119CD0-A673-4695-BA85-3D109D2F76DE}">
+        <RemoveFolder Id="Product_Root" On="uninstall"/>
+        <File Id="s3i.dll" Name="s3i.dll" Vital="yes" KeyPath="yes"/>
+        <File Id="s3i.exe" Name="s3i.exe" Vital="yes"/>
+        <File Id="s3i.deps.json" Name="s3i.deps.json" Vital="yes"/>
+        <File Id="s3i.runtimeconfig.json" Name="s3i.runtimeconfig.json" Vital="yes"/>
+        <File Id="s3i.runtimeconfig.dev.json" Name="s3i.runtimeconfig.dev.json" Vital="yes"/>
+        <File Id="s3iLib.dll" Name="s3iLib.dll" Vital="yes"/>
+        <Environment Id="path" Name="PATH" Value="[Product_Root]" Action="set" System="yes" Part="last" Permanent="no" />
+      </Component>
+      <Component Id="s3iWorker" Guid="{8BB0518E-EABA-4CC1-906E-CE2D4CC88F9A}">
+        <File Id="s3iWorker.exe" Name="s3iWorker.exe" Source="$(var.s3iWorker.TargetDir)s3iWorker.exe" Vital="yes" KeyPath="yes"/>
+        <File Id="s3iWorker.dll" Name="s3iWorker.dll" Source="$(var.s3iWorker.TargetDir)s3iWorker.dll" Vital="yes"/>
+        <File Id="s3iWorker.deps.json" Name="s3iWorker.deps.json" Source="$(var.s3iWorker.TargetDir)s3iWorker.deps.json" Vital="yes"/>
+        <File Id="s3iWorker.runtimeconfig.dev.json" Name="s3iWorker.runtimeconfig.dev.json" Source="$(var.s3iWorker.TargetDir)s3iWorker.runtimeconfig.dev.json" Vital="yes"/>
+        <File Id="s3iWorker.runtimeconfig.json" Name="s3iWorker.runtimeconfig.json" Source="$(var.s3iWorker.TargetDir)s3iWorker.runtimeconfig.json" Vital="yes"/>
+        <File Id="appsettings.Development.json" Name="appsettings.Development.json" Source="$(var.s3iWorker.TargetDir)appsettings.Development.json" Vital="yes"/>
+        <File Id="appsettings.json" Name="appsettings.json" Source="$(var.s3iWorker.TargetDir)appsettings.json" Vital="yes"/>
+        <ServiceInstall Id="s3iWorker_install" Name="s3i" DisplayName="MSI package batch installer service" Description="Installs batches of MSI packages from S3 buckets and/or Web sites" Start="auto" Arguments="[CMDLINEARGS]" ErrorControl="normal" Type="ownProcess" Vital="yes">
+          <util:ServiceConfig ServiceName="s3i" ResetPeriodInDays="1" RestartServiceDelayInSeconds="30" FirstFailureActionType="restart" SecondFailureActionType="restart" ThirdFailureActionType="restart" />
+          <ServiceDependency Id="LanmanServer"/>
+        </ServiceInstall>
+        <ServiceControl Id="s3iWorker_control" Name="s3i" Start="install" Stop="both" Remove="uninstall" />
+        <!-- never ending list of ms crap... -->
+        <File Id="Microsoft.Extensions.Configuration.Abstractions.dll" Name="Microsoft.Extensions.Configuration.Abstractions.dll" Source="$(var.s3iWorker.TargetDir)Microsoft.Extensions.Configuration.Abstractions.dll" Vital="yes"/>
+        <File Id="Microsoft.Extensions.Configuration.Binder.dll" Name="Microsoft.Extensions.Configuration.Binder.dll" Source="$(var.s3iWorker.TargetDir)Microsoft.Extensions.Configuration.Binder.dll" Vital="yes"/>
+        <File Id="Microsoft.Extensions.Configuration.CommandLine.dll" Name="Microsoft.Extensions.Configuration.CommandLine.dll" Source="$(var.s3iWorker.TargetDir)Microsoft.Extensions.Configuration.CommandLine.dll" Vital="yes"/>
+        <File Id="Microsoft.Extensions.Configuration.dll" Name="Microsoft.Extensions.Configuration.dll" Source="$(var.s3iWorker.TargetDir)Microsoft.Extensions.Configuration.dll" Vital="yes"/>
+        <File Id="Microsoft.Extensions.Configuration.EnvironmentVariables.dll" Name="Microsoft.Extensions.Configuration.EnvironmentVariables.dll" Source="$(var.s3iWorker.TargetDir)Microsoft.Extensions.Configuration.EnvironmentVariables.dll" Vital="yes"/>
+        <File Id="Microsoft.Extensions.Configuration.FileExtensions.dll" Name="Microsoft.Extensions.Configuration.FileExtensions.dll" Source="$(var.s3iWorker.TargetDir)Microsoft.Extensions.Configuration.FileExtensions.dll" Vital="yes"/>
+        <File Id="Microsoft.Extensions.Configuration.Json.dll" Name="Microsoft.Extensions.Configuration.Json.dll" Source="$(var.s3iWorker.TargetDir)Microsoft.Extensions.Configuration.Json.dll" Vital="yes"/>
+        <File Id="Microsoft.Extensions.Configuration.UserSecrets.dll" Name="Microsoft.Extensions.Configuration.UserSecrets.dll" Source="$(var.s3iWorker.TargetDir)Microsoft.Extensions.Configuration.UserSecrets.dll" Vital="yes"/>
+        <File Id="Microsoft.Extensions.DependencyInjection.Abstractions.dll" Name="Microsoft.Extensions.DependencyInjection.Abstractions.dll" Source="$(var.s3iWorker.TargetDir)Microsoft.Extensions.DependencyInjection.Abstractions.dll" Vital="yes"/>
+        <File Id="Microsoft.Extensions.DependencyInjection.dll" Name="Microsoft.Extensions.DependencyInjection.dll" Source="$(var.s3iWorker.TargetDir)Microsoft.Extensions.DependencyInjection.dll" Vital="yes"/>
+        <File Id="Microsoft.Extensions.FileProviders.Abstractions.dll" Name="Microsoft.Extensions.FileProviders.Abstractions.dll" Source="$(var.s3iWorker.TargetDir)Microsoft.Extensions.FileProviders.Abstractions.dll" Vital="yes"/>
+        <File Id="Microsoft.Extensions.FileProviders.Physical.dll" Name="Microsoft.Extensions.FileProviders.Physical.dll" Source="$(var.s3iWorker.TargetDir)Microsoft.Extensions.FileProviders.Physical.dll" Vital="yes"/>
+        <File Id="Microsoft.Extensions.FileSystemGlobbing.dll" Name="Microsoft.Extensions.FileSystemGlobbing.dll" Source="$(var.s3iWorker.TargetDir)Microsoft.Extensions.FileSystemGlobbing.dll" Vital="yes"/>
+        <File Id="Microsoft.Extensions.Hosting.Abstractions.dll" Name="Microsoft.Extensions.Hosting.Abstractions.dll" Source="$(var.s3iWorker.TargetDir)Microsoft.Extensions.Hosting.Abstractions.dll" Vital="yes"/>
+        <File Id="Microsoft.Extensions.Hosting.dll" Name="Microsoft.Extensions.Hosting.dll" Source="$(var.s3iWorker.TargetDir)Microsoft.Extensions.Hosting.dll" Vital="yes"/>
+        <File Id="Microsoft.Extensions.Hosting.WindowsServices.dll" Name="Microsoft.Extensions.Hosting.WindowsServices.dll" Source="$(var.s3iWorker.TargetDir)Microsoft.Extensions.Hosting.WindowsServices.dll" Vital="yes"/>
+        <File Id="Microsoft.Extensions.Logging.Abstractions.dll" Name="Microsoft.Extensions.Logging.Abstractions.dll" Source="$(var.s3iWorker.TargetDir)Microsoft.Extensions.Logging.Abstractions.dll" Vital="yes"/>
+        <File Id="Microsoft.Extensions.Logging.Configuration.dll" Name="Microsoft.Extensions.Logging.Configuration.dll" Source="$(var.s3iWorker.TargetDir)Microsoft.Extensions.Logging.Configuration.dll" Vital="yes"/>
+        <File Id="Microsoft.Extensions.Logging.Console.dll" Name="Microsoft.Extensions.Logging.Console.dll" Source="$(var.s3iWorker.TargetDir)Microsoft.Extensions.Logging.Console.dll" Vital="yes"/>
+        <File Id="Microsoft.Extensions.Logging.Debug.dll" Name="Microsoft.Extensions.Logging.Debug.dll" Source="$(var.s3iWorker.TargetDir)Microsoft.Extensions.Logging.Debug.dll" Vital="yes"/>
+        <File Id="Microsoft.Extensions.Logging.dll" Name="Microsoft.Extensions.Logging.dll" Source="$(var.s3iWorker.TargetDir)Microsoft.Extensions.Logging.dll" Vital="yes"/>
+        <File Id="Microsoft.Extensions.Logging.EventLog.dll" Name="Microsoft.Extensions.Logging.EventLog.dll" Source="$(var.s3iWorker.TargetDir)Microsoft.Extensions.Logging.EventLog.dll" Vital="yes"/>
+        <File Id="Microsoft.Extensions.Logging.EventSource.dll" Name="Microsoft.Extensions.Logging.EventSource.dll" Source="$(var.s3iWorker.TargetDir)Microsoft.Extensions.Logging.EventSource.dll" Vital="yes"/>
+        <File Id="Microsoft.Extensions.Options.ConfigurationExtensions.dll" Name="Microsoft.Extensions.Options.ConfigurationExtensions.dll" Source="$(var.s3iWorker.TargetDir)Microsoft.Extensions.Options.ConfigurationExtensions.dll" Vital="yes"/>
+        <File Id="Microsoft.Extensions.Options.dll" Name="Microsoft.Extensions.Options.dll" Source="$(var.s3iWorker.TargetDir)Microsoft.Extensions.Options.dll" Vital="yes"/>
+        <File Id="Microsoft.Extensions.Primitives.dll" Name="Microsoft.Extensions.Primitives.dll" Source="$(var.s3iWorker.TargetDir)Microsoft.Extensions.Primitives.dll" Vital="yes"/>
+        <File Id="System.Diagnostics.EventLog.dll" Name="System.Diagnostics.EventLog.dll" Source="$(var.s3iWorker.TargetDir)System.Diagnostics.EventLog.dll" Vital="yes"/>
+        <File Id="System.ServiceProcess.ServiceController.dll" Name="System.ServiceProcess.ServiceController.dll" Source="$(var.s3iWorker.TargetDir)System.ServiceProcess.ServiceController.dll" Vital="yes"/>        <!-- service -->
+      </Component>
+    </DirectoryRef>
+
+    <DirectoryRef Id="runtimes.win.lib.netcoreapp2.0">
+      <Component Id="runtimes.netcoreapp2.0" Guid="{A42FF591-8E16-40DB-8720-2D95490F63E7}">
+        <File Id="runtimes.netcoreapp2.0.System.Diagnostics.EventLog.dll" Name="System.Diagnostics.EventLog.dll" Source="$(var.s3iWorker.TargetDir)runtimes\win\lib\netcoreapp2.0\System.Diagnostics.EventLog.dll" Vital="yes" KeyPath="yes"/>
+      </Component>
+    </DirectoryRef>
+    <DirectoryRef Id="runtimes.win.lib.netstandard2.0">
+      <Component Id="runtimes.netstandard2.0" Guid="{E2500EA6-D752-4525-9F62-A002A8CBB105}">
+        <File Id="runtimes.netstandard2.0.System.ServiceProcess.ServiceController.dll" Name="System.ServiceProcess.ServiceController.dll" Source="$(var.s3iWorker.TargetDir)runtimes\win\lib\netstandard2.0\System.ServiceProcess.ServiceController.dll" Vital="yes" KeyPath="yes"/>
+      </Component>
+    </DirectoryRef>
+
+    <Feature Id="ProductFeature" Title="s3i" Level="1">
+      <ComponentRef Id="s3iCommandLine" />
+      <ComponentRef Id="s3iWorker" />
+      <ComponentRef Id="runtimes.netcoreapp2.0"/>
+      <ComponentRef Id="runtimes.netstandard2.0"/>
+      <ComponentRef Id="AWSSDK" />
+    </Feature>
+
+    <MajorUpgrade DowngradeErrorMessage="A newer than [ProductVersion] version of [ProductName] is already installed." />
+  </Product>
+</Wix>
