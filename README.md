@@ -18,6 +18,12 @@ like AWS S3 can be used for storing configuration and/or software installers.
   develop:
 [![Build status](https://ci.appveyor.com/api/projects/status/s5poqaqr1xn2e5ml/branch/develop?svg=true)](https://ci.appveyor.com/project/OlegBoulanov/s3i/branch/develop)
 
+## Functionality and examples
+
+s3i is a small Windows command line utility and service for managing Windows Installer packages products on groups of computers. Each managed host has s3i installed and configured for polling of group-specific configuration file. Changes of this file eventually lead to products being installed, reconfigured, upgraded, downgraded or uninstalled - on all computers in the same group.
+
+Detailed desription can be found in [wiki](https://github.com/OlegBoulanov/s3i/wiki)
+
 ## Installation Prerequisites
 
 - Windows 7/10 (with [Windows Installer](https://docs.microsoft.com/en-us/windows/win32/msi/overview-of-windows-installer))
@@ -25,68 +31,7 @@ like AWS S3 can be used for storing configuration and/or software installers.
    - since there is no Windows Installer (`msiexec.exe`) for Linux I'm aware of
 - [.NET Core Runtime 3.0.0](https://dotnet.microsoft.com/download/dotnet-core/3.0), which runs on Windows, Linux, or OSX
 
-Latest version of `s3i.msi` can be found on the project's [Releases tab](https://github.com/OlegBoulanov/s3i/releases/latest)
+## Installation 
 
-## Self Test
+Latest version of `s3i.msi` can be installed from [Releases page](https://github.com/OlegBoulanov/s3i/releases/latest)
 
-Download and install `s3i.msi` from the link above first. Then, run the follwing command in Windows (or Linux) Command Line window:
-
-### Dry run
-```
-C:\Users\olegb\> s3i https://raw.githubusercontent.com/OlegBoulanov/s3i/develop/Examples/Config.ini --verbose --dryrun
-```
-
-Output should be similar to that:
-```
-Products [1]:
-  UselessProduct: https://github.com/OlegBoulanov/s3i/releases/download/v1.0.267/wixExample.msi => C:\Users\olegb\AppData\Local\Temp\s3i\github.com\OlegBoulanov\s3i\releases\download\v1.0.267\wixExample.msi
-    UselessProperty = doing nothing at all
-Uninstall [1]:
-  https://github.com/OlegBoulanov/s3i/releases/download/v1.0.267/wixExample.msi
-Install [1]:
-  https://github.com/OlegBoulanov/s3i/releases/download/v1.0.267/wixExample.msi
-(DryRun) Uninstall C:\Users\olegb\AppData\Local\Temp\s3i\github.com\OlegBoulanov\s3i\releases\download\v1.0.267\wixExample.msi
-(DryRun) Download 1 product:
-  https://github.com/OlegBoulanov/s3i/releases/download/v1.0.267/wixExample.msi
-(DryRun) Install C:\Users\olegb\AppData\Local\Temp\s3i\github.com\OlegBoulanov\s3i\releases\download\v1.0.267\wixExample.msi
-(DryRun) Save C:\Users\olegb\AppData\Local\Temp\s3i\github.com\OlegBoulanov\s3i\releases\download\v1.0.267\wixExample.json
-Elapsed: 00:00:00.8382180
-```
-Also, one file is created in your %TEMP% directory:
-```
-C:\Users\olegb\AppData\Local\Temp\s3i\github.com\OlegBoulanov\s3i\releases\download\v1.0.267\wixExample.json
-```
-Linux directory will be different, but still user-specific.
-
-### Test wixExample installation
-
-If you remove `--dryrun` option, real installation will be attempted ... and may fail - if my example configuration file and releases go out of sync, 
-which is quite possible (as a side effect of continuous integration and manual intervention of cleaning out outdated releases). 
-
-To fix it, just download config file, and edit product URI, pointing it to one of the latest versions of `wixExample.msi` on Releases page:
-```
-[$products$]
-UselessProduct = https://github.com/OlegBoulanov/s3i/releases/download/v1.0.267/wixExample.msi
-[UselessProduct]
-UselessProperty = doing nothing at all
-
-```
-And run again with that local file:
-```
-C:\Users\olegb> s3i C:\Users\olegb\AppData\Local\Temp\s3i\config\Config.ini --verbose
-Products [1]:
-  UselessProduct: https://github.com/OlegBoulanov/s3i/releases/download/v1.0.267/wixExample.msi => C:\Users\olegb\AppData\Local\Temp\s3i\github.com\OlegBoulanov\s3i\releases\download\v1.0.267\wixExample.msi
-    UselessProperty = doing nothing at all
-Install [1]:
-  https://github.com/OlegBoulanov/s3i/releases/download/v1.0.267/wixExample.msi
-(Execute) Download 1 product:
-  https://github.com/OlegBoulanov/s3i/releases/download/v1.0.267/wixExample.msi
-(Execute) Install C:\Users\olegb\AppData\Local\Temp\s3i\github.com\OlegBoulanov\s3i\releases\download\v1.0.267\wixExample.msi
-Save C:\Users\olegb\AppData\Local\Temp\s3i\github.com\OlegBoulanov\s3i\releases\download\v1.0.267\wixExample.json
-Elapsed: 00:00:16.5867625
-```
-This time wixExample should be installed
-
-## Functionality and more detailed examples
-
-Detailed desription can be found in [wiki](https://github.com/OlegBoulanov/s3i/wiki)
