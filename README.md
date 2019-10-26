@@ -11,7 +11,9 @@ like AWS S3 can be used for storing configuration and/or software installers.
 
 ## Functionality
 
-s3i is a small Windows command line utility and service for managing Windows Installer packages products on groups of computers. Each managed host has s3i installed and configured for polling of group-specific configuration file. Changes of this file eventually lead to products being installed, reconfigured, upgraded, downgraded or uninstalled - on all computers in the same group.
+s3i is a small Windows command line utility and service for managing Windows Installer packages products (in *.msi files) on groups of computers. Each managed host has s3i installed and configured for polling of group-specific configuration file. Changes of this file _eventually (on installed software request)_ result in products being installed, reconfigured, upgraded, downgraded or uninstalled - on all computers in the same group. Configuration files specify product installation source and set of property values to apply at installation. Both configuration files and installation sources can be served locally (or from UNC), from public Web site (like GitHub Releases), or from AWS S3 bucket.
+
+In essence, s3i is a simple Continuous Deployment complement for already established Continuous Integration system (this project itself is an example of such)
 
 Detailed desription can be found in [wiki](https://github.com/OlegBoulanov/s3i/wiki)
 
@@ -25,8 +27,8 @@ Detailed desription can be found in [wiki](https://github.com/OlegBoulanov/s3i/w
 
 ## Installation Prerequisites
 
-- Windows 7/10 (with [Windows Installer](https://docs.microsoft.com/en-us/windows/win32/msi/overview-of-windows-installer))
-- [.NET Core Runtime 3.0.0](https://dotnet.microsoft.com/download/dotnet-core/3.0), which runs on Windows, Linux, or OSX
+- Windows 7/10/* (comes with [Windows Installer](https://docs.microsoft.com/en-us/windows/win32/msi/overview-of-windows-installer))
+   - [.NET Core Runtime 3.0.0](https://dotnet.microsoft.com/download/dotnet-core/3.0) installed
 
 ## Installation 
 
