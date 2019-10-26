@@ -18,7 +18,7 @@ like AWS S3 can be used for storing configuration and/or software installers.
   develop:
 [![Build status](https://ci.appveyor.com/api/projects/status/s5poqaqr1xn2e5ml/branch/develop?svg=true)](https://ci.appveyor.com/project/OlegBoulanov/s3i/branch/develop)
 
-## Functionality and examples
+## Functionality
 
 s3i is a small Windows command line utility and service for managing Windows Installer packages products on groups of computers. Each managed host has s3i installed and configured for polling of group-specific configuration file. Changes of this file eventually lead to products being installed, reconfigured, upgraded, downgraded or uninstalled - on all computers in the same group.
 
