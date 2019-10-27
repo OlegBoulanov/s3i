@@ -20,7 +20,6 @@ namespace s3iLib
 #pragma warning disable CA2227 // we need write access to deserialize
         public ProductPropertiesDictionary Props { get; set; } = new ProductPropertiesDictionary();
 #pragma warning restore CA2227
-        [JsonIgnore]
         public DateTimeOffset LastModified { get; set; } = DateTimeOffset.MinValue;
         public string MapToLocalPath(string basePath)
         {
@@ -40,8 +39,8 @@ namespace s3iLib
             if (versionIsNewer < 0) return InstallAction.Downgrade;
             // same version, changed props means reinstall
             if (!Props.Equals(installedProduct.Props)) return InstallAction.Reinstall;
-            //// compare modification times then and reinstall, if upstream has been updated since last installation
-            //if (DateTimeOffset.MinValue < installedProduct.LastModified && installedProduct.LastModified < LastModified) return InstallAction.Reinstall;
+            // compare modification times then and reinstall, if upstream has been updated since last installation
+            if (DateTimeOffset.MinValue < installedProduct.LastModified && installedProduct.LastModified < LastModified) return InstallAction.Reinstall;
             // else (if same version, datetime, and no props changed) 
             return InstallAction.NoAction;
         }
