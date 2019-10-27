@@ -21,7 +21,7 @@ namespace s3iLib
         public ProductPropertiesDictionary Props { get; set; } = new ProductPropertiesDictionary();
 #pragma warning restore CA2227
         [JsonIgnore]
-        public DateTimeOffset LastModified { get; set; }
+        public DateTimeOffset LastModified { get; set; } = DateTimeOffset.MinValue;
         public string MapToLocalPath(string basePath)
         {
             return MapToLocalPath(basePath, Name, Path.GetFileName(Uri.AbsolutePath));

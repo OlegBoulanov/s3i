@@ -21,7 +21,7 @@ namespace s3iLib
                 {
                     using (var responseStream = await result.Content.ReadAsStreamAsync().ConfigureAwait(false))
                     {
-                        await processStream.Invoke(responseStream, result.Content.Headers.LastModified ?? DateTimeOffset.UtcNow).ConfigureAwait(false);
+                        await processStream.Invoke(responseStream, result.Content.Headers.LastModified ?? DateTimeOffset.MinValue).ConfigureAwait(false);
                     }
                 }
                 return result.StatusCode;
