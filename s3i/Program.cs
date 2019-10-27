@@ -110,7 +110,10 @@ namespace s3i
                 }
             }
             // installed products (cached installer files) we don't need anymore
-            remove = products.FindFilesToUninstall(Path.Combine(commandLine.StagingFolder, $"*{MsiInstaller.MsiFileExtension}"));
+            foreach (var ext in Installer.GetSupportedExtensions())
+            {
+                foreach (var file in products.FindFilesToUninstall(Path.Combine(commandLine.StagingFolder, $"*{ext}"))) remove.Append(file);
+            }
             if (commandLine.Verbose)
             {
                 if (remove.Any())
