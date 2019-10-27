@@ -56,7 +56,7 @@ namespace s3i
         internal static int Uninstall(this CommandLine commandLine, string msiFilePath, bool deleteAllFiles)
         {
             var retCode = commandLine.LogAndExecute($"Uninstall {msiFilePath}",
-                (run) => run ? Installer.Uninstall(msiFilePath, commandLine.MsiExecArgs, commandLine.DryRun, commandLine.Timeout) : 0,
+                (run) => run ? MsiInstaller.Uninstall(msiFilePath, commandLine.MsiExecArgs, commandLine.DryRun, commandLine.Timeout) : 0,
                 x => x.HResult,
                 s => Console.WriteLine(s)
                 );
@@ -86,7 +86,7 @@ namespace s3i
         internal static int Install(this CommandLine commandLine, ProductInfo product)
         {
             var retCode = commandLine.LogAndExecute($"Install {product.LocalPath}",
-                (run) => run ? Installer.Install(product.LocalPath, product.Props, commandLine.MsiExecArgs, commandLine.DryRun, commandLine.Timeout) : 0,
+                (run) => run ? MsiInstaller.Install(product.LocalPath, product.Props, commandLine.MsiExecArgs, commandLine.DryRun, commandLine.Timeout) : 0,
                 x => x.HResult,
                 s => Console.WriteLine(s)
                 );

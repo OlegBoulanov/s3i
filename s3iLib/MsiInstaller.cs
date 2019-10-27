@@ -7,9 +7,8 @@ using System.Diagnostics;
 
 namespace s3iLib
 {
-    public static class Installer
+    public static class MsiInstaller
     {
-        public enum Action { NoAction, Install, Reinstall, Uninstall };
         public static string MsiExec { get; set; } = "msiexec.exe";
         public static string InstallerFileExtension { get; set; } = ".msi";
         public static int RunInstall(string commandLineArgs, bool dryrun, TimeSpan timeout)
