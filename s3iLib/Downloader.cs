@@ -10,7 +10,7 @@ namespace s3iLib
 {
     public abstract class Downloader
     {
-        public abstract Task<HttpStatusCode> DownloadAsync(Uri uri, DateTime modifiedSinceDateUtc, Func<Stream,DateTimeOffset, Task> processStream);
+        public abstract Task<HttpStatusCode> DownloadAsync(Uri uri, DateTime modifiedSinceDateUtc, Func<Stream, DateTimeOffset, Task> processStream);
         public async Task<HttpStatusCode> DownloadAsync(Uri uri, string localFilePath)
         {
             Contract.Requires(null != uri);
