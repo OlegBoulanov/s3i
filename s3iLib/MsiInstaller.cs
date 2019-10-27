@@ -13,7 +13,7 @@ namespace s3iLib
     public class MsiInstaller : Installer
     {
         public static string MsiExec { get; set; } = "msiexec.exe";
-        public static string MsiFileExtension { get; set; } = ".msi";
+        public static string SupportedFileExtension { get; set; } = ".msi";
         public static int RunInstall(string commandLineArgs, bool dryrun, TimeSpan timeout)
         {
             if (RuntimeInformation.IsOSPlatform(OSPlatform.Windows))
@@ -54,7 +54,7 @@ namespace s3iLib
         public static bool CanInstall(Uri uri)
         {
             Contract.Requires(null != uri);
-            return 0 == string.Compare(MsiFileExtension, Path.GetExtension(uri.AbsolutePath), true, CultureInfo.InvariantCulture);
+            return 0 == string.Compare(SupportedFileExtension, Path.GetExtension(uri.AbsolutePath), true, CultureInfo.InvariantCulture);
         }
         #region Installer methods implementation
         public override int Install(Uri uri, ProductPropertiesDictionary props, string extraArgs, bool dryrun, TimeSpan timeout)
