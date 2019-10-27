@@ -5,7 +5,7 @@
    "version": "0.2.0",
    "configurations": [
         {
-            "name": ".NET Core Launch (console)",
+            "name": "s3iLibTests",
             "type": "coreclr",
             "request": "launch",
             "preLaunchTask": "build",
@@ -13,6 +13,19 @@
             "program": "${workspaceFolder}/s3iLibTests/bin/Debug/netcoreapp3.0/s3iLibTests.dll",
             "args": [],
             "cwd": "${workspaceFolder}/s3iLibTests",
+            // For more information about the 'console' field, see https://aka.ms/VSCode-CS-LaunchJson-Console
+            "console": "internalConsole",
+            "stopAtEntry": false
+        },
+        {
+            "name": "s3iRunExample",
+            "type": "coreclr",
+            "request": "launch",
+            "preLaunchTask": "build",
+            // If you have changed target frameworks, make sure to update the program path.
+            "program": "${workspaceFolder}/s3i/bin/Debug/netcoreapp3.0/s3i.dll",
+            "args": [ "https://raw.githubusercontent.com/OlegBoulanov/s3i/develop/Examples/Config.ini" ],
+            "cwd": "${workspaceFolder}/s3i",
             // For more information about the 'console' field, see https://aka.ms/VSCode-CS-LaunchJson-Console
             "console": "internalConsole",
             "stopAtEntry": false
