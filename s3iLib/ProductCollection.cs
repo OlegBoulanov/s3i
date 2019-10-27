@@ -23,7 +23,7 @@ namespace s3iLib
             using(var reader = new StreamReader(stream))
             {
                 var products = JsonSerializer.Deserialize<ProductCollection>(await reader.ReadToEndAsync().ConfigureAwait(false));
-                products.ForEach(p => p.LastModified = lastModified.UtcDateTime);
+                products.ForEach(p => p.LastModifiedUtc = lastModified.UtcDateTime);
                 return products;
             }
         }
@@ -51,7 +51,7 @@ namespace s3iLib
                 if (sectionProducts.Equals(sectionName, StringComparison.InvariantCultureIgnoreCase))
                 {
                     var nextUri = null != baseUri ? baseUri.BuildRelativeUri(keyValue) : new Uri(keyValue);
-                    products.Add(new ProductInfo { Name = keyName, Uri = nextUri, LastModified = lastModified });
+                    products.Add(new ProductInfo { Name = keyName, Uri = nextUri, LastModifiedUtc = lastModified });
                     baseUri = nextUri;
                 }
                 else
@@ -73,7 +73,7 @@ namespace s3iLib
                   switch (Path.GetExtension(uri.AbsolutePath).ToUpperInvariant())
                   {
                       case ".MSI":
-                          products.Add(new ProductInfo { Name = uri.ToString(), Uri = uri, LastModified = lastModified });
+                          products.Add(new ProductInfo { Name = uri.ToString(), Uri = uri, LastModifiedUtc = lastModified });
                           await Task.CompletedTask.ConfigureAwait(false);
                           break;
                       case ".INI":

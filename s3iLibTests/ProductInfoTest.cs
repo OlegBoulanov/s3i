@@ -17,8 +17,7 @@ namespace s3iLibTests
                 + "  \"Props\": {" + Environment.NewLine
                 + "    \"prop1\": \"value1\"," + Environment.NewLine
                 + "    \"prop2\": \"value2\"" + Environment.NewLine
-                + "  }," + Environment.NewLine
-                + "  \"LastModified\": \"2019-10-23T09:15:23.1234+04:00\"" + Environment.NewLine
+                + "  }" + Environment.NewLine
                 + "}";
         ProductInfo FromJson(string json = null)
         {
@@ -35,9 +34,6 @@ namespace s3iLibTests
             {
                 Uri = new Uri("https://s3.something.com/install-me/me-me-me.msi"),
                 Name = "TestProduct",
-#pragma warning disable CA1305
-                LastModified = DateTimeOffset.Parse("2019-10-23 09:15:23.1234+04:00"),
-#pragma warning restore CA1305
             };
             pi.Props.Add("prop1", "value1");
             pi.Props.Add("prop2", "value2");
@@ -73,13 +69,6 @@ namespace s3iLibTests
             Assert.AreEqual(InstallAction.Upgrade, downloaded.CompareAndSelectAction(installed));
             downloaded.Uri = new Uri("https://x.com/prod/1.2.1/p.msi");
             Assert.AreEqual(InstallAction.Downgrade, downloaded.CompareAndSelectAction(installed));
-            // 
-            downloaded = FromJson();
-            installed = FromJson();
-            installed.LastModified = downloaded.LastModified.AddMinutes(10);
-            Assert.AreEqual(InstallAction.NoAction, downloaded.CompareAndSelectAction(installed));
-            installed.LastModified = downloaded.LastModified.AddMinutes(-20);
-            Assert.AreEqual(InstallAction.Reinstall, downloaded.CompareAndSelectAction(installed));
         }
     }
 }
