@@ -55,8 +55,15 @@ namespace s3i
         }
         internal static int Uninstall(this CommandLine commandLine, string msiFilePath, bool deleteAllFiles)
         {
+            var uri = new Uri(msiFilePath);
+            var installer = Installer.SelectInstaller(uri);
+            if(null == installer)
+            {
+                Console.WriteLine($"? Installation of {uri} is not supported");
+                return -1;
+            }
             var retCode = commandLine.LogAndExecute($"Uninstall {msiFilePath}",
-                (run) => run ? Installer.Uninstall(msiFilePath, commandLine.MsiExecArgs, commandLine.DryRun, commandLine.Timeout) : 0,
+                (run) => run ? installer.Uninstall(uri, commandLine.MsiExecArgs, commandLine.DryRun, commandLine.Timeout) : 0,
                 x => x.HResult,
                 s => Console.WriteLine(s)
                 );
@@ -85,8 +92,15 @@ namespace s3i
 
         internal static int Install(this CommandLine commandLine, ProductInfo product)
         {
+            var uri = new Uri(product.LocalPath);
+            var installer = Installer.SelectInstaller(uri);
+            if(null == installer)
+            {
+                Console.WriteLine($"? Uninstallation of {uri} is not supported");
+                return -1;
+            }
             var retCode = commandLine.LogAndExecute($"Install {product.LocalPath}",
-                (run) => run ? Installer.Install(product.LocalPath, product.Props, commandLine.MsiExecArgs, commandLine.DryRun, commandLine.Timeout) : 0,
+                (run) => run ? installer.Install(uri, product.Props, commandLine.MsiExecArgs, commandLine.DryRun, commandLine.Timeout) : 0,
                 x => x.HResult,
                 s => Console.WriteLine(s)
                 );

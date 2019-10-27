@@ -144,29 +144,31 @@ namespace s3iLib
             if (null == compare) compare = (s1, s2) => { return 0 == string.Compare(s1, s2, StringComparison.CurrentCultureIgnoreCase); };
             return files.Where(e => !Exists(product => compare(product.LocalPath, e)));
         }
-        public (IEnumerable<ProductInfo> filesToUninstall, IEnumerable<ProductInfo> productsToInstall) Separate(Func<string, ProductInfo> findInstalledProduct, params string [] prefixes)
+        public (IEnumerable<ProductInfo> filesToUninstall, IEnumerable<ProductInfo> productsToInstall) SeparateActions(Func<string, ProductInfo> findInstalledProduct, params string [] prefixes)
         {
             var uninstall = new List<ProductInfo>();
             var install = new List<ProductInfo>();
             foreach(var product in this) 
             {
                 var installedProduct = findInstalledProduct?.Invoke(product.LocalPath);
-                if (null == installedProduct)
+                var installAction = product.CompareAndSelectAction(installedProduct, prefixes);
+                // map action to msiexec type action sequence
+                switch (installAction)
                 {
-                    install.Add(product);
-                    continue;
-                }
-                var installerAction = product.CompareAndSelectAction(installedProduct, prefixes);
-                switch (installerAction)
-                {
-                    case Installer.Action.Install:
+                    case InstallAction.NoAction:
+                        // still install over - shouldn't do any harm
                         install.Add(product);
                         break;
-                    case Installer.Action.Reinstall:
+                    case InstallAction.Install:
+                    case InstallAction.Upgrade:
+                        install.Add(product);
+                        break;
+                    case InstallAction.Reinstall:
+                    case InstallAction.Downgrade:
                         uninstall.Add(installedProduct);
                         install.Add(product);
                         break;
-                    case Installer.Action.Uninstall:
+                    case InstallAction.Uninstall:
                         uninstall.Add(installedProduct);
                         break;
                 }

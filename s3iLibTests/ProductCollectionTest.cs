@@ -148,7 +148,7 @@ Three    = https://xxx.s3.amazonaws.com/Test/Windows10/Distrib//SecondProduct/9.
                 new ProductInfo { Name = "Prod04", Uri = new Uri("https://download/from/Prod04/1.2.3+install/p4.msi"), LocalPath = "Prod04\\p4.msi", },
             };
             var remove = products.FilesToUninstall(installed.Keys);
-            var (uninstall, install) = products.Separate(localPath =>
+            var (uninstall, install) = products.SeparateActions(localPath =>
             {
                 var uri = installed.ContainsKey(localPath) ? installed[localPath] : null;
                 return null != uri ? new ProductInfo { Uri = new Uri(uri), } : null;

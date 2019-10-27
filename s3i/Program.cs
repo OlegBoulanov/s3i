@@ -79,7 +79,7 @@ namespace s3i
                 else
                 {
                     DownloaderS3.ProfileName = commandLine.ProfileName;
-                    Installer.MsiExec = commandLine.MsiExecCommand;
+                    MsiInstaller.MsiExec = commandLine.MsiExecCommand;
                     var clock = System.Diagnostics.Stopwatch.StartNew();
                     exitCode = await ProcessAndExecute(commandLine).ConfigureAwait(false);
                     if (commandLine.Verbose)
@@ -110,7 +110,7 @@ namespace s3i
                 }
             }
             // installed products (cached installer files) we don't need anymore
-            remove = products.FindFilesToUninstall(Path.Combine(commandLine.StagingFolder, $"*{Installer.InstallerFileExtension}"));
+            remove = products.FindFilesToUninstall(Path.Combine(commandLine.StagingFolder, $"*{MsiInstaller.MsiFileExtension}"));
             if (commandLine.Verbose)
             {
                 if (remove.Any())
@@ -127,7 +127,7 @@ namespace s3i
             }
             else
             {
-                (uninstall, install) = products.Separate(localMsiFile =>
+                (uninstall, install) = products.SeparateActions(localMsiFile =>
                 {
                     var localInfoFile = Path.ChangeExtension(localMsiFile, ProductInfo.LocalInfoFileExtension);
                     var installedProduct = ProductInfo.FindInstalled(localInfoFile).Result;

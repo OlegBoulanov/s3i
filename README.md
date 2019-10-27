@@ -15,14 +15,15 @@ s3i is a small Windows command line utility and service for managing Windows Ins
 
 In essence, s3i is a simple Continuous Deployment complement for already established Continuous Integration system (this project itself is an example of such)
 
+![Deployment with s3i](./Docs/Deployment-with-s3i.png "Deployment with s3i")
+
 Detailed desription can be found in [wiki](https://github.com/OlegBoulanov/s3i/wiki)
 
 ## Build Status
 
-  master:
-[![Build status](https://ci.appveyor.com/api/projects/status/s5poqaqr1xn2e5ml/branch/master?svg=true)](https://ci.appveyor.com/project/OlegBoulanov/s3i/branch/master)
-  develop:
-[![Build status](https://ci.appveyor.com/api/projects/status/s5poqaqr1xn2e5ml/branch/develop?svg=true)](https://ci.appveyor.com/project/OlegBoulanov/s3i/branch/develop)
+|  master | develop |release |
+|:-------:|:------:|:-------:|
+|[![Build status](https://ci.appveyor.com/api/projects/status/s5poqaqr1xn2e5ml/branch/master?svg=true)](https://ci.appveyor.com/project/OlegBoulanov/s3i/branch/master)|[![Build status](https://ci.appveyor.com/api/projects/status/s5poqaqr1xn2e5ml/branch/develop?svg=true)](https://ci.appveyor.com/project/OlegBoulanov/s3i/branch/develop)|[![Build status](https://ci.appveyor.com/api/projects/status/s5poqaqr1xn2e5ml/branch/release?svg=true)](https://ci.appveyor.com/project/OlegBoulanov/s3i/branch/release)|
 
 ## Installation Prerequisites
 
