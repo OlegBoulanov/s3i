@@ -51,17 +51,13 @@ namespace s3iLib
         }
         public async Task ToJson(Stream stream)
         {
-            using (var writer = new StreamWriter(stream))
-            {
-                await writer.WriteAsync(ToJson()).ConfigureAwait(false);
-            }
+            using var writer = new StreamWriter(stream);
+            await writer.WriteAsync(ToJson()).ConfigureAwait(false);
         }
         public static async Task<ProductInfo> FromJson(Stream stream)
         {
-            using (var reader = new StreamReader(stream))
-            {
-                return JsonSerializer.Deserialize<ProductInfo>(await reader.ReadToEndAsync().ConfigureAwait(false));
-            }
+            using var reader = new StreamReader(stream);
+            return JsonSerializer.Deserialize<ProductInfo>(await reader.ReadToEndAsync().ConfigureAwait(false));
         }
         public static string LocalInfoFileExtension { get; } = ".json";
         public async Task SaveToLocal(string path)
@@ -76,10 +72,8 @@ namespace s3iLib
         {
             if (File.Exists(path))
             {
-                using (var fs = new FileStream(path, FileMode.Open))
-                {
-                    return await FromJson(fs).ConfigureAwait(false);
-                }
+                using var fs = new FileStream(path, FileMode.Open);
+                return await FromJson(fs).ConfigureAwait(false);
             }
             return null;
         }
