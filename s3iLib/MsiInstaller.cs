@@ -43,7 +43,7 @@ namespace s3iLib
         public static string FormatCommand(string msiFilePath, ProductPropertiesDictionary props, string prefix, string suffix)
         {
             Contract.Requires(null != msiFilePath);
-            StringBuilder sb = new StringBuilder($"{prefix} {msiFilePath.Replace('/', '\\').Quote("\"")}");
+            StringBuilder sb = new StringBuilder($"{prefix} {msiFilePath.Replace('/', Path.DirectorySeparatorChar).Quote("\"")}");
             // begin with list of quoted if necessary props
             if (null != props) sb.Append(props.Aggregate("", (s, a) => { s = $"{s} {a.Key}={a.Value.Quote("\"")}"; return s; }));
             // now append extra args, so they may override props and set more msiexec options
