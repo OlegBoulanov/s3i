@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Diagnostics.Contracts;
 using System.IO;
+using System.Net;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -48,7 +49,31 @@ namespace s3i
         internal static int DownloadProducts(this CommandLine commandLine, IEnumerable<ProductInfo> products, TimeSpan timeout)
         {
             return commandLine.LogAndExecute($"Download {products.Count()} product{products.Count().Plural()}:{products.Aggregate(new StringBuilder(), (sb, p) => { sb.AppendLine(); sb.Append($"  {p.Uri}"); return sb; }, sb => sb.ToString())}",
-                (run) => { if (run) ProductCollection.DownloadInstallers(products).Wait(timeout); return 0; },
+                (run) => {
+                    if (run)
+                    {
+                        var download = ProductCollection.DownloadInstallers(products);
+                        if (download.Wait(timeout))
+                        {
+                            foreach(var result in download.Result)
+                            {
+                                switch (result.Value)
+                                {
+                                    case HttpStatusCode.OK:
+                                    case HttpStatusCode.NotModified:
+                                        break;
+                                    default:
+                                        throw new ApplicationException($"Download error: {result.Key} => {result.Value}");
+                                }
+                            }
+                        }
+                        else
+                        {
+                            throw new ApplicationException("Product download timed out");
+                        }
+                    }
+                    return 0; 
+                },
                 x => x.HResult,
                 s => Console.WriteLine(s)
                 );

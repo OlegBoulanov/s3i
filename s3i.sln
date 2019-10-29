@@ -27,6 +27,9 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Examples", "Examples", "{B1
 	EndProjectSection
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Docs", "Docs", "{34EBCDEE-EC29-46FB-8E29-84D33C0BA080}"
+	ProjectSection(SolutionItems) = preProject
+		Docs\Deployment-with-s3i.png = Docs\Deployment-with-s3i.png
+	EndProjectSection
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution

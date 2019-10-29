@@ -13,19 +13,15 @@ namespace s3iLib
         {
             Contract.Requires(null != uri);
             Contract.Requires(null != processStream);
-            using (var handler = new HttpClientHandler { UseDefaultCredentials = true, })
-            using (var client = new HttpClient(handler))
-            using (var result = await client.GetAsync(uri).ConfigureAwait(false))
+            using var handler = new HttpClientHandler { UseDefaultCredentials = true, };
+            using var client = new HttpClient(handler);
+            using var result = await client.GetAsync(uri).ConfigureAwait(false);
+            if (result.IsSuccessStatusCode)
             {
-                if (result.IsSuccessStatusCode)
-                {
-                    using (var responseStream = await result.Content.ReadAsStreamAsync().ConfigureAwait(false))
-                    {
-                        await processStream.Invoke(responseStream, result.Content.Headers.LastModified ?? DateTimeOffset.MinValue).ConfigureAwait(false);
-                    }
-                }
-                return result.StatusCode;
+                using var responseStream = await result.Content.ReadAsStreamAsync().ConfigureAwait(false);
+                await processStream.Invoke(responseStream, result.Content.Headers.LastModified ?? DateTimeOffset.MinValue).ConfigureAwait(false);
             }
+            return result.StatusCode;
         }
     }
 }

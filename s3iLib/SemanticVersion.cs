@@ -127,7 +127,7 @@ namespace s3iLib
         }
         public override int GetHashCode()
         {
-            return ToString().GetHashCode();
+            return ToString().GetHashCode(StringComparison.InvariantCulture);
         }
         public override string ToString()
         {
