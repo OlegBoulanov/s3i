@@ -70,7 +70,7 @@ namespace s3iLib
             foreach (var prop in GetType().GetProperties())
             {
                 var attributes = prop.GetCustomAttributes(true).Where(a => a is CommandLineKeyAttribute);
-                if (0 == attributes.Count()) continue;    // because Max may throw
+                if (attributes.Any()) continue;    // because Max may throw
                 keysLength = Math.Max(keysLength, attributes.Max(a => FormatKeys(((CommandLineKeyAttribute)a).Keys).Length));
             }
             foreach (var prop in GetType().GetProperties())
