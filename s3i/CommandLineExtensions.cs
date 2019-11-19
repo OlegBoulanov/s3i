@@ -175,15 +175,13 @@ namespace s3i
             // we must have staging folder
             if (string.IsNullOrWhiteSpace(commandLine.StagingFolder)) return new Outcome<bool, string>(false).AddErrors("Staging folder is not specified, you may want to set TEMP or HOME environment variable");
             if (!commandLine.StagingFolder.EndsWith(Path.DirectorySeparatorChar)) commandLine.StagingFolder += Path.DirectorySeparatorChar;
-            // validate
+            // validate arguments are Uris
             var outcome = new Outcome<bool, string>(true);
             foreach (var a in commandLine.Arguments)
             {
                 try
                 {
-                    // this one throws... thank you, Amazon
-                    var uri = new Uri(a);
-                    if (!AmazonS3Uri.TryParseAmazonS3Uri(uri, out var s3uri)) { outcome.AddErrors($"Invalid AWS S3 Uri: {a}"); }
+                    _ = new Uri(a);
                 }
                 catch (Exception x)
                 {
