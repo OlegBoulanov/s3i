@@ -96,7 +96,7 @@ namespace s3i
         {
             var exitCode = 0;
 
-            IEnumerable<string> remove = new List<string>();
+            var remove = new List<string>();
             IEnumerable<ProductInfo> uninstall = new List<ProductInfo>(), install = null;
             var products = await ProductCollection.ReadProducts(commandLine.Arguments.Select((uri, index) => { return new Uri(uri); })).ConfigureAwait(false);
             products.MapToLocal(commandLine.StagingFolder);
@@ -112,7 +112,10 @@ namespace s3i
             // installed products (cached installer files) we don't need anymore
             foreach (var ext in Installer.GetSupportedExtensions())
             {
-                foreach (var file in products.FindFilesToUninstall(Path.Combine(commandLine.StagingFolder, $"*{ext}"))) remove.Append(file);
+                foreach (var file in products.FindFilesToUninstall(Path.Combine(commandLine.StagingFolder, $"*{ext}")))
+                {
+                    remove.Add(file);
+                }
             }
             if (commandLine.Verbose)
             {
