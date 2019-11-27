@@ -28,7 +28,8 @@ namespace s3iLib
         }
         static string MapToLocal(Uri uri, string localBasePath)
         {
-            return Path.Combine(localBasePath, $"{uri.Host}{Path.DirectorySeparatorChar}{uri.AbsolutePath.RemoveDotSegments()}").UnifySlashes();
+            //return Path.Combine(localBasePath, $"{uri.Host}{Path.DirectorySeparatorChar}{uri.AbsolutePath.RemoveDotSegments()}").UnifySlashes();
+            return Path.Combine(localBasePath, $"{uri.GetHashCode():X8}{Path.DirectorySeparatorChar}{Path.GetFileName(uri.AbsolutePath)}").UnifySlashes();
         }
         public ProductCollection MapToLocal(string localBasePath)
         {
@@ -36,8 +37,9 @@ namespace s3iLib
             {
                 if (string.IsNullOrWhiteSpace(p.LocalPath))
                 {
-                    var uri = p.Uri;
-                    p.LocalPath = MapToLocal(uri, localBasePath);
+                    //var uri = p.Uri;
+                    //p.LocalPath = MapToLocal(uri, localBasePath);
+                    p.LocalPath = Path.Combine(localBasePath, $"{Uri.EscapeDataString(p.Name)}{Path.DirectorySeparatorChar}{Path.GetFileName(p.Uri.AbsolutePath)}").UnifySlashes();
                 }
             });
             return this;
@@ -180,6 +182,13 @@ namespace s3iLib
                 }
             }
             return (uninstall, install);
+        }
+        public (IEnumerable<string> filesToRemove, IEnumerable<ProductInfo> filesToUninstall, IEnumerable<ProductInfo> productsToInstall)
+        Preprocess(Func<string, ProductInfo> findInstalledProduct, params string[] prefixes)
+        {
+            var filesToRemove = new List<string>();
+            (var filesToUninstall, var productsToInstall) = SeparateActions(findInstalledProduct, prefixes);
+            return (filesToRemove, filesToUninstall, productsToInstall);
         }
     }
 }
