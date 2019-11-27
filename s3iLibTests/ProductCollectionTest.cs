@@ -71,7 +71,9 @@ Three    = https://xxx.s3.amazonaws.com/Test/Windows10/Distrib//SecondProduct/9.
             Assert.AreEqual(3, products.Count);
             Assert.AreEqual(3, files.Count());
             var x = Path.DirectorySeparatorChar;
-            Assert.AreEqual($"C:{x}Temp{x}xxx.s3.amazonaws.com{x}Test{x}Windows10{x}Distrib{x}ProductOne{x}12.6.16{x}ProductOne.msi", files.First().local);
+            Assert.AreEqual($"C:{x}Temp{x}One{x}ProductOne.msi", files.ToArray()[0].local);
+            Assert.AreEqual($"C:{x}Temp{x}Two{x}SecondProduct.msi", files.ToArray()[1].local);
+            Assert.AreEqual($"C:{x}Temp{x}Three{x}SecondProduct.msi", files.ToArray()[2].local);
         }
 
         const string products1 = "[$products$]\nOne=https://x.amazonaws.com/one/config.ini\nTwo=https://x.amazonaws.com/one/config.ini\n[One]p11=1\np12=2\n[Two]\np21=11\np22=12\n";

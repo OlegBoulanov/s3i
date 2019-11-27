@@ -112,10 +112,7 @@ namespace s3i
             // installed products (cached installer files) we don't need anymore
             foreach (var ext in Installer.GetSupportedExtensions())
             {
-                foreach (var file in products.FindFilesToUninstall(Path.Combine(commandLine.StagingFolder, $"*{ext}")))
-                {
-                    remove.Add(file);
-                }
+                remove.AddRange(products.FindFilesToUninstall(Path.Combine(commandLine.StagingFolder, $"*{ext}")));
             }
             if (commandLine.Verbose)
             {
