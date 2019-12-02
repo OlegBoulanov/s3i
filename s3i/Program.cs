@@ -168,7 +168,7 @@ namespace s3i
                 // 2) Uninstall whose to be changed
                 foreach (var f in uninstall)
                 {
-                    var err = commandLine.Uninstall(f.LocalPath, false);
+                    var err = commandLine.Uninstall(f.LocalPath, true);
                     if (0 == exitCode && 0 != err) { exitCode = err; break; }
                 }
                 // 3) Download/cache existing and new
