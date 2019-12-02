@@ -26,19 +26,12 @@ namespace s3iLib
             products.ForEach(p => p.LastModifiedUtc = lastModified.UtcDateTime);
             return products;
         }
-        static string MapToLocal(Uri uri, string localBasePath)
-        {
-            //return Path.Combine(localBasePath, $"{uri.Host}{Path.DirectorySeparatorChar}{uri.AbsolutePath.RemoveDotSegments()}").UnifySlashes();
-            return Path.Combine(localBasePath, $"{uri.GetHashCode():X8}{Path.DirectorySeparatorChar}{Path.GetFileName(uri.AbsolutePath)}").UnifySlashes();
-        }
         public ProductCollection MapToLocal(string localBasePath)
         {
             ForEach(p =>
             {
                 if (string.IsNullOrWhiteSpace(p.LocalPath))
                 {
-                    //var uri = p.Uri;
-                    //p.LocalPath = MapToLocal(uri, localBasePath);
                     p.LocalPath = Path.Combine(localBasePath, $"{Uri.EscapeDataString(p.Name)}{Path.DirectorySeparatorChar}{Path.GetFileName(p.Uri.AbsolutePath)}").UnifySlashes();
                 }
             });
