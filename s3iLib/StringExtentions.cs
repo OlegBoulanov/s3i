@@ -76,6 +76,19 @@ namespace s3iLib
             }
             return s;
         }
+
+        public static string Expand(this string s, IDictionary<string, string> defines)
+        {
+            if (null != defines)
+            {
+                // simple one pass case sensitive
+                foreach (var k in defines.Keys)
+                {
+                    s = s?.Replace(k, defines[k], StringComparison.CurrentCulture);
+                }
+            }
+            return s;
+        }
     }
 
     public static class IntegerExtensions
