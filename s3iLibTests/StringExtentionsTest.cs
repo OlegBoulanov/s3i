@@ -3,6 +3,7 @@ using NUnit.Framework;
 
 using System.IO;
 using System.Text.RegularExpressions;
+using System.Collections.Generic;
 
 using s3iLib;
 
@@ -67,6 +68,15 @@ namespace s3iLibTests
             Assert.AreEqual("\"a b c\"", "a b c".Quote(""));
             Assert.AreEqual("\"ab\tc\"", "ab\tc".Quote(""));
             Assert.AreEqual("***a b c***", "a b c".Quote("***"));
+        }
+        [Test]
+        public void TestExpand()
+        {
+            Assert.IsNull(((string)null).Expand(null));
+            Assert.AreEqual("x", "x".Expand(null));
+            Assert.IsNull(((string)null).Expand(new Dictionary<string, string>()));
+            Assert.AreEqual("x", "x".Expand(new Dictionary<string, string>()));
+            Assert.AreEqual("xyDefValue_two=2", "xy$def$_$one=2".Expand(new Dictionary<string, string>() { { "$def$", "DefValue" }, { "$one", "two" } }));
         }
     }
 }

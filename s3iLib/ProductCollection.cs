@@ -37,18 +37,25 @@ namespace s3iLib
             });
             return this;
         }
+        const string sectionDefine = "$define$";
         const string sectionProducts = "$products$";
         public static async Task<ProductCollection> FromIni(Stream stream, DateTimeOffset lastModified, Uri baseUri = null)
         {
+            var defines = new Dictionary<string, string>();
             var products = new ProductCollection();
             await IniReader.Read(stream, (sectionName, keyName, keyValue) =>
             {
-                keyValue = Environment.ExpandEnvironmentVariables(keyValue);
+                // expand defines first, envars - after that
+                keyValue = Environment.ExpandEnvironmentVariables(keyValue.Expand(defines));
                 if (sectionProducts.Equals(sectionName, StringComparison.InvariantCultureIgnoreCase))
                 {
                     var nextUri = null != baseUri ? baseUri.BuildRelativeUri(keyValue) : new Uri(keyValue);
                     products.Add(new ProductInfo { Name = keyName, Uri = nextUri, LastModifiedUtc = lastModified });
                     baseUri = nextUri;
+                }
+                else if (sectionDefine.Equals(sectionName, StringComparison.InvariantCultureIgnoreCase))
+                {
+                    defines[keyName] = keyValue;
                 }
                 else
                 {
