@@ -28,7 +28,7 @@ Detailed desription can be found in [wiki](https://github.com/OlegBoulanov/s3i/w
 ## Installation Prerequisites
 
 - Windows 7/10/* (comes with [Windows Installer](https://docs.microsoft.com/en-us/windows/win32/msi/overview-of-windows-installer))
-   - [.NET Core Runtime 3.0.0](https://dotnet.microsoft.com/download/dotnet-core/3.0) installed
+   - [.NET Core Runtime 3.1.0](https://dotnet.microsoft.com/download/dotnet-core/3.1) installed
 
 ## Installation 
 
