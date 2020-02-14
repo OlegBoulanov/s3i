@@ -66,7 +66,7 @@ namespace s3iLib
             {
                 await ToJson(fs).ConfigureAwait(false);
             }
-            File.SetLastWriteTimeUtc(path, LastModifiedUtc.UtcDateTime);
+            if(DateTimeOffset.MinValue < LastModifiedUtc) File.SetLastWriteTimeUtc(path, LastModifiedUtc.UtcDateTime);
         }
         public static async Task<ProductInfo> FindInstalled(string path)
         {
