@@ -152,7 +152,7 @@ namespace s3iLib
             if (null == compare) compare = (s1, s2) => { return 0 == string.Compare(s1, s2, StringComparison.CurrentCultureIgnoreCase); };
             return files.Where(e => !Exists(product => compare(product.LocalPath, e)));
         }
-        public (IEnumerable<ProductInfo> filesToUninstall, IEnumerable<ProductInfo> productsToInstall) SeparateActions(Func<string, ProductInfo> findInstalledProduct, params string[] prefixes)
+        public (IEnumerable<ProductInfo> filesToUninstall, IEnumerable<ProductInfo> productsToInstall) PrepareActions(Func<string, ProductInfo> findInstalledProduct, params string[] prefixes)
         {
             var uninstall = new List<ProductInfo>();
             var install = new List<ProductInfo>();
@@ -187,7 +187,7 @@ namespace s3iLib
         Preprocess(Func<string, ProductInfo> findInstalledProduct, params string[] prefixes)
         {
             var filesToRemove = new List<string>();
-            (var filesToUninstall, var productsToInstall) = SeparateActions(findInstalledProduct, prefixes);
+            (var filesToUninstall, var productsToInstall) = PrepareActions(findInstalledProduct, prefixes);
             return (filesToRemove, filesToUninstall, productsToInstall);
         }
     }
