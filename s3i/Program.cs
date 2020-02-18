@@ -130,14 +130,31 @@ namespace s3i
             }
             else
             {
-                (uninstall, install) = products.SeparateActions(localMsiFile =>
+                (uninstall, install) = products.PrepareActions(localMsiFile =>
                 {
                     var localInfoFile = Path.ChangeExtension(localMsiFile, ProductInfo.LocalInfoFileExtension);
                     var installedProduct = ProductInfo.FindInstalled(localInfoFile).Result;
-                    // some backward compatibility in case if was not serialized
                     if (null != installedProduct)
                     {
+                        // some backward compatibility in case if was not serialized
                         if (string.IsNullOrEmpty(installedProduct.LocalPath)) installedProduct.LocalPath = localMsiFile;
+                    }
+                    else
+                    {
+                        // check for failed/incomplete installation leftovers, and clean it
+                        try
+                        {
+                            if (File.Exists(localMsiFile))
+                            {
+                                Console.WriteLine($"Delete stale {localMsiFile} (no matching {ProductInfo.LocalInfoFileExtension} found)");
+                                File.Delete(localMsiFile);
+                            }
+                        }
+                        catch (FileNotFoundException) { }
+                        catch (Exception x)
+                        {
+                            Console.WriteLine($"? {x.Format(4)}");
+                        }
                     }
                     return installedProduct;
                 },
