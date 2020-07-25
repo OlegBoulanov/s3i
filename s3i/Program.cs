@@ -79,6 +79,7 @@ namespace s3i
                 else
                 {
                     DownloaderS3.ProfileName = commandLine.ProfileName;
+                    AmazonS3ClientMap.DefaultRegion = Amazon.RegionEndpoint.GetBySystemName(commandLine.RegionName);
                     MsiInstaller.MsiExec = commandLine.MsiExecCommand;
                     var clock = System.Diagnostics.Stopwatch.StartNew();
                     exitCode = await ProcessAndExecute(commandLine).ConfigureAwait(false);

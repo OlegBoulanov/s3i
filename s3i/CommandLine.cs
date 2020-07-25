@@ -13,6 +13,9 @@ namespace s3i
         [CommandLineKey("AWS user profile name", "-p", "--profile <profile-name>")]
         public string ProfileName { get; set; } = "default";
 
+        [CommandLineKey("AWS defualt region name", "-r", "--region <region-name>")]
+        public string RegionName { get; set; } = "us-east-1";
+
         [CommandLineKey("List of comma separated allowed version prefixes", "-x", "--prefixes <list>")]
         public string VersionPrefixes { get; set; } = "v,V,ver,Ver";
 
