@@ -35,6 +35,7 @@ SecondProduct    = ../../../Distrib/SecondProduct/9.4.188/SecondProduct.msi
             
  PROMPTS_UPDATE	= https://s3.amazonaws.com/prompts.update.company.com/
  SYNC            = 00:15:00 1000 20000000 00:01:00
+
 ";
         [Test]
         public async Task TestTwoProductProps()
@@ -54,6 +55,29 @@ SecondProduct    = ../../../Distrib/SecondProduct/9.4.188/SecondProduct.msi
             Assert.AreEqual("https://s3.amazonaws.com/sessions.company.com/", products[1].Props["UNC_SESSIONS"]);
             Assert.AreEqual("https://s3.amazonaws.com/prompts.update.company.com/", products[1].Props["PROMPTS_UPDATE"]);
             Assert.AreEqual("00:15:00 1000 20000000 00:01:00", products[1].Props["SYNC"]);
+        }
+
+        const string ssmTestConfig = @"[$Products$]
+
+ProductOne = https://xxx.s3.amazonaws.com/Test/Windows10/Distrib/ProductOne/12.6.16/ProductOne.msi
+           
+ [ProductOne]
+ SYNC            = 00:15:00 1000 20000000 00:01:00
+ BUCKET_SUFFIX = Local bucket suffix: ${ssm:/hms/tpm/dice/local/naming/s3/bucket_suffix} => ${ssm:/hms/tpm/dice/local/naming/env/name}
+
+";
+        //[Test]
+        public async Task TestSSM()
+        {
+            AmazonAccount.ProfileName = "default";
+            AmazonAccount.RegionName = "ap-southeast-2";
+            
+            using var stream = new MemoryStream(Encoding.ASCII.GetBytes(ssmTestConfig));
+            var products = await ProductCollection.FromIni(stream, DateTimeOffset.UtcNow, null).ConfigureAwait(false); 
+            products.MapToLocal("C:\\Temp\\");
+            Assert.AreEqual(1, products.Count);
+            Assert.AreEqual("00:15:00 1000 20000000 00:01:00", products[0].Props["SYNC"]);
+            Assert.AreEqual("Local bucket suffix: ivr.dev.none.apse2.tpm.hms => dev", products[0].Props["BUCKET_SUFFIX"]);
         }
 
         const string manyProducts = @"[$Products$]
