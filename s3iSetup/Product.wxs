@@ -65,6 +65,7 @@
         <File Id="AWSSDK.Core.dll" Name="AWSSDK.Core.dll" Source="$(var.s3i.TargetDir)AWSSDK.Core.dll" Vital="yes"/>
         <File Id="AWSSDK.S3.dll" Name="AWSSDK.S3.dll" Source="$(var.s3i.TargetDir)AWSSDK.S3.dll" Vital="yes"/>
         <File Id="AWSSDK.SecurityToken.dll" Name="AWSSDK.SecurityToken.dll" Source="$(var.s3i.TargetDir)AWSSDK.SecurityToken.dll" Vital="yes"/>
+        <File Id="AWSSDK.SimpleSystemsManagement.dll" Name="AWSSDK.SimpleSystemsManagement.dll" Source="$(var.s3i.TargetDir)AWSSDK.SimpleSystemsManagement.dll" Vital="yes"/>
       </Component>
       <Component Id="s3iCommandLine" Guid="{36119CD0-A673-4695-BA85-3D109D2F76DE}">
         <RemoveFolder Id="Product_Root" On="uninstall"/>
