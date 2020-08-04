@@ -4,7 +4,7 @@ using System.Globalization;
 using System.Collections.Generic;
 using System.Collections.Concurrent;
 using System.Linq;
-using System.Text;
+using System.Text.RegularExpressions;
 using System.Threading.Tasks;
 
 using System.IO;
@@ -45,8 +45,7 @@ namespace s3iLib
             var products = new ProductCollection();
             await IniReader.Read(stream, (sectionName, keyName, keyValue) =>
             {
-                // expand defines first, envars - after that
-                keyValue = Environment.ExpandEnvironmentVariables(keyValue.Expand(defines));
+                keyValue = Variables.Expand(keyValue.Expand(defines));
                 if (sectionProducts.Equals(sectionName, StringComparison.InvariantCultureIgnoreCase))
                 {
                     var nextUri = null != baseUri ? baseUri.BuildRelativeUri(keyValue) : new Uri(keyValue);
