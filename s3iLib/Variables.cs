@@ -21,7 +21,7 @@ namespace s3iLib
 {
     public static class Variables
     {
-        static readonly Regex varableReference = new Regex(@"\$\{(?:(ssm:)(?:((\/[a-z0-9-_]+)+))|(env:)([A-Za-z0-9_]+))\}", RegexOptions.Compiled);
+        static readonly Regex varableReference = new Regex(@"\$\{(?:(ssm:)(?:((\/[A-Za-z0-9-_]+)+))|(env:)([A-Za-z0-9-_]+))\}", RegexOptions.Compiled);
         static readonly Lazy<AmazonSimpleSystemsManagementClient> ssm = new Lazy<AmazonSimpleSystemsManagementClient>(() 
             => new AmazonSimpleSystemsManagementClient(AmazonAccount.Credentials.Value, Amazon.RegionEndpoint.GetBySystemName(AmazonAccount.RegionName)));
         public static string Expand(string s)
