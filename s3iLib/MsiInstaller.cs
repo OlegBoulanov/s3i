@@ -14,6 +14,7 @@ namespace s3iLib
     {
         public static string MsiExec { get; set; } = "msiexec.exe";
         public static string SupportedFileExtension { get; set; } = ".msi";
+        public static char [] CharsToQuote = new char [] { ' ', '\t', '<', '>' };
         public static int RunInstall(string commandLineArgs, bool dryrun, TimeSpan timeout)
         {
             if (RuntimeInformation.IsOSPlatform(OSPlatform.Windows))
@@ -45,7 +46,7 @@ namespace s3iLib
         public static string FormatCommand(string msiFilePath, ProductPropertiesDictionary props, string prefix, string suffix)
         {
             Contract.Requires(null != msiFilePath);
-            return $"{prefix} {msiFilePath.Replace('/', Path.DirectorySeparatorChar).Quote("\"")}{props?.Aggregate("", (s, a) => { return $"{s} {a.Key}={a.Value.Quote("\"")}"; })} {suffix}";
+            return $"{prefix} {msiFilePath.Replace('/', Path.DirectorySeparatorChar).Quote("\"", CharsToQuote)}{props?.Aggregate("", (s, a) => { return $"{s} {a.Key}={a.Value.Quote("\"", CharsToQuote)}"; })} {suffix}";
         }
         public static bool CanInstall(Uri uri)
         {
