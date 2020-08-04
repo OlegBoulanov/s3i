@@ -20,11 +20,13 @@ namespace s3iLib
             {
                 if (!dryrun)
                 {
+                    var cmdexe = "cmd.exe";
                     var args = $"/c {MsiExec.Quote(null)} {commandLineArgs}";
-                    using var process = Process.Start("cmd.exe", args);
+                    using var process = Process.Start(cmdexe, args);
                     if (timeout.TotalMilliseconds <= 0) return 0;
                     if (false == process.WaitForExit((int)timeout.TotalMilliseconds) || 0 != process.ExitCode)
                     {
+                        Console.WriteLine($"{cmdexe} {args}");
                         Console.WriteLine($"{MsiExec} failed with {process.ExitCode}");
                     }
                     return process.ExitCode;
