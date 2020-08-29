@@ -18,12 +18,16 @@ namespace s3iLibTests
 
         }
 
-        [Test]
-        public void TestReplace()
+        //[Test] - commented out for Appveyor
+        public void TestSsmReplace()
         {
-            Assert.AreEqual("abcdefg", Variables.Expand("abcdefg"));
             Assert.AreEqual("abcdefgxxx", Variables.Expand("abcdefg${ssm:/no/such/parameter}xxx"));
             Assert.AreEqual("abcdefgSorry!xxx", Variables.Expand("abcdefg${ssm:/no/such/parameter?Sorry!}xxx"));
+        }
+        [Test]
+        public void TestEnvReplace()
+        {
+            Assert.AreEqual("abcdefg", Variables.Expand("abcdefg"));
             Assert.AreEqual("abcdefgxxx", Variables.Expand("abcdefg${env:NOSUCHVAR}xxx"));
             Assert.AreEqual("abcdefgNOWAYxxx", Variables.Expand("abcdefg${env:NOSUCHVAR?NOWAY}xxx"));
         }
