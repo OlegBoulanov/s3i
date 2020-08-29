@@ -18,17 +18,28 @@ namespace s3iLibTests
 
         }
 
-        //[Test] - commented out for Appveyor
+        [Test]
         public void TestSsmReplace()
         {
-            Assert.AreEqual("abcdefgxxx", Variables.Expand("abcdefg${ssm:/no/such/parameter}xxx"));
-            Assert.AreEqual("abcdefgSorry!xxx", Variables.Expand("abcdefg${ssm:/no/such/parameter?Sorry!}xxx"));
+            try
+            {
+                var creds = AmazonAccount.Credentials;  // may throw
+                Assert.Throws(typeof(ArgumentException), () => Variables.Expand("abcdefg${ssm:/x/NOSUCHVAR}xxx"));
+                Assert.AreEqual("abcdefgxxx", Variables.Expand("abcdefg${ssm:/no/such/parameter?}xxx"));
+                Assert.AreEqual("abcdefgSorry!xxx", Variables.Expand("abcdefg${ssm:/no/such/parameter?Sorry!}xxx"));
+            }
+            catch (Exception x)
+            {
+                Assert.Inconclusive($"Caught {x.Message}");
+            }
         }
         [Test]
         public void TestEnvReplace()
         {
             Assert.AreEqual("abcdefg", Variables.Expand("abcdefg"));
-            Assert.AreEqual("abcdefgxxx", Variables.Expand("abcdefg${env:NOSUCHVAR}xxx"));
+            Assert.AreEqual("abcdefg${env:***}xxx", Variables.Expand("abcdefg${env:***}xxx"));
+            Assert.Throws(typeof(ArgumentException), () => Variables.Expand("abcdefg${env:NOSUCHVAR}xxx"));
+            Assert.AreEqual("abcdefgxxx", Variables.Expand("abcdefg${env:NOSUCHVAR?}xxx"));
             Assert.AreEqual("abcdefgNOWAYxxx", Variables.Expand("abcdefg${env:NOSUCHVAR?NOWAY}xxx"));
         }
     }
