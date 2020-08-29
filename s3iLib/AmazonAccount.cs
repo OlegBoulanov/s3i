@@ -14,7 +14,7 @@ namespace s3iLib
 {
     public static class AmazonAccount
     {
-        public static string RegionName { get; set; }
+        public static string RegionName { get; set; } = "us-east-1";
         public static string ProfileName { get; set; } = "default";
         public static Lazy<AWSCredentials> Credentials { get; } = new Lazy<AWSCredentials>(() =>
         {
