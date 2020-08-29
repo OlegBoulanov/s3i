@@ -23,7 +23,7 @@ namespace s3iLib
     {
         // ${type:name[?default_value]}, use type/name to resolve, or return default_value
         // type supported are: ssm and env
-        static readonly Regex varableReference = new Regex(@"\$\{(?:(?<type>ssm:)(?:(?<name>(\/[a-z0-9-_]+)+))|(?<type>env:)(?<name>[A-Za-z0-9_]+))(?:\?(?<value>[^\}]*))?\}", RegexOptions.Compiled);
+        static readonly Regex varableReference = new Regex(@"\$\{(?:(?<type>ssm:)(?:(?<name>(\/[A-Za-z0-9-_]+)+))|(?<type>env:)(?<name>[A-Za-z0-9_]+))(?:\?(?<value>[^\}]*))?\}", RegexOptions.Compiled);
         static readonly Lazy<AmazonSimpleSystemsManagementClient> ssm = new Lazy<AmazonSimpleSystemsManagementClient>(() 
             => new AmazonSimpleSystemsManagementClient(AmazonAccount.Credentials.Value, Amazon.RegionEndpoint.GetBySystemName(AmazonAccount.RegionName)));
         public static string Expand(string s)
@@ -31,24 +31,39 @@ namespace s3iLib
             s = Environment.ExpandEnvironmentVariables(s);  // OS specific
             s = varableReference.Replace(s, m =>
             {
-                var type = m.Groups["type"]?.Value;
-                var name = m.Groups["name"]?.Value;
-                var value = m.Groups["value"]?.Value;
-                switch (type)
+                var type = m.Groups["type"];
+                var name = m.Groups["name"];
+                if (type.Success && name.Success)
                 {
-                    case "ssm:":
-                        try {
-                            return ssm.Value.GetParameterAsync(new GetParameterRequest { Name = name, }).Result.Parameter.Value;
-                        } catch(AggregateException x) {
-                            if(x.InnerExceptions.Any(xx => xx is ParameterNotFoundException)) {
-                                return value;
+                    var value = m.Groups["value"];
+                    switch (type.Value)
+                    {
+                        case "ssm:":
+                            try
+                            {
+                                return ssm.Value.GetParameterAsync(new GetParameterRequest { Name = name.Value, }).Result.Parameter.Value;
                             }
-                            throw;
-                        }
-                    case "env:":
-                        return Environment.GetEnvironmentVariable(name) ?? value;    // OS agnostic
+                            catch (AggregateException x)
+                            {
+                                if (x.InnerExceptions.Any(xx => xx is ParameterNotFoundException))
+                                {
+                                    if (value.Success) return value.Value;
+                                    throw new ArgumentException($"SSM parameter not found: {name}");
+                                }
+                                throw;
+                            }
+                        case "env:":    // OS agnostic
+                            var envar = Environment.GetEnvironmentVariable(name.Value);
+                            if(null != envar) return envar;
+                            if (value.Success) return value.Value;
+                            throw new ArgumentException($"Environment Variable not found: {name}");
+                    }
                 }
-                throw new ArgumentException($"Invalid variable type ({type}) in: '{m.Value}', only ssm: or env: supported");
+                else
+                {
+                    // fall through
+                }
+                throw new ArgumentException($"Invalid variable reference in: '{m.Value}'");
             });
             return s;
         }
