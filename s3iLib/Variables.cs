@@ -19,53 +19,101 @@ using Amazon.S3.Util;
 
 namespace s3iLib
 {
-    public static class Variables
+   public class Variables : Dictionary<string, string>
     {
         // ${type:name[?default_value]}, use type/name to resolve, or return default_value
-        // type supported are: ssm and env
-        static readonly Regex varableReference = new Regex(@"\$\{(?:(?<type>ssm:)(?:(?<name>(\/[A-Za-z0-9-_]+)+))|(?<type>env:)(?<name>[A-Za-z0-9_]+))(?:\?(?<value>[^\}]*))?\}", RegexOptions.Compiled);
-        static readonly Lazy<AmazonSimpleSystemsManagementClient> ssm = new Lazy<AmazonSimpleSystemsManagementClient>(() 
-            => new AmazonSimpleSystemsManagementClient(AmazonAccount.Credentials.Value, Amazon.RegionEndpoint.GetBySystemName(AmazonAccount.RegionName)));
-        public static string Expand(string s)
+        // types supported are: ssm, env, and var (== no type)
+        readonly Regex rexVar;
+        public Dictionary<string, Func<string, string, string>> Resolvers { get; }
+        Lazy<AmazonSimpleSystemsManagementClient> ssm;
+        public Variables(Dictionary<string, Func<string, string, string>> resolvers = null, string prefix = @"\$\{", string suffix = @"\}")
         {
-            s = Environment.ExpandEnvironmentVariables(s);  // OS specific
-            s = varableReference.Replace(s, m =>
+            rexVar = new Regex(prefix + @"((?<type>[a-z]+):)?(?<name>[\/A-Za-z0-9-_\.]+)(\?(?<value>[^\}]*))?" + suffix, RegexOptions.Compiled);
+            if(!string.IsNullOrWhiteSpace(AmazonAccount.RegionName)) {
+                ssm = new Lazy<AmazonSimpleSystemsManagementClient>(()
+                    => new AmazonSimpleSystemsManagementClient(AmazonAccount.Credentials.Value, Amazon.RegionEndpoint.GetBySystemName(AmazonAccount.RegionName)));
+            }
+            Resolvers = resolvers;
+        }
+        public string Expand(string s, Func<string, string, string, string> resolver)
+        {
+            s = rexVar.Replace(s, m =>
             {
-                var type = m.Groups["type"];
                 var name = m.Groups["name"];
-                if (type.Success && name.Success)
+                var type = m.Groups["type"];
+                var value = m.Groups["value"];
+                if(!name.Success) throw new FormatException($"Invalid variable ref in '{m.Value}'");
+                return resolver(name.Value, type.Success? type.Value : null, value.Success ? value.Value : null);
+            });
+            return s;
+        }
+        public string Expand(string s)
+        {
+            var s2 = Expand(s, (name, type, value) =>
+            {
+                if (!string.IsNullOrWhiteSpace(type))
                 {
-                    var value = m.Groups["value"];
-                    switch (type.Value)
+                    switch (type)
                     {
-                        case "ssm:":
+                        case "ssm":
                             try
                             {
-                                return ssm.Value.GetParameterAsync(new GetParameterRequest { Name = name.Value, }).Result.Parameter.Value;
+                                return ssm.Value.GetParameterAsync(new GetParameterRequest { Name = name, }).Result.Parameter.Value;
                             }
                             catch (AggregateException x)
                             {
                                 if (x.InnerExceptions.Any(xx => xx is ParameterNotFoundException))
                                 {
-                                    if (value.Success) return value.Value;
-                                    throw new ArgumentException($"SSM parameter not found: {name}");
+                                    return value ?? throw new ArgumentException($"SSM parameter not found: '{name}'");
                                 }
                                 throw;
                             }
-                        case "env:":    // OS agnostic
-                            var envar = Environment.GetEnvironmentVariable(name.Value);
-                            if(null != envar) return envar;
-                            if (value.Success) return value.Value;
-                            throw new ArgumentException($"Environment Variable not found: {name}");
+                        case "env":    // OS agnostic
+                            var envar = System.Environment.GetEnvironmentVariable(name);
+                            if (null != envar) return envar;
+                            return value ?? throw new ArgumentException($"Environment variable not found: '{name}'");
+                        case "var":
+                            break;  // same as no type
+                        default:
+                            if(null != Resolvers && Resolvers.TryGetValue(type, out var res)) return res(name, value); 
+                            throw new ArgumentException($"Unsupported variable type: '{type}:{name}'");
+                    }
+                }
+                // ${name[?value]}
+                if (base.TryGetValue(name, out var val)) return val;
+                return val ?? throw new ArgumentException($"Undefined variable: '{name}'");
+            });
+            return s2 == s ? s2 : Expand(s2);
+        }
+        /// <summary>Read simple yaml-compatible map of 'name: value' lines</summart>
+        public async Task<Variables> Read(Stream stream, Func<string, bool> redefine = null, Func<string, bool> mismatch = null)
+        {
+            var rexLine = new Regex(@"(?<name>[^:]+):\s*(?<value>.*)\s*");
+            using var reader = new StreamReader(stream);
+            for (string line; null != (line = await reader.ReadLineAsync().ConfigureAwait(false));)
+            {
+                var p = line.IndexOfAny(new char [] { '#' });
+                if(0 <= p) line = line.Substring(0, p);
+                line  = line.Trim();
+                if(string.IsNullOrWhiteSpace(line)) continue;
+                var m = rexLine.Match(line);
+                if(m.Success)
+                {
+                    var name = m.Groups["name"].Value;
+                    var value = Expand(m.Groups["value"].Value);
+                    if(!TryAdd(name, value))
+                    {
+                        if(redefine?.Invoke(name) ?? false) {
+                            this[name] = value;
+                        }
                     }
                 }
                 else
                 {
-                    // fall through
+                    if(!mismatch?.Invoke(line) ?? false) break;
                 }
-                throw new ArgumentException($"Invalid variable reference in: '{m.Value}'");
-            });
-            return s;
+            }
+            return this;
         }
-    }
+   }
 }

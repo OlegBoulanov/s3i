@@ -99,7 +99,16 @@ namespace s3i
 
             var remove = new List<string>();
             IEnumerable<ProductInfo> uninstall = new List<ProductInfo>(), install = null;
-            var products = await ProductCollection.ReadProducts(commandLine.Arguments.Select((uri, index) => { return new Uri(uri); })).ConfigureAwait(false);
+            Variables vars = null;
+            if(!string.IsNullOrWhiteSpace(commandLine.PathToVariables))
+            {
+                vars = await new Variables().Read(new FileStream(commandLine.PathToVariables, FileMode.Open));
+                if(commandLine.Verbose)
+                {
+                    Console.WriteLine(vars.Aggregate($"Variables[{vars.Count}]:", (a, v) => $"{Environment.NewLine}  {v}"));
+                }
+            }
+            var products = await ProductCollection.ReadProducts(commandLine.Arguments.Select((uri, index) => { return new Uri(uri); }), vars).ConfigureAwait(false);
             products.MapToLocal(commandLine.StagingFolder);
             if (commandLine.Verbose)
             {

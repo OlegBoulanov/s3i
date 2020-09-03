@@ -39,13 +39,13 @@ namespace s3iLib
         }
         const string sectionDefine = "$define$";
         const string sectionProducts = "$products$";
-        public static async Task<ProductCollection> FromIni(Stream stream, DateTimeOffset lastModified, Uri baseUri = null)
+        public static async Task<ProductCollection> FromIni(Stream stream, DateTimeOffset lastModified, Uri baseUri = null, Variables vars = null)
         {
             var defines = new Dictionary<string, string>();
             var products = new ProductCollection();
             await IniReader.Read(stream, (sectionName, keyName, keyValue) =>
             {
-                keyValue = Variables.Expand(keyValue.Expand(defines));
+                keyValue = vars.Expand(keyValue.Expand(defines));
                 if (sectionProducts.Equals(sectionName, StringComparison.InvariantCultureIgnoreCase))
                 {
                     var nextUri = null != baseUri ? baseUri.BuildRelativeUri(keyValue) : new Uri(keyValue);
@@ -65,7 +65,7 @@ namespace s3iLib
             }).ConfigureAwait(false);
             return products;
         }
-        public static async Task<ProductCollection> ReadProducts(Downloader downloader, Uri uri)
+        public static async Task<ProductCollection> ReadProducts(Downloader downloader, Uri uri, Variables vars = null)
         {
             Contract.Requires(null != downloader);
             Contract.Requires(null != uri);
@@ -79,7 +79,7 @@ namespace s3iLib
                         await Task.CompletedTask.ConfigureAwait(false);
                         break;
                     case ".INI":
-                        products.AddRange(await ProductCollection.FromIni(stream, lastModified, uri).ConfigureAwait(false));
+                        products.AddRange(await ProductCollection.FromIni(stream, lastModified, uri, vars).ConfigureAwait(false));
                         break;
                     case ".JSON":
                         products.AddRange(await ProductCollection.FromJson(stream, lastModified).ConfigureAwait(false));
@@ -98,7 +98,7 @@ namespace s3iLib
             }
             return products;
         }
-        public static async Task<ProductCollection> ReadProducts(IEnumerable<Uri> uris)
+        public static async Task<ProductCollection> ReadProducts(IEnumerable<Uri> uris, Variables vars = null)
         {
             var products = new ProductCollection();
             var arrayOfProducts = await Task.WhenAll(
@@ -107,7 +107,7 @@ namespace s3iLib
                 {
                     tasks.Add(Task<ProductCollection>.Run(() =>
                     {
-                        return ReadProducts(Downloader.Select(configFileUri), configFileUri);
+                        return ReadProducts(Downloader.Select(configFileUri), configFileUri, vars);
                     }));
                     return tasks;
                 })).ConfigureAwait(false);
