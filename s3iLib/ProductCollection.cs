@@ -45,7 +45,8 @@ namespace s3iLib
             var products = new ProductCollection();
             await IniReader.Read(stream, (sectionName, keyName, keyValue) =>
             {
-                keyValue = vars.Expand(keyValue.Expand(defines));
+                keyValue = keyValue.Expand(defines);
+                if(null != vars) keyValue = vars.Expand(keyValue);
                 if (sectionProducts.Equals(sectionName, StringComparison.InvariantCultureIgnoreCase))
                 {
                     var nextUri = null != baseUri ? baseUri.BuildRelativeUri(keyValue) : new Uri(keyValue);
