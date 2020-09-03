@@ -22,10 +22,10 @@ namespace s3i
         [CommandLineKey("Environment variable name (default command line)", "-e", "--envvar <var-name>")]
         public string EnvironmentVariableName { get; set; } = "s3i_args";
 
-        [CommandLineKey("Path to staging folder", "-s", "--stage <path>")]
+        [CommandLineKey("Path to variables file (yaml map format)", "-z", "--vars <path>")]
         public string PathToVariables { get; set; } = null;
 
-        [CommandLineKey("Path to variables file (yaml map format)", "-z", "--vars <path>")]
+        [CommandLineKey("Path to staging folder", "-s", "--stage <path>")]
         public string StagingFolder { get; set; } = null;
 
         [CommandLineKey("Clear staging folder at startup", "-c", "--clean")]
