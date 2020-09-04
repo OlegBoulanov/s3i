@@ -99,10 +99,10 @@ namespace s3i
 
             var remove = new List<string>();
             IEnumerable<ProductInfo> uninstall = new List<ProductInfo>(), install = null;
-            Variables vars = null;
+            Variables vars = new Variables();   // need instance to expand ${}
             if(!string.IsNullOrWhiteSpace(commandLine.PathToVariables))
             {
-                vars = await new Variables().Read(new FileStream(commandLine.PathToVariables, FileMode.Open));
+                vars = await vars.Read(new FileStream(commandLine.PathToVariables, FileMode.Open));
                 if(commandLine.Verbose)
                 {
                     Console.WriteLine(vars.Aggregate($"Variables[{vars.Count}]:", (a, v) => $"{Environment.NewLine}  {v}"));
