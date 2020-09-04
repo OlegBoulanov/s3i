@@ -81,7 +81,7 @@ namespace s3iLib
                 }
                 // ${name[?value]}
                 if (base.TryGetValue(name, out var val)) return val;
-                return val ?? throw new ArgumentException($"Undefined variable: '{name}'");
+                return value ?? throw new ArgumentException($"Undefined variable: '{name}'");
             });
             return s2 == s ? s2 : Expand(s2);
         }
