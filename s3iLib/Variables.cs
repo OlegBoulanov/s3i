@@ -26,9 +26,9 @@ namespace s3iLib
         readonly Regex rexVar;
         public Dictionary<string, Func<string, string, string>> Resolvers { get; }
         Lazy<AmazonSimpleSystemsManagementClient> ssm;
-        public Variables(Dictionary<string, Func<string, string, string>> resolvers = null, string prefix = @"\$\{", string suffix = @"\}")
+        public Variables(Dictionary<string, Func<string, string, string>> resolvers = null)
         {
-            rexVar = new Regex(prefix + @"((?<type>[a-z]+):)?(?<name>[\/A-Za-z0-9-_\.]+)(\?(?<value>(\${[^\}]+}|[^\}]*)))?" + suffix, RegexOptions.Compiled);
+            rexVar = new Regex(@"\${((?<type>[a-z]+):)?(?<name>[\/A-Za-z0-9-_\.]+)(\?(?<value>(\${[^\}]+}|[^\}]*)))?}", RegexOptions.Compiled);
             if(!string.IsNullOrWhiteSpace(AmazonAccount.RegionName)) {
                 ssm = new Lazy<AmazonSimpleSystemsManagementClient>(()
                     => new AmazonSimpleSystemsManagementClient(AmazonAccount.Credentials.Value, Amazon.RegionEndpoint.GetBySystemName(AmazonAccount.RegionName)));
