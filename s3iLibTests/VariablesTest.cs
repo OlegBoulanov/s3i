@@ -57,9 +57,13 @@ one:1
             using var stream = new MemoryStream(System.Text.Encoding.UTF8.GetBytes(file));
             var vars = new Variables().Read(stream).Result;
             Assert.AreEqual(3, vars.Count);
+            Assert.AreEqual("1", vars["one"]);
+            Assert.AreEqual("222", vars["two"]);
             Assert.AreEqual("== 1+222 ==", vars["three"]);
             Assert.AreEqual("== 1+222 ==", vars.Expand("${nope?${three}}"));
             Assert.AreEqual("== 1+222 ==", vars.Expand("${three?nope}"));
+            Assert.AreEqual("== 1+222 ==", vars.Expand("${three?${two}}"));
+            Assert.AreEqual("== 1+222 ==", vars.Expand("${three?${nope}}"));
         }
     }
 }
