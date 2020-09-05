@@ -52,13 +52,14 @@ namespace s3iLibTests
 one:1
   two:   222
      # comment
-   three: == ${one}+${two}
+   three: == ${one}+${two} ==
             ";
             using var stream = new MemoryStream(System.Text.Encoding.UTF8.GetBytes(file));
             var vars = new Variables().Read(stream).Result;
             Assert.AreEqual(3, vars.Count);
-            Assert.AreEqual("== 1+222", vars["three"]);
-            Assert.AreEqual("== 1+222", vars.Expand("${three}"));
+            Assert.AreEqual("== 1+222 ==", vars["three"]);
+            Assert.AreEqual("== 1+222 ==", vars.Expand("${nope?${three}}"));
+            Assert.AreEqual("== 1+222 ==", vars.Expand("${three?nope}"));
         }
     }
 }
