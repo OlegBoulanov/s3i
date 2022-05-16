@@ -23,14 +23,14 @@
       <![CDATA[Installed OR (WIXNETFX4RELEASEINSTALLED >= "#$(var.NetFx472)")]]>
     </Condition>
     -->
-    
+    <!--
     <Property Id="NETCOREHOSTVERSION">
       <RegistrySearch Id="NetCoreHostVersion" Type="raw" Win64="yes" Root="HKLM" Key="SOFTWARE\dotnet\Setup\InstalledVersions\x64\sharedhost" Name="Version" />
     </Property>
     <Condition Message="This setup requires .NET Core 3.1">
       <![CDATA[Installed OR (NETCOREHOSTVERSION >= "3.1.0")]]>
     </Condition>
-
+    -->
     <util:Group Id="AdminGroup" Name="Administrators"/>
 
     <Property Id="CMDLINEARGS" Admin="yes"> </Property>
