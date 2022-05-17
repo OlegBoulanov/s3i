@@ -45,15 +45,6 @@
       <Directory Id="ProgramFilesFolder">
         <Directory Id="INSTALLDIR" Name="$(var.Manufacturer)">
           <Directory Id="Product_Root" Name="$(var.ProductName)">
-            <!--runtimes\win\lib\netstandard2.0-->
-            <Directory Id="runtimes" Name="runtimes">
-              <Directory Id="runtimes.win" Name="win">
-                <Directory Id="runtimes.win.lib" Name="lib">
-                  <Directory Id="runtimes.win.lib.netcoreapp2.0" Name="netcoreapp2.0" />
-                  <Directory Id="runtimes.win.lib.netstandard2.0" Name="netstandard2.0" />
-                </Directory>
-              </Directory>
-            </Directory>
           </Directory>
         </Directory>
       </Directory>
@@ -73,7 +64,6 @@
         <File Id="s3i.exe" Name="s3i.exe" Vital="yes"/>
         <File Id="s3i.deps.json" Name="s3i.deps.json" Vital="yes"/>
         <File Id="s3i.runtimeconfig.json" Name="s3i.runtimeconfig.json" Vital="yes"/>
-        <File Id="s3i.runtimeconfig.dev.json" Name="s3i.runtimeconfig.dev.json" Vital="yes"/>
         <File Id="s3iLib.dll" Name="s3iLib.dll" Vital="yes"/>
         <Environment Id="path" Name="PATH" Value="[Product_Root]" Action="set" System="yes" Part="last" Permanent="no" />
       </Component>
@@ -81,7 +71,6 @@
         <File Id="s3iWorker.exe" Name="s3iWorker.exe" Source="$(var.s3iWorker.TargetDir)s3iWorker.exe" Vital="yes" KeyPath="yes"/>
         <File Id="s3iWorker.dll" Name="s3iWorker.dll" Source="$(var.s3iWorker.TargetDir)s3iWorker.dll" Vital="yes"/>
         <File Id="s3iWorker.deps.json" Name="s3iWorker.deps.json" Source="$(var.s3iWorker.TargetDir)s3iWorker.deps.json" Vital="yes"/>
-        <File Id="s3iWorker.runtimeconfig.dev.json" Name="s3iWorker.runtimeconfig.dev.json" Source="$(var.s3iWorker.TargetDir)s3iWorker.runtimeconfig.dev.json" Vital="yes"/>
         <File Id="s3iWorker.runtimeconfig.json" Name="s3iWorker.runtimeconfig.json" Source="$(var.s3iWorker.TargetDir)s3iWorker.runtimeconfig.json" Vital="yes"/>
         <File Id="appsettings.Development.json" Name="appsettings.Development.json" Source="$(var.s3iWorker.TargetDir)appsettings.Development.json" Vital="yes"/>
         <File Id="appsettings.json" Name="appsettings.json" Source="$(var.s3iWorker.TargetDir)appsettings.json" Vital="yes"/>
@@ -122,22 +111,9 @@
       </Component>
     </DirectoryRef>
 
-    <DirectoryRef Id="runtimes.win.lib.netcoreapp2.0">
-      <Component Id="runtimes.netcoreapp2.0" Guid="{A42FF591-8E16-40DB-8720-2D95490F63E7}">
-        <File Id="runtimes.netcoreapp2.0.System.Diagnostics.EventLog.dll" Name="System.Diagnostics.EventLog.dll" Source="$(var.s3iWorker.TargetDir)runtimes\win\lib\netcoreapp2.0\System.Diagnostics.EventLog.dll" Vital="yes" KeyPath="yes"/>
-      </Component>
-    </DirectoryRef>
-    <DirectoryRef Id="runtimes.win.lib.netstandard2.0">
-      <Component Id="runtimes.netstandard2.0" Guid="{E2500EA6-D752-4525-9F62-A002A8CBB105}">
-        <File Id="runtimes.netstandard2.0.System.ServiceProcess.ServiceController.dll" Name="System.ServiceProcess.ServiceController.dll" Source="$(var.s3iWorker.TargetDir)runtimes\win\lib\netstandard2.0\System.ServiceProcess.ServiceController.dll" Vital="yes" KeyPath="yes"/>
-      </Component>
-    </DirectoryRef>
-
     <Feature Id="ProductFeature" Title="s3i" Level="1">
       <ComponentRef Id="s3iCommandLine" />
       <ComponentRef Id="s3iWorker" />
-      <ComponentRef Id="runtimes.netcoreapp2.0"/>
-      <ComponentRef Id="runtimes.netstandard2.0"/>
       <ComponentRef Id="AWSSDK" />
     </Feature>
 

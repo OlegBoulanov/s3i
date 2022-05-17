@@ -2,11 +2,9 @@
 
   <PropertyGroup>
     <OutputType>Exe</OutputType>
-    <TargetFramework>netcoreapp3.1</TargetFramework>
-    <PublishTrimmed>true</PublishTrimmed>
-    <!--PublishReadyToRun>true</PublishReadyToRun>
-    <PublishSingleFile>true</PublishSingleFile>
-    <RuntimeIdentifier>win-x64</RuntimeIdentifier-->
+    <TargetFramework>net6.0-windows</TargetFramework>
+    <RuntimeIdentifier>win-x64</RuntimeIdentifier>
+    <SelContained>false</SelContained>
     <!--for VSCode to follow error click-->
     <GenerateFullPaths>true</GenerateFullPaths>
     <UserSecretsId>dotnet-s3iWorker-B25F4EE2-1834-4E3A-A446-747DD117F03F</UserSecretsId>
