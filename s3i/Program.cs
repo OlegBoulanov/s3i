@@ -34,9 +34,8 @@ namespace s3i
         static async Task<int> AsyncMain(string[] args)
         {
             int exitCode = 0;
-            var assembly = Assembly.GetExecutingAssembly();
-            var exeFileName = Path.GetFileNameWithoutExtension(assembly.Location);
-            var version = FileVersionInfo.GetVersionInfo(assembly.Location);
+            var exeFileName = Path.GetFileNameWithoutExtension(Environment.ProcessPath);
+            var version = FileVersionInfo.GetVersionInfo(Environment.ProcessPath);
             var commandLine = new CommandLine
             {
                 HelpHeader = $"{exeFileName}: msi package batch installer v{version.ProductVersion}{Environment.NewLine}"
