@@ -72,7 +72,6 @@
         <File Id="s3i.exe" Name="s3i.exe" Vital="yes"/>
         <File Id="s3i.deps.json" Name="s3i.deps.json" Vital="yes"/>
         <File Id="s3i.runtimeconfig.json" Name="s3i.runtimeconfig.json" Vital="yes"/>
-        <File Id="s3i.runtimeconfig.dev.json" Name="s3i.runtimeconfig.dev.json" Vital="yes"/>
         <File Id="s3iLib.dll" Name="s3iLib.dll" Vital="yes"/>
         <Environment Id="path" Name="PATH" Value="[Product_Root]" Action="set" System="yes" Part="last" Permanent="no" />
       </Component>
@@ -80,7 +79,6 @@
         <File Id="s3iWorker.exe" Name="s3iWorker.exe" Source="$(var.s3iWorker.TargetDir)s3iWorker.exe" Vital="yes" KeyPath="yes"/>
         <File Id="s3iWorker.dll" Name="s3iWorker.dll" Source="$(var.s3iWorker.TargetDir)s3iWorker.dll" Vital="yes"/>
         <File Id="s3iWorker.deps.json" Name="s3iWorker.deps.json" Source="$(var.s3iWorker.TargetDir)s3iWorker.deps.json" Vital="yes"/>
-        <File Id="s3iWorker.runtimeconfig.dev.json" Name="s3iWorker.runtimeconfig.dev.json" Source="$(var.s3iWorker.TargetDir)s3iWorker.runtimeconfig.dev.json" Vital="yes"/>
         <File Id="s3iWorker.runtimeconfig.json" Name="s3iWorker.runtimeconfig.json" Source="$(var.s3iWorker.TargetDir)s3iWorker.runtimeconfig.json" Vital="yes"/>
         <File Id="appsettings.Development.json" Name="appsettings.Development.json" Source="$(var.s3iWorker.TargetDir)appsettings.Development.json" Vital="yes"/>
         <File Id="appsettings.json" Name="appsettings.json" Source="$(var.s3iWorker.TargetDir)appsettings.json" Vital="yes"/>
