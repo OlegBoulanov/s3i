@@ -123,9 +123,9 @@
 
     <DirectoryRef Id="runtimes.win.lib.net6.0">
       <Component Id="runtimes.net6.0" Guid="{A42FF591-8E16-40DB-8720-2D95490F63E7}">
-        <File Id="runtimes.net6.0.System.Diagnostics.EventLog.dll" Name="System.Diagnostics.EventLog.dll" Source="$(var.s3iWorker.TargetDir)runtimes\win\lib\net6.0\System.Diagnostics.EventLog.dll" Vital="yes" KeyPath="yes"/>
         <File Id="runtimes.net6.0.System.Diagnostics.EventLog.Messages.dll" Name="System.Diagnostics.EventLog.Messages.dll" Source="$(var.s3iWorker.TargetDir)runtimes\win\lib\net6.0\System.Diagnostics.EventLog.Messages.dll" Vital="yes" KeyPath="yes"/>
-        <File Id="runtimes.net6.0.System.ServiceProcess.ServiceController.dll" Name="System.ServiceProcess.ServiceController.dll" Source="$(var.s3iWorker.TargetDir)runtimes\win\lib\net6.0\System.ServiceProcess.ServiceController.dll" Vital="yes" KeyPath="yes"/>
+        <File Id="runtimes.net6.0.System.Diagnostics.EventLog.dll" Name="System.Diagnostics.EventLog.dll" Source="$(var.s3iWorker.TargetDir)runtimes\win\lib\net6.0\System.Diagnostics.EventLog.dll" Vital="yes"/>
+        <File Id="runtimes.net6.0.System.ServiceProcess.ServiceController.dll" Name="System.ServiceProcess.ServiceController.dll" Source="$(var.s3iWorker.TargetDir)runtimes\win\lib\net6.0\System.ServiceProcess.ServiceController.dll" Vital="yes"/>
       </Component>
     </DirectoryRef>
 
