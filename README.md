@@ -34,3 +34,7 @@ Detailed desription can be found in [wiki](https://github.com/OlegBoulanov/s3i/w
 
 Latest version of `s3i.msi` can be installed from [Releases page](https://github.com/OlegBoulanov/s3i/releases/latest)
 
+## Project maintenance
+Integration with Github and AppVeyor: token change
+- git config --global credential.helper store
+- git clone https://OlegBoulanov:**github-token-for-appveyor**@github.com/OlegBoulanov/s3i
