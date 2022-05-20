@@ -16,7 +16,7 @@ namespace s3iWorker
         [CommandLineKey("Run in command line mode", "-c", "--console")]
         public bool RunConsole { get; set; }
         [CommandLineKey("Path to excutable to run", "-p", "--path <path-to-exe>")]
-        public string ProcessFilePath { get; set; } = $"{Path.GetDirectoryName(HttpUtility.UrlDecode(new Uri(System.Reflection.Assembly.GetExecutingAssembly().CodeBase).AbsolutePath))}{Path.DirectorySeparatorChar}s3i.exe";
+        public string ProcessFilePath { get; set; } = $"{Path.GetDirectoryName(System.Reflection.Assembly.GetExecutingAssembly().Location)}{Path.DirectorySeparatorChar}s3i.exe";
         [CommandLineKey("Process timeout", "-t", "--timeout <timespan>")]
         public TimeSpan ProcessTimeout { get; set; } = TimeSpan.FromMinutes(5);
         [CommandLineKey("Process start delay", "-d", "--delay <timespan>")]
