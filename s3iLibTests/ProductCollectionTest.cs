@@ -149,10 +149,11 @@ Three    = https://xxx.s3.amazonaws.com/Test/Windows10/Distrib//SecondProduct/9.
         {
             var tempFilePath = Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location);
             var dlls = Directory.EnumerateFileSystemEntries(tempFilePath, "AWSSDK*.dll", SearchOption.AllDirectories).Select(s => Path.Combine(tempFilePath, s)).ToList();
-            Assert.That(dlls.Count(), Is.EqualTo(3));
+            Assert.That(dlls.Count(), Is.EqualTo(4));
             Assert.That(dlls.Contains($"{Path.Combine(tempFilePath, "AWSSDK.Core.dll")}"));
             Assert.That(dlls.Contains($"{Path.Combine(tempFilePath, "AWSSDK.S3.dll")}"));
             Assert.That(dlls.Contains($"{Path.Combine(tempFilePath, "AWSSDK.SecurityToken.dll")}"));
+            Assert.That(dlls.Contains($"{Path.Combine(tempFilePath, "AWSSDK.SimpleSystemsManagement.dll")}"));
         }
 
         [Test]
