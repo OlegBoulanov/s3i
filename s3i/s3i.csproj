@@ -1,32 +1,26 @@
-﻿<Project Sdk="Microsoft.NET.Sdk">
-
-  <PropertyGroup>
-    <OutputType>Exe</OutputType>
-    <TargetFramework>net6.0</TargetFramework>
-    <SelContained>false</SelContained>
-<!--
+<Project Sdk="Microsoft.NET.Sdk">
+	<PropertyGroup>
+		<OutputType>Exe</OutputType>
+		<TargetFramework>net6.0</TargetFramework>
+		<SelContained>false</SelContained>
+		<!--
     <PublishTrimmed>true</PublishTrimmed>
     <PublishSingleFile>true</PublishSingleFile>
     <RuntimeIdentifier>win-x64</RuntimeIdentifier>
 -->
-    <GenerateFullPaths>true</GenerateFullPaths>
-  </PropertyGroup>
-
-  <PropertyGroup>
-    <GenerateAssemblyInfo>false</GenerateAssemblyInfo>
-    <IsPublishable>true</IsPublishable>
-  </PropertyGroup>
-  
-  <ItemGroup>
-    <PackageReference Include="AWSSDK.S3" Version="3.3.106.6" />
-    <PackageReference Include="AWSSDK.SimpleSystemsManagement" Version="3.3.106.6" />
-    <PackageReference Include="AWSSDK.SecurityToken" Version="3.3.103.13" />
-    <PackageReference Include="System.Text.Json" Version="4.6.0" />
-    <!--PackageReference Include="Newtonsoft.Json" Version="12.0.2" /-->
-  </ItemGroup>
-  
-  <ItemGroup>
-    <ProjectReference Include="..\s3iLib\s3iLib.csproj" />
-  </ItemGroup>
-  
+		<GenerateFullPaths>true</GenerateFullPaths>
+	</PropertyGroup>
+	<PropertyGroup>
+		<GenerateAssemblyInfo>false</GenerateAssemblyInfo>
+		<IsPublishable>true</IsPublishable>
+	</PropertyGroup>
+	<ItemGroup>
+		<PackageReference Include="AWSSDK.S3" Version="3.7.9.4"/>
+		<PackageReference Include="AWSSDK.SimpleSystemsManagement" Version="3.7.17.6"/>
+		<PackageReference Include="AWSSDK.SecurityToken" Version="3.7.1.153"/>
+		<PackageReference Include="System.Text.Json" Version="6.0.4"/>
+	</ItemGroup>
+	<ItemGroup>
+		<ProjectReference Include="..\s3iLib\s3iLib.csproj"/>
+	</ItemGroup>
 </Project>
