@@ -37,4 +37,4 @@ Latest version of `s3i.msi` can be installed from [Releases page](https://github
 ## Project maintenance
 Integration with Github and AppVeyor: token change
 - git config --global credential.helper store
-- git clone https://OlegBoulanov:**github-token-for-appveyor**@github.com/OlegBoulanov/s3i
+- git clone https<notatag>://OlegBoulanov:**github-token-for-appveyor**@github.com/OlegBoulanov/s3i
