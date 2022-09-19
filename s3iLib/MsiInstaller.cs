@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Globalization;
 using System.IO;
 using System.Runtime.InteropServices;
@@ -12,9 +13,14 @@ namespace s3iLib
 {
     public class MsiInstaller : Installer
     {
+        //
+        // https://learn.microsoft.com/en-us/windows/win32/msi/error-codes
+        //
         public static string MsiExec { get; set; } = "msiexec.exe";
         public static string SupportedFileExtension { get; set; } = ".msi";
         public static char [] CharsToQuote = new char [] { ' ', '\t', '<', '>' };
+        public static IEnumerable<int> RetryOnErrors = new List<int> { 1618, };
+        public static TimeSpan RetryDelay = TimeSpan.FromSeconds(8);
         public static int RunInstall(string commandLineArgs, bool dryrun, TimeSpan timeout)
         {
             if (RuntimeInformation.IsOSPlatform(OSPlatform.Windows))
@@ -23,14 +29,26 @@ namespace s3iLib
                 {
                     var cmdexe = "cmd.exe";
                     var args = $"/c {MsiExec.Quote(null)} {commandLineArgs}";
-                    using var process = Process.Start(cmdexe, args);
-                    if (timeout.TotalMilliseconds <= 0) return 0;
-                    if (false == process.WaitForExit((int)timeout.TotalMilliseconds) || 0 != process.ExitCode)
+                    for (var attempt = 0; ++attempt <= 4; )
                     {
-                        Console.WriteLine($"{cmdexe} {args}");
-                        Console.WriteLine($"{MsiExec} failed with {process.ExitCode}");
+                        using var process = Process.Start(cmdexe, args);
+                        if (timeout.TotalMilliseconds <= 0) return 0;
+                        if (false == process.WaitForExit((int)timeout.TotalMilliseconds) || 0 != process.ExitCode)
+                        {
+                            Console.WriteLine($"{cmdexe} {args}");
+                            Console.WriteLine($"{MsiExec} failed with {process.ExitCode}");
+                        }
+                        if(RetryOnErrors.Contains(process.ExitCode)) 
+                        {
+                            var delay = attempt * RetryDelay;
+                            Console.WriteLine($"... will retry after {delay} ...");
+                            Task.Delay(delay);
+                        }
+                        else
+                        {
+                            return process.ExitCode;
+                        }
                     }
-                    return process.ExitCode;
                 }
                 else
                 {
