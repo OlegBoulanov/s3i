@@ -41,8 +41,8 @@ namespace s3iLib
                         if(RetryOnErrors.Contains(process.ExitCode)) 
                         {
                             var delay = attempt * RetryDelay;
-                            Console.WriteLine($"... will retry after {delay} ...");
-                            Task.Delay(delay);
+                            Console.WriteLine($"... will retry after {delay} delay ...");
+                            Task.Delay(delay).Wait();
                         }
                         else
                         {
