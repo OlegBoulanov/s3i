@@ -46,7 +46,8 @@ namespace s3i
             if(string.IsNullOrWhiteSpace(commandLine.Out)) return await AsyncMain(commandLine);
             // redirected output
             Console.WriteLine($"Redirecting output to {commandLine.Out}");
-            Directory.CreateDirectory(Path.GetDirectoryName(commandLine.Out));
+            var dir = Path.GetDirectoryName(commandLine.Out);
+            if (!string.IsNullOrWhiteSpace(dir)) Directory.CreateDirectory(dir);
             using var fileStream = new FileStream(commandLine.Out, FileMode.Create);
             using var streamWriter = new StreamWriter(fileStream);
             Console.SetOut(streamWriter);
