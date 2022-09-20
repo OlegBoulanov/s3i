@@ -45,13 +45,24 @@ namespace s3i
             commandLine.SetDefaults(exeFileName);
             if(string.IsNullOrWhiteSpace(commandLine.Out)) return await AsyncMain(commandLine);
             // redirected output
-            Console.WriteLine($"Redirecting output to {commandLine.Out}");
-            Directory.CreateDirectory(Path.GetDirectoryName(commandLine.Out));
-            using var fileStream = new FileStream(commandLine.Out, FileMode.Create);
-            using var streamWriter = new StreamWriter(fileStream);
-            Console.SetOut(streamWriter);
-            Console.SetError(streamWriter);
-            return await AsyncMain(commandLine);
+            var cout = Console.Out;
+            var cerr = Console.Error;
+            try
+            {
+                if (commandLine.Verbose) Console.WriteLine($"Redirecting output to {commandLine.Out}");
+                var dir = Path.GetDirectoryName(commandLine.Out);
+                if (!string.IsNullOrWhiteSpace(dir)) Directory.CreateDirectory(dir);
+                using var fileStream = new FileStream(commandLine.Out, FileMode.Create);
+                using var streamWriter = new StreamWriter(fileStream);
+                Console.SetOut(streamWriter);
+                Console.SetError(streamWriter);
+                return await AsyncMain(commandLine);
+            }
+            finally
+            {
+                Console.SetOut(cout);
+                Console.SetError(cerr);
+            }
         }
         static async Task<int> AsyncMain(CommandLine commandLine)
         {
