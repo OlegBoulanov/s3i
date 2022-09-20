@@ -33,7 +33,6 @@ namespace s3i
 #pragma warning disable CA1303// warning CA1303: Method '***' passes a literal string as parameter 'value'
         static async Task<int> AsyncMain(string[] args)
         {
-            int exitCode = 0;
             var exeFileName = Path.GetFileNameWithoutExtension(Environment.ProcessPath);
             var version = FileVersionInfo.GetVersionInfo(Environment.ProcessPath);
             var commandLine = new CommandLine
@@ -44,6 +43,17 @@ namespace s3i
             };
             commandLine.Parse(args.Select(a => Environment.ExpandEnvironmentVariables(a)));
             commandLine.SetDefaults(exeFileName);
+            if(string.IsNullOrWhiteSpace(commandLine.Out)) return await AsyncMain(commandLine);
+            // redirected output
+            using var fileStream = new FileStream(commandLine.Out, FileMode.Create);
+            using var streamWriter = new StreamWriter(fileStream);
+            Console.SetOut(streamWriter);
+            Console.SetError(streamWriter);
+            return await AsyncMain(commandLine);
+        }
+        static async Task<int> AsyncMain(CommandLine commandLine)
+        {
+            int exitCode = 0;
             // decide if help needed
             if (commandLine.Arguments.Count < 1)
             {

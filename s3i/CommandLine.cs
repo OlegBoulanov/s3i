@@ -43,6 +43,9 @@ namespace s3i
         [CommandLineKey("Dry run", "-d", "--dryrun")]
         public bool DryRun { get; set; } = false;
 
+        [CommandLineKey("Redirect output to file", "-o", "--out <path>")]
+        public string Out { get; set; }
+        
         [CommandLineKey("Print full log info", "-v", "--verbose")]
         public bool Verbose { get; set; }
     }
