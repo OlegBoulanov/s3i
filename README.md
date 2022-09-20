@@ -27,14 +27,18 @@ Detailed desription can be found in [wiki](https://github.com/OlegBoulanov/s3i/w
 
 ## Installation Prerequisites
 
-- Windows 7/10/* (comes with [Windows Installer](https://docs.microsoft.com/en-us/windows/win32/msi/overview-of-windows-installer))
-   - [.NET Core Runtime 3.1.0](https://dotnet.microsoft.com/download/dotnet-core/3.1) installed
+- Windows 10/* (comes with [Windows Installer](https://docs.microsoft.com/en-us/windows/win32/msi/overview-of-windows-installer))
+   - [.NET 6.0](https://dotnet.microsoft.com/en-us/download/dotnet/6.0) Runtime installed
 
 ## Installation 
 
 Latest version of `s3i.msi` can be installed from [Releases page](https://github.com/OlegBoulanov/s3i/releases/latest)
 
 ## Project maintenance
-Integration with Github and AppVeyor: token change
+### Integration with Github and AppVeyor: token change
 - git config --global credential.helper store
 - git clone https<notatag>://OlegBoulanov:**github-token-for-appveyor**@github.com/OlegBoulanov/s3i
+### Making release
+- Push/merge to release branch
+- New version artifacts will be uploaded here: https://github.com/OlegBoulanov/s3i/releases
+
