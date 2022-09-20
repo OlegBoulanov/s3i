@@ -166,6 +166,15 @@ namespace s3i
                 var temp = Environment.GetEnvironmentVariable("TEMP") ?? $"{Environment.GetEnvironmentVariable("HOME")}{Path.DirectorySeparatorChar}Temp";
                 commandLine.StagingFolder = $"{temp}{Path.DirectorySeparatorChar}{exeFileName}";
             }
+            if (null != commandLine.Out)
+            {
+                if (string.IsNullOrWhiteSpace(commandLine.Out)) commandLine.Out = $"{exeFileName}.log";
+                if (!Path.IsPathRooted(commandLine.Out))
+                {
+                    commandLine.Out = Path.Combine(commandLine.StagingFolder, commandLine.Out);
+                    //if (commandLine.Verbose) Console.WriteLine($"Assuming output: {commandLine.Out}");
+                }
+            }
         }
 #pragma warning disable CA1031// warning CA1031: Modify '***' to catch a more specific exception type, or rethrow the exception.
 #pragma warning disable CA1303// warning CA1303: Method '***' passes a literal string as parameter 'value'
