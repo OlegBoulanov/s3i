@@ -81,10 +81,15 @@ namespace s3i
                 else
                 {
                     var defaultArgs = defaultCommandLine.Split(new char[] { ' ' }, StringSplitOptions.RemoveEmptyEntries);
-                    commandLine.Parse(defaultArgs);
-                    if (commandLine.Arguments.Count < 1)
+                    if (defaultArgs.Any()) 
+                    {
+                        // guess it's safe to recurse?
+                        return await AsyncMain(defaultArgs);
+                    }
+                    else
                     {
                         Console.WriteLine(commandLine.Help());
+                        return exitCode;
                     }
                 }
             }
