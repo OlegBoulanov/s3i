@@ -24,19 +24,19 @@ namespace s3iLib
                 throw new ApplicationException($"Can't find AWS profile [{ProfileName}]");
             // we need to avoid unnecessary AssumeRole() if running on EC2 and the role is available
             // see https://aws.amazon.com/blogs/security/announcing-an-update-to-iam-role-trust-policy-behavior/
-            string profileRoleName = null;
+            string instanceRoleName = null;
             try
             {
                 var instanceRoles = InstanceProfileAWSCredentials.GetAvailableRoles();
-                profileRoleName = instanceRoles?.FirstOrDefault(role => profile.Options.RoleArn.EndsWith(role));
+                instanceRoleName = instanceRoles?.FirstOrDefault(role => profile.Options.RoleArn.EndsWith(role));
             }
             catch (Exception)
             {
                 // not running on EC2
             }
-            return string.IsNullOrWhiteSpace(profileRoleName)
-                ? profile.GetAWSCredentials(profile.CredentialProfileStore)
-                : new InstanceProfileAWSCredentials(profileRoleName);
+            return string.IsNullOrWhiteSpace(instanceRoleName) || !profile.Options.RoleArn.EndsWith(instanceRoleName)
+                ? profile.GetAWSCredentials(profile.CredentialProfileStore) // follow standard chain: https://docs.aws.amazon.com/sdk-for-net/v3/developer-guide/creds-assign.html
+                : new InstanceProfileAWSCredentials(instanceRoleName);      // use instance refreshed credentials directly (not assuming any roles)
         });
 
     }
