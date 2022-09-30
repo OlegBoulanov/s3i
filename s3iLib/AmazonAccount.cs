@@ -6,6 +6,7 @@ using System.IO;
 using System.Threading.Tasks;
 using System.Diagnostics.Contracts;
 
+using Amazon;
 using Amazon.Runtime;
 using Amazon.Runtime.CredentialManagement;
 using Amazon.S3;
@@ -34,7 +35,9 @@ namespace s3iLib
             {
                 // not running on EC2
             }
-            return string.IsNullOrWhiteSpace(instanceRoleName) || !profile.Options.RoleArn.EndsWith(instanceRoleName)
+            var parts = profile.Options.RoleArn.Split('/');     // arn:aws:iam::1234567890:role/name
+            var roleName = 2 == parts.Length ? parts[1] : "";   // never null
+            return string.IsNullOrWhiteSpace(instanceRoleName) || !roleName.Equals(instanceRoleName)
                 ? profile.GetAWSCredentials(profile.CredentialProfileStore) // follow standard chain: https://docs.aws.amazon.com/sdk-for-net/v3/developer-guide/creds-assign.html
                 : new InstanceProfileAWSCredentials(instanceRoleName);      // use instance refreshed credentials directly (not assuming any roles)
         });
