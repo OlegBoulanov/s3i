@@ -21,6 +21,10 @@ namespace s3iLib
         public static string ProfileName { get; set; } = "default";
         public static Lazy<AWSCredentials> Credentials { get; } = new Lazy<AWSCredentials>(() =>
         {
+            if(string.IsNullOrWhiteSpace(ProfileName))
+            {
+                return new InstanceProfileAWSCredentials();
+            }
             if (!new CredentialProfileStoreChain().TryGetProfile(ProfileName, out var profile))
                 throw new ApplicationException($"Can't find AWS profile [{ProfileName}]");
             // we need to avoid unnecessary AssumeRole() if running on EC2 and the role is available
